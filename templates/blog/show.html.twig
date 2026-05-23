@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.effectiveMetaTitle }} — {{ studio_name }}{% endblock %}
+{% block meta_description %}{{ article.effectiveMetaDescription }}{% endblock %}
+
+{% block og_image %}
+    {% if article.coverImageName %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/articles/' ~ article.coverImageName)) }}">
+    {% else %}
+        <meta property="og:image" content="https://picsum.photos/seed/article{{ article.id }}/1200/630">
+    {% endif %}
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="{{ article.publishedAt|date('c') }}">
+    <meta property="article:section" content="{{ article.category.name }}">
+{% endblock %}
+
+{% block body %}
+<article class="blog-article">
+    <header class="page-header">
+        <div class="container" style="max-width: 800px;">
+            <p class="section-subtitle text-light opacity-50 mb-2">
+                <a href="{{ path('app_blog_category', { slug: article.category.slug }) }}" class="text-light text-decoration-none">{{ article.category.name }}</a>
+            </p>
+            <h1>{{ article.title }}</h1>
+            <p class="small opacity-75 mt-3">
+                {{ article.publishedAt|date('d F Y')|capitalize }}
+                <span class="mx-2">•</span>
+                {{ article.readingTimeMinutes }} min de lecture
+                {% if article.author %}
+                    <span class="mx-2">•</span>
+                    Par {{ article.author }}
+                {% endif %}
+            </p>
+        </div>
+    </header>
+
+    {% set cover = article.coverImageName ? asset('uploads/articles/' ~ article.coverImageName) : 'https://picsum.photos/seed/article' ~ article.id ~ '/1600/700' %}
+    <div class="blog-cover-wrap">
+        <div class="container" style="max-width: 1100px;">
+            <img src="{{ cover }}" alt="{{ article.title }}" class="img-fluid rounded shadow-sm">
+        </div>
+    </div>
+
+    <section class="section pt-5">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <div class="article-content">
+                        <p class="lead text-muted mb-4">{{ article.excerpt }}</p>
+                        {{ article.content|markdown }}
+                    </div>
+
+                    <hr class="my-5">
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="text-muted small">Partager :</span>
+                            {% set url = absolute_url(path('app_blog_show', { slug: article.slug })) %}
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ url|url_encode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-dark" aria-label="Partager sur Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ url|url_encode }}&text={{ article.title|url_encode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-dark" aria-label="Partager sur Twitter">
+                                <i class="bi bi-twitter-x"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ url|url_encode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-dark" aria-label="Partager sur LinkedIn">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                            <a href="mailto:?subject={{ article.title|url_encode }}&body={{ url }}" class="btn btn-sm btn-outline-dark" aria-label="Partager par email">
+                                <i class="bi bi-envelope"></i>
+                            </a>
+                        </div>
+                        <a href="{{ path('app_blog') }}" class="btn btn-dark">
+                            <i class="bi bi-arrow-left me-2"></i>Tous les articles
+                        </a>
+                    </div>
+                </div>
+
+                <aside class="col-lg-4">
+                    {% include 'blog/_sidebar.html.twig' %}
+                </aside>
+            </div>
+        </div>
+    </section>
+</article>
+
+{% if recentArticles|length > 0 %}
+<section class="section bg-white border-top">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-subtitle">À lire ensuite</p>
+            <h2 class="section-title">Articles récents</h2>
+        </div>
+        <div class="row g-4">
+            {% for a in recentArticles|slice(0, 3) %}
+                <div class="col-md-4">
+                    <article class="blog-card h-100">
+                        {% set img = a.coverImageName ? asset('uploads/articles/' ~ a.coverImageName) : 'https://picsum.photos/seed/article' ~ a.id ~ '/800/500' %}
+                        <a href="{{ path('app_blog_show', { slug: a.slug }) }}" class="blog-card-cover">
+                            <img src="{{ img }}" alt="{{ a.title }}" loading="lazy">
+                        </a>
+                        <div class="blog-card-body">
+                            <p class="small text-muted mb-2">{{ a.publishedAt|date('d M Y') }} • {{ a.category.name }}</p>
+                            <h4 class="serif fs-5">
+                                <a href="{{ path('app_blog_show', { slug: a.slug }) }}" class="text-decoration-none text-dark">{{ a.title }}</a>
+                            </h4>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# Structured data (JSON-LD) for SEO #}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": {{ article.title|json_encode|raw }},
+    "description": {{ article.effectiveMetaDescription|json_encode|raw }},
+    "image": {{ cover|json_encode|raw }},
+    "datePublished": "{{ article.publishedAt|date('c') }}",
+    "dateModified": "{{ article.updatedAt|date('c') }}",
+    "author": {
+        "@type": "Person",
+        "name": "{{ article.author ?? studio_name }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ studio_name }}"
+    },
+    "mainEntityOfPage": "{{ absolute_url(path('app_blog_show', { slug: article.slug })) }}"
+}
+</script>
+{% endblock %}

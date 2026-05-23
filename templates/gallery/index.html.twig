@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Galerie — {{ studio_name }}{% endblock %}
+{% block meta_description %}Découvrez la galerie de {{ studio_name }} : mariages, portraits, événements et plus.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Galerie</h1>
+        <p>{{ totalPhotos }} photo{{ totalPhotos > 1 ? 's' : '' }} à découvrir</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if categories|length > 0 %}
+            <div class="category-pills d-flex flex-wrap gap-2 justify-content-center mb-5" data-aos="fade-up">
+                <a href="{{ path('app_gallery') }}" class="btn active">Tout voir</a>
+                {% for category in categories %}
+                    <a href="{{ path('app_gallery_category', { slug: category.slug }) }}" class="btn">{{ category.name }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if totalPhotos == 0 %}
+            <p class="text-center text-muted py-5">La galerie est en cours de construction. Revenez très bientôt !</p>
+        {% else %}
+            <div class="photo-grid">
+                {% for photo in photos %}
+                    {% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/800/' ~ (700 + (photo.id * 37) % 400) %}
+                    <a class="photo-card" href="{{ path('app_photo_show', { id: photo.id }) }}" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 50 }}">
+                        <img src="{{ img }}" alt="{{ photo.title }}" loading="lazy">
+                        <div class="overlay">
+                            <div>
+                                <h5>{{ photo.title }}</h5>
+                                <small>{{ photo.category.name }}</small>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+            {% if totalPages > 1 %}
+                <nav aria-label="Pagination de la galerie" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                            <a class="page-link" href="{{ currentPage > 1 ? path('app_gallery', { page: currentPage - 1 }) : '#' }}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% for p in 1..totalPages %}
+                            <li class="page-item {{ p == currentPage ? 'active' : '' }}">
+                                <a class="page-link" href="{{ path('app_gallery', { page: p }) }}">{{ p }}</a>
+                            </li>
+                        {% endfor %}
+                        <li class="page-item {{ currentPage >= totalPages ? 'disabled' : '' }}">
+                            <a class="page-link" href="{{ currentPage < totalPages ? path('app_gallery', { page: currentPage + 1 }) : '#' }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

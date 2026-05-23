@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ gallery.title }} — Galerie privée{% endblock %}
+{% block meta_description %}Galerie privée — accès réservé.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">
+            <i class="bi bi-lock-fill me-1"></i>Galerie privée
+        </p>
+        <h1>{{ gallery.title }}</h1>
+        <p>Bienvenue {{ gallery.clientName }} — {{ gallery.photos|length }} photo{{ gallery.photos|length > 1 ? 's' : '' }}</p>
+
+        {% if gallery.allowDownload and gallery.photos|length > 0 %}
+            <div class="mt-4">
+                <a href="{{ path('app_client_gallery_download_all', { token: gallery.token }) }}" class="btn btn-light btn-lg px-4">
+                    <i class="bi bi-cloud-download me-2"></i>Tout télécharger en ZIP
+                </a>
+            </div>
+        {% endif %}
+
+        <div class="mt-3">
+            <a href="{{ path('app_client_gallery_logout', { token: gallery.token }) }}" class="small text-light opacity-75 text-decoration-none">
+                <i class="bi bi-box-arrow-right me-1"></i>Se déconnecter
+            </a>
+        </div>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if gallery.welcomeMessage %}
+            <div class="bg-white p-4 rounded shadow-sm border mb-5">
+                <p class="mb-0" style="white-space: pre-line;">{{ gallery.welcomeMessage }}</p>
+            </div>
+        {% endif %}
+
+        {% if gallery.photos|length == 0 %}
+            <p class="text-center text-muted py-5">La galerie est vide pour le moment. Le photographe ajoutera bientôt vos photos.</p>
+        {% else %}
+            <div class="photo-grid">
+                {% for photo in gallery.photos %}
+                    <div class="photo-card client-photo" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 50 }}">
+                        <a class="glightbox" href="{{ path('app_client_gallery_photo', { token: gallery.token, photoId: photo.id }) }}"
+                           data-gallery="client" data-title="{{ photo.title }}">
+                            <img src="{{ path('app_client_gallery_photo', { token: gallery.token, photoId: photo.id }) }}" alt="{{ photo.title }}" loading="lazy">
+                        </a>
+                        {% if gallery.allowDownload %}
+                            <a href="{{ path('app_client_gallery_download', { token: gallery.token, photoId: photo.id }) }}"
+                               class="client-photo-download" title="Télécharger" aria-label="Télécharger {{ photo.title }}">
+                                <i class="bi bi-download"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-5 small text-muted">
+            <p class="mb-1"><i class="bi bi-shield-check me-1"></i>Cette galerie est privée. Le lien et le mot de passe vous sont strictement personnels.</p>
+            {% if gallery.expiresAt %}
+                <p class="mb-0">Accès valable jusqu'au {{ gallery.expiresAt|date('d/m/Y') }}.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Témoignages clients — {{ studio_name }}{% endblock %}
+{% block meta_description %}Avis et témoignages de clients satisfaits — {{ studio_name }}.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Ils m'ont fait confiance</h1>
+        <p>Quelques mots de mes clients</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if testimonials|length == 0 %}
+            <p class="text-center text-muted">Aucun témoignage pour le moment.</p>
+        {% else %}
+            <div class="row g-4">
+                {% for t in testimonials %}
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                        <div class="testimonial-card h-100">
+                            <div class="text-warning mb-3">
+                                {% for i in 1..t.rating %}<i class="bi bi-star-fill"></i>{% endfor %}
+                                {% for i in t.rating+1..5 %}<i class="bi bi-star text-muted opacity-25"></i>{% endfor %}
+                            </div>
+                            <blockquote class="serif fs-5 mb-3">« {{ t.content }} »</blockquote>
+                            <footer>
+                                <strong>{{ t.authorName }}</strong>
+                                {% if t.authorRole %}
+                                    <div class="text-muted small">{{ t.authorRole }}</div>
+                                {% endif %}
+                            </footer>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted mb-3">Vous avez travaillé avec moi ?</p>
+                <a href="{{ path('app_contact') }}" class="btn btn-outline-dark px-4">Partagez votre expérience</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

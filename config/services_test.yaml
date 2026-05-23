@@ -1,0 +1,3 @@
+# services_test.yaml — empty on purpose.
+# In tests, static::getContainer() returns a TestContainer that exposes
+# private services automatically, so no need to re-declare anything here.

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for u in urls %}
+    <url>
+        <loc>{{ url(u.route) }}</loc>
+        <changefreq>{{ u.changefreq }}</changefreq>
+        <priority>{{ u.priority }}</priority>
+    </url>
+{% endfor %}
+{% for category in categories %}
+    <url>
+        <loc>{{ url('app_gallery_category', { slug: category.slug }) }}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+{% endfor %}
+{% for photo in photos %}
+    <url>
+        <loc>{{ url('app_photo_show', { id: photo.id }) }}</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+{% endfor %}
+{% for ac in articleCategories %}
+    <url>
+        <loc>{{ url('app_blog_category', { slug: ac.slug }) }}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+{% endfor %}
+{% for article in articles %}
+    <url>
+        <loc>{{ url('app_blog_show', { slug: article.slug }) }}</loc>
+        <lastmod>{{ (article.updatedAt ?? article.publishedAt)|date('Y-m-d') }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+{% endfor %}
+</urlset>

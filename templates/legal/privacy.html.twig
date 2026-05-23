@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de confidentialité — {{ studio_name }}{% endblock %}
+{% block meta_description %}Politique de confidentialité et gestion des données personnelles — {{ studio_name }}.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Politique de confidentialité</h1>
+        <p>Conforme au RGPD — dernière mise à jour : {{ "now"|date('d/m/Y') }}</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container" style="max-width: 800px;">
+        <h3 class="serif mt-4">Responsable du traitement</h3>
+        <p>{{ studio_name }} — {{ contact_email }}</p>
+
+        <h3 class="serif mt-4">Données collectées</h3>
+        <p>Nous collectons les données suivantes uniquement avec votre consentement :</p>
+        <ul>
+            <li><strong>Formulaire de contact :</strong> nom, email, téléphone (optionnel), type de projet, date et message.</li>
+            <li><strong>Newsletter :</strong> adresse email.</li>
+            <li><strong>Cookies :</strong> uniquement les cookies techniques nécessaires au fonctionnement du site (session, CSRF).</li>
+        </ul>
+
+        <h3 class="serif mt-4">Finalité</h3>
+        <p>Vos données servent uniquement à :</p>
+        <ul>
+            <li>Répondre à vos demandes de devis et organiser vos séances</li>
+            <li>Vous envoyer notre newsletter si vous y êtes inscrit</li>
+            <li>Assurer le bon fonctionnement du site</li>
+        </ul>
+        <p>Aucune donnée n'est revendue ou transmise à des tiers à des fins commerciales.</p>
+
+        <h3 class="serif mt-4">Durée de conservation</h3>
+        <ul>
+            <li>Demandes de contact : 3 ans à compter du dernier échange.</li>
+            <li>Abonnement newsletter : jusqu'au désabonnement.</li>
+        </ul>
+
+        <h3 class="serif mt-4">Vos droits</h3>
+        <p>Conformément au RGPD et à la loi Informatique et Libertés, vous disposez d'un droit d'accès, de rectification, de suppression, d'opposition, de limitation et de portabilité de vos données.</p>
+        <p>Pour exercer ces droits, contactez-nous à <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+        <p>Vous pouvez également introduire une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>.</p>
+
+        <h3 class="serif mt-4">Cookies</h3>
+        <p>Ce site n'utilise que des cookies techniques strictement nécessaires (session PHP, jeton CSRF). Aucun cookie de tracking ou publicitaire n'est déposé.</p>
+    </div>
+</section>
+{% endblock %}

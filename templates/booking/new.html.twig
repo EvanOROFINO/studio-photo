@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver — {{ service.title }} — {{ studio_name }}{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">Réservation</p>
+        <h1>{{ service.title }}</h1>
+        <p>Réservez votre séance en ligne avec un acompte de 30%</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if demo_mode %}
+            <div class="alert alert-info mx-auto mb-4" style="max-width: 760px;">
+                <i class="bi bi-info-circle me-1"></i>
+                <strong>Mode démo</strong> — Stripe n'est pas configuré. Le paiement sera simulé pour vous permettre de tester le flux complet. Aucune carte bancaire ne sera débitée.
+            </div>
+        {% endif %}
+
+        <div class="bg-white p-3 p-md-4 rounded shadow-sm border mb-4">
+            <h5 class="serif mb-2"><i class="bi bi-calendar3 me-2"></i>Sélectionnez votre date</h5>
+            <p class="text-muted small mb-3">Les jours en rouge ou gris sont indisponibles. Cliquez sur une date libre pour la pré-sélectionner.</p>
+            <div id="booking-calendar"></div>
+            <p class="small text-muted mt-2 mb-0" id="booking-calendar-selected">Aucune date sélectionnée</p>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <div class="bg-white p-4 p-md-5 rounded shadow-sm border">
+                    <h3 class="serif mb-4">Vos informations</h3>
+                    {{ form_start(form, { 'attr': { 'novalidate': 'novalidate' } }) }}
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form_row(form.clientName) }}</div>
+                            <div class="col-md-6">{{ form_row(form.clientEmail) }}</div>
+                            <div class="col-md-6">{{ form_row(form.clientPhone) }}</div>
+                            <div class="col-md-6">{{ form_row(form.eventDate) }}</div>
+                            <div class="col-12">{{ form_row(form.location) }}</div>
+                            <div class="col-12">{{ form_row(form.notes) }}</div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-dark btn-lg px-4">
+                                    <i class="bi bi-credit-card me-2"></i>Payer l'acompte ({{ deposit|number_format(0, ',', ' ') }} €)
+                                </button>
+                                <p class="small text-muted mt-2 mb-0">
+                                    <i class="bi bi-shield-lock me-1"></i>Paiement sécurisé par Stripe. Le solde sera réglé après la séance.
+                                </p>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="bg-light p-4 p-md-5 rounded">
+                    <h5 class="serif mb-3"><i class="bi bi-receipt me-2"></i>Récapitulatif</h5>
+                    <ul class="list-unstyled mb-3">
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Prestation</span>
+                            <strong>{{ service.title }}</strong>
+                        </li>
+                        {% if service.duration %}
+                            <li class="d-flex justify-content-between py-2 border-bottom">
+                                <span>Durée</span>
+                                <span>{{ service.duration }}</span>
+                            </li>
+                        {% endif %}
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <span>Tarif total</span>
+                            <strong>{{ total|number_format(0, ',', ' ') }} €</strong>
+                        </li>
+                        <li class="d-flex justify-content-between py-2 border-bottom text-success">
+                            <span>Acompte (30%) à régler maintenant</span>
+                            <strong class="fs-5">{{ deposit|number_format(0, ',', ' ') }} €</strong>
+                        </li>
+                        <li class="d-flex justify-content-between py-2">
+                            <span>Solde après séance</span>
+                            <span>{{ (total - deposit)|number_format(0, ',', ' ') }} €</span>
+                        </li>
+                    </ul>
+
+                    <hr>
+                    <h6 class="small text-uppercase fw-bold mb-2">Conditions</h6>
+                    <ul class="small text-muted">
+                        <li>L'acompte verrouille la date dans mon agenda.</li>
+                        <li>Annulation sans frais jusqu'à 30 jours avant la séance.</li>
+                        <li>Annulation entre 30 et 7 jours : acompte conservé.</li>
+                        <li>Annulation à moins de 7 jours : totalité due.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/fr.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('booking-calendar');
+    const dateInput = document.querySelector('input[name="booking[eventDate]"]');
+    const selectedLabel = document.getElementById('booking-calendar-selected');
+    if (!el || !dateInput) return;
+
+    const calendar = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        firstDay: 1,
+        height: 'auto',
+        validRange: { start: new Date() },
+        headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+        events: '{{ path('app_availability_api') }}',
+        eventDisplay: 'block',
+        dateClick: function (info) {
+            const isBusy = calendar.getEvents().some(e => {
+                const start = new Date(e.start); start.setHours(0,0,0,0);
+                const end = e.end ? new Date(e.end) : new Date(start.getTime() + 86400000);
+                return info.date >= start && info.date < end;
+            });
+            if (isBusy) {
+                selectedLabel.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Cette date est indisponible.</span>';
+                return;
+            }
+            dateInput.value = info.dateStr;
+            selectedLabel.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Date sélectionnée : <strong>' + info.dateStr.split('-').reverse().join('/') + '</strong>';
+            document.querySelectorAll('.fc-day-selected-custom').forEach(c => c.classList.remove('fc-day-selected-custom'));
+            info.dayEl.classList.add('fc-day-selected-custom');
+        },
+    });
+    calendar.render();
+
+    // Sync if user types the date manually
+    dateInput.addEventListener('change', () => {
+        if (dateInput.value) {
+            selectedLabel.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Date sélectionnée : <strong>' + dateInput.value.split('-').reverse().join('/') + '</strong>';
+        }
+    });
+});
+</script>
+<style>
+.fc-day-selected-custom { background: rgba(200, 169, 126, 0.25) !important; }
+.fc-day-disabled { background: #f8f9fa !important; }
+</style>
+{% endblock %}

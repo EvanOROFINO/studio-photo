@@ -1,0 +1,19 @@
+# Racine du projet — utilisé UNIQUEMENT si l'hébergeur ne permet pas de
+# définir le DocumentRoot directement sur /public/.
+#
+# La méthode recommandée chez OVH/Infomaniak/o2switch reste de pointer
+# le domaine sur le dossier "public/" via le panneau d'administration.
+# Ce fichier est un filet de secours.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Réécrit toute requête qui n'est pas déjà dans /public vers /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Bloque l'accès aux fichiers sensibles à la racine
+<FilesMatch "(^\.|composer\.(json|lock)|\.env|README|CHANGELOG|LICENSE|phpunit)">
+    Require all denied
+</FilesMatch>

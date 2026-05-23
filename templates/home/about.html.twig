@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}À propos — {{ studio_name }}{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>À propos</h1>
+        <p>Un regard, une histoire à raconter</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <img src="https://images.unsplash.com/photo-1554941426-86f86f8a4b04?w=800&auto=format&fit=crop"
+                     alt="Portrait du photographe" class="img-fluid rounded shadow-sm">
+            </div>
+            <div class="col-lg-7">
+                <p class="section-subtitle">Photographe à {{ studio_city }}</p>
+                <h2 class="section-title">Enchanté, je suis votre photographe.</h2>
+                <p class="lead text-muted">Passionné depuis plus de dix ans par l'art de capturer l'émotion, je travaille en lumière naturelle pour livrer des images sincères et intemporelles.</p>
+                <p>Mon approche : prendre le temps de vous connaître, m'effacer pour que les vrais moments s'expriment, puis vous livrer des images que vous garderez toute une vie. Pas de poses figées, pas de mises en scène artificielles — juste vous, dans ce qui vous rend uniques.</p>
+                <p>Basé à {{ studio_city }}, je me déplace partout en France et à l'étranger pour vos mariages, séances famille, portraits professionnels ou événements d'entreprise.</p>
+
+                <div class="row mt-5 g-3">
+                    <div class="col-6 col-lg-4">
+                        <div class="p-3 border rounded text-center">
+                            <h3 class="serif mb-1 text-accent">10+</h3>
+                            <small class="text-muted">Années d'expérience</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="p-3 border rounded text-center">
+                            <h3 class="serif mb-1 text-accent">200+</h3>
+                            <small class="text-muted">Mariages couverts</small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="p-3 border rounded text-center">
+                            <h3 class="serif mb-1 text-accent">98%</h3>
+                            <small class="text-muted">Clients satisfaits</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section bg-white border-top">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-subtitle">Mes valeurs</p>
+            <h2 class="section-title">Ce qui guide chaque séance</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <i class="bi bi-heart-fill text-accent fs-1 mb-3 d-block"></i>
+                <h4 class="serif">Authenticité</h4>
+                <p class="text-muted">Des images qui vous ressemblent, pas des mises en scène.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="bi bi-clock-fill text-accent fs-1 mb-3 d-block"></i>
+                <h4 class="serif">Patience</h4>
+                <p class="text-muted">Je prends le temps qu'il faut pour capter le bon instant.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="bi bi-award-fill text-accent fs-1 mb-3 d-block"></i>
+                <h4 class="serif">Qualité</h4>
+                <p class="text-muted">Matériel pro, post-traitement soigné, livraison rapide.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section bg-dark text-white text-center">
+    <div class="container">
+        <h2 class="section-title">Prêt à créer ensemble ?</h2>
+        <a href="{{ path('app_contact') }}" class="btn btn-light btn-lg px-4 mt-3">Me contacter</a>
+    </div>
+</section>
+{% endblock %}

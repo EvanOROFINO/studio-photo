@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales — {{ studio_name }}{% endblock %}
+{% block meta_description %}Mentions légales du site {{ studio_name }}.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Mentions légales</h1>
+        <p>Dernière mise à jour : {{ "now"|date('d/m/Y') }}</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container" style="max-width: 800px;">
+        <h3 class="serif mt-4">Éditeur du site</h3>
+        <p>Le présent site est édité par <strong>{{ studio_name }}</strong>, photographe indépendant.</p>
+        <ul>
+            <li>Statut : Entrepreneur individuel (auto-entrepreneur)</li>
+            <li>SIRET : à compléter</li>
+            <li>Adresse : {{ studio_city }}, France</li>
+            <li>Email : <a href="mailto:{{ contact_email }}">{{ contact_email }}</a></li>
+            <li>Téléphone : {{ contact_phone }}</li>
+        </ul>
+
+        <h3 class="serif mt-4">Directeur de la publication</h3>
+        <p>Le directeur de la publication est le photographe éditeur du site.</p>
+
+        <h3 class="serif mt-4">Hébergement</h3>
+        <p>Ce site est hébergé par : à compléter (ex : OVH, 2 rue Kellermann, 59100 Roubaix, France).</p>
+
+        <h3 class="serif mt-4">Propriété intellectuelle</h3>
+        <p>L'ensemble des photographies, textes, logos et éléments graphiques présents sur ce site sont la propriété exclusive de {{ studio_name }} et sont protégés par les lois françaises et internationales relatives à la propriété intellectuelle.</p>
+        <p>Toute reproduction, représentation, modification, publication ou adaptation, totale ou partielle, des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation écrite préalable.</p>
+
+        <h3 class="serif mt-4">Droit à l'image</h3>
+        <p>Les personnes apparaissant sur les photographies publiées ont donné leur autorisation écrite. Toute personne souhaitant le retrait d'une image la concernant peut en faire la demande à <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+
+        <h3 class="serif mt-4">Liens hypertextes</h3>
+        <p>Le site peut contenir des liens vers d'autres sites. {{ studio_name }} n'est pas responsable du contenu de ces sites externes.</p>
+
+        <h3 class="serif mt-4">Données personnelles</h3>
+        <p>Consultez notre <a href="{{ path('app_privacy') }}">politique de confidentialité</a> pour plus d'informations.</p>
+    </div>
+</section>
+{% endblock %}

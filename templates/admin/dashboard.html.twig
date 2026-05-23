@@ -1,0 +1,61 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Bienvenue, {{ app.user.fullName ?? app.user.email }} 👋{% endblock %}
+
+{% block main %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">Photos publiées</div>
+                <div class="h2 mb-0">{{ totalPhotos }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">À la une</div>
+                <div class="h2 mb-0">{{ featuredPhotos }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 {{ newMessages > 0 ? 'border-warning' : '' }}">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">Nouveaux messages</div>
+                <div class="h2 mb-0 {{ newMessages > 0 ? 'text-warning' : '' }}">{{ newMessages }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">Total demandes</div>
+                <div class="h2 mb-0">{{ totalMessages }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="mb-3">Démarrer</h5>
+        <p class="text-muted">Voici quelques actions courantes :</p>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\PhotoCrudController').setAction('new') }}" class="btn btn-primary">
+                <i class="fa fa-plus me-1"></i> Ajouter une photo
+            </a>
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\CategoryCrudController').setAction('index') }}" class="btn btn-outline-primary">
+                Gérer les catégories
+            </a>
+            <a href="{{ ea_url().setController('App\\Controller\\Admin\\ContactRequestCrudController').setAction('index') }}" class="btn btn-outline-primary">
+                Voir les demandes
+            </a>
+            <a href="/" target="_blank" class="btn btn-outline-secondary">
+                <i class="fa fa-external-link-alt me-1"></i> Voir le site
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

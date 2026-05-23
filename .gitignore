@@ -1,0 +1,52 @@
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> studio-photo ###
+# Photos uploaded via admin (never commit user content)
+/public/uploads/photos/*
+!/public/uploads/photos/.gitkeep
+/public/uploads/articles/*
+!/public/uploads/articles/.gitkeep
+
+# Private client galleries (stored outside public/)
+/var/client-galleries/
+
+# Release artifacts
+/build/
+/dist/
+/release/
+*.zip
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Database dumps
+*.sql
+!migrations/*.sql
+
+# Local secrets
+/secrets/
+###< studio-photo ###

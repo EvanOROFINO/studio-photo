@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Disponibilités — {{ studio_name }}{% endblock %}
+{% block meta_description %}Calendrier des disponibilités de {{ studio_name }} pour vos séances photo, mariages et événements.{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Disponibilités</h1>
+        <p>Trouvez la date qui vous convient et réservez en ligne</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container" style="max-width: 1000px;">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge" style="background:#198754; width:1.2rem; height:1.2rem;">&nbsp;</span>
+                    <span>Disponible — réservable</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge" style="background:#dc3545; width:1.2rem; height:1.2rem;">&nbsp;</span>
+                    <span>Date déjà réservée</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge" style="background:#6c757d; width:1.2rem; height:1.2rem;">&nbsp;</span>
+                    <span>Indisponible (congés…)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-3 p-md-4 rounded shadow-sm border">
+            <div id="availability-calendar"></div>
+        </div>
+
+        <div class="alert alert-info mt-4 small">
+            <i class="bi bi-info-circle me-1"></i>
+            Une date qui vous intéresse est <strong>libre</strong> ? <a href="{{ path('app_services') }}" class="alert-link">Choisissez une prestation</a> et réservez en ligne. Le solde est à régler après la séance.
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/fr.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('availability-calendar');
+    if (!el) return;
+    const calendar = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        firstDay: 1,
+        height: 'auto',
+        validRange: { start: new Date() },
+        headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+        events: '{{ path('app_availability_api') }}',
+        eventDisplay: 'block',
+        dayCellDidMount: function (info) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            if (info.date >= today) {
+                info.el.style.cursor = 'pointer';
+            }
+        },
+        dateClick: function (info) {
+            // Click on free day → go to services to pick one
+            const isBusy = calendar.getEvents().some(e => {
+                const start = new Date(e.start); start.setHours(0,0,0,0);
+                const end = e.end ? new Date(e.end) : new Date(start.getTime() + 86400000);
+                return info.date >= start && info.date < end;
+            });
+            if (!isBusy) {
+                window.location.href = '{{ path('app_services') }}';
+            }
+        },
+    });
+    calendar.render();
+});
+</script>
+{% endblock %}

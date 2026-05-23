@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Prestations & tarifs — {{ studio_name }}{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Prestations</h1>
+        <p>Des formules adaptées à chaque occasion</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if services|length == 0 %}
+            <p class="text-center text-muted">Les prestations seront bientôt disponibles. <a href="{{ path('app_contact') }}">Contactez-moi</a> pour un devis personnalisé.</p>
+        {% else %}
+            <div class="row g-4">
+                {% for service in services %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="service-card">
+                            <i class="bi {{ service.icon }} icon"></i>
+                            <h4 class="serif">{{ service.title }}</h4>
+                            <p class="text-muted">{{ service.description }}</p>
+                            {% if service.duration %}
+                                <p class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>{{ service.duration }}</p>
+                            {% endif %}
+                            {% if service.priceFrom %}
+                                <p class="price">À partir de {{ service.priceFrom|number_format(0, ',', ' ') }} €</p>
+                            {% endif %}
+                            <div class="d-flex gap-2 mt-2 flex-wrap">
+                                {% if service.priceFrom %}
+                                    <a href="{{ path('app_booking_new', { id: service.id }) }}" class="btn btn-dark btn-sm">
+                                        <i class="bi bi-credit-card me-1"></i>Réserver en ligne
+                                    </a>
+                                {% endif %}
+                                <a href="{{ path('app_contact') }}" class="btn btn-outline-dark btn-sm">Sur devis</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted small">Tous les devis sont personnalisés selon votre projet. N'hésitez pas à me contacter pour un échange.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

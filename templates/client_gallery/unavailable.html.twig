@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Galerie indisponible{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="login-card text-center">
+        <i class="bi bi-exclamation-circle fs-1 text-warning"></i>
+        <h3 class="serif mt-3 mb-2">Galerie indisponible</h3>
+        <p class="text-muted">Cette galerie n'existe pas, a été désactivée ou a expiré.</p>
+        <p class="text-muted small">Contactez votre photographe pour obtenir un nouveau lien.</p>
+        <a href="{{ path('app_home') }}" class="btn btn-dark mt-3">Retour au site</a>
+    </div>
+</div>
+{% endblock %}

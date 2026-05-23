@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="{% block meta_description %}{{ studio_name }} — {{ studio_tagline }} à {{ studio_city }}. Mariages, portraits, événements.{% endblock %}">
+        <title>{% block title %}{{ studio_name }}{% endblock %}</title>
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+
+        {# Open Graph / Twitter Card #}
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="{{ studio_name }}">
+        <meta property="og:title" content="{{ block('title') }}">
+        <meta property="og:description" content="{{ block('meta_description') }}">
+        <meta property="og:url" content="{{ app.request.uri }}">
+        <meta property="og:locale" content="fr_FR">
+        {% block og_image %}<meta property="og:image" content="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200">{% endblock %}
+        <meta name="twitter:card" content="summary_large_image">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+        <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+        <link href="{{ asset('css/site.css') }}" rel="stylesheet">
+
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        {% include 'partials/_header.html.twig' %}
+
+        <main class="flex-grow-1">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="container mt-3">
+                        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'info' ? 'info' : 'danger') }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </main>
+
+        {% include 'partials/_footer.html.twig' %}
+
+        {# Floating WhatsApp button #}
+        <a href="https://wa.me/{{ contact_phone|replace({' ': '', '+': '', '.': ''}) }}"
+           target="_blank" rel="noopener"
+           class="whatsapp-fab"
+           aria-label="Discuter sur WhatsApp">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+
+        {# Cookie banner (RGPD) #}
+        <div id="cookieBanner" class="cookie-banner" hidden>
+            <div class="container d-flex flex-column flex-md-row align-items-md-center gap-3">
+                <div class="flex-grow-1 small">
+                    Ce site n'utilise que des cookies techniques nécessaires à son fonctionnement (session, sécurité). Aucun tracking ni publicité.
+                    <a href="{{ path('app_privacy') }}" class="text-light text-decoration-underline">En savoir plus</a>
+                </div>
+                <button type="button" id="cookieAccept" class="btn btn-light btn-sm px-3">J'ai compris</button>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+        <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.AOS) AOS.init({ duration: 600, once: true, offset: 80 });
+                if (window.GLightbox) GLightbox({ selector: '.glightbox', loop: true });
+
+                // Cookie banner
+                const banner = document.getElementById('cookieBanner');
+                const accept = document.getElementById('cookieAccept');
+                if (banner && !localStorage.getItem('cookieConsent')) {
+                    banner.hidden = false;
+                }
+                if (accept) {
+                    accept.addEventListener('click', () => {
+                        localStorage.setItem('cookieConsent', '1');
+                        banner.hidden = true;
+                    });
+                }
+            });
+        </script>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

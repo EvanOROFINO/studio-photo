@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservation confirmée — {{ studio_name }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container" style="max-width: 720px;">
+        <div class="bg-white p-4 p-md-5 rounded shadow-sm border text-center">
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 90px; height: 90px; background: #d4edda;">
+                    <i class="bi bi-check-lg" style="font-size: 3rem; color: #198754;"></i>
+                </div>
+            </div>
+
+            <p class="section-subtitle">{{ demo_mode ? 'Démo — Paiement simulé' : 'Acompte reçu' }}</p>
+            <h1 class="serif mb-3">Merci {{ booking.clientName|split(' ')|first }} !</h1>
+            <p class="lead text-muted mb-4">Votre séance est officiellement réservée.</p>
+
+            <div class="bg-light p-4 rounded text-start mb-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Référence</small>
+                        <strong>{{ booking.reference }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Prestation</small>
+                        <strong>{{ booking.service.title }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Date</small>
+                        <strong>{{ booking.eventDate|date('d/m/Y') }}</strong>
+                    </div>
+                    {% if booking.location %}
+                        <div class="col-6">
+                            <small class="text-muted d-block">Lieu</small>
+                            <strong>{{ booking.location }}</strong>
+                        </div>
+                    {% endif %}
+                    <div class="col-6">
+                        <small class="text-muted d-block">Acompte payé</small>
+                        <strong class="text-success">{{ booking.depositAmount|number_format(0, ',', ' ') }} €</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Solde à régler après séance</small>
+                        <strong>{{ (booking.amountTotal - booking.depositAmount)|number_format(0, ',', ' ') }} €</strong>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-muted">
+                Un email de confirmation a été envoyé à <strong>{{ booking.clientEmail }}</strong>.
+                Je vous recontacte sous 48h pour finaliser les derniers détails de votre séance.
+            </p>
+
+            {% if demo_mode %}
+                <div class="alert alert-warning small mt-4 text-start">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Mode démo actif :</strong> aucune carte n'a été débitée et aucun email n'a été envoyé.
+                    En production, le photographe configurera ses clés Stripe pour activer les vrais paiements.
+                </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2 justify-content-center flex-wrap">
+                <a href="{{ path('app_home') }}" class="btn btn-outline-dark">Retour à l'accueil</a>
+                <a href="{{ path('app_gallery') }}" class="btn btn-dark">Voir la galerie</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

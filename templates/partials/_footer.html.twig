@@ -1,0 +1,52 @@
+<footer class="bg-dark text-light pt-5 pb-4 mt-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h5 class="serif mb-3"><i class="bi bi-camera-fill me-2"></i>{{ studio_name }}</h5>
+                <p class="text-light opacity-75 mb-2">{{ studio_tagline }}</p>
+                <p class="text-light opacity-75 small mb-3">{{ studio_city }}, France</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ social_instagram }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="{{ social_facebook }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="https://wa.me/{{ contact_phone|replace({' ': '', '+': '', '.': ''}) }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <h6 class="text-uppercase small fw-bold mb-3">Navigation</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a href="{{ path('app_home') }}" class="text-light opacity-75 text-decoration-none">Accueil</a></li>
+                    <li class="mb-2"><a href="{{ path('app_gallery') }}" class="text-light opacity-75 text-decoration-none">Galerie</a></li>
+                    <li class="mb-2"><a href="{{ path('app_services') }}" class="text-light opacity-75 text-decoration-none">Prestations</a></li>
+                    <li class="mb-2"><a href="{{ path('app_testimonials') }}" class="text-light opacity-75 text-decoration-none">Avis clients</a></li>
+                    <li class="mb-2"><a href="{{ path('app_about') }}" class="text-light opacity-75 text-decoration-none">À propos</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <h6 class="text-uppercase small fw-bold mb-3">Pratique</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a href="{{ path('app_contact') }}" class="text-light opacity-75 text-decoration-none">Contact</a></li>
+                    <li class="mb-2"><a href="{{ path('app_faq') }}" class="text-light opacity-75 text-decoration-none">FAQ</a></li>
+                    <li class="mb-2"><a href="{{ path('app_legal_notice') }}" class="text-light opacity-75 text-decoration-none">Mentions légales</a></li>
+                    <li class="mb-2"><a href="{{ path('app_privacy') }}" class="text-light opacity-75 text-decoration-none">Confidentialité</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-4">
+                <h6 class="text-uppercase small fw-bold mb-3">Newsletter</h6>
+                <p class="text-light opacity-75 small mb-2">Recevez mes dernières séances et conseils.</p>
+                <form method="post" action="{{ path('app_newsletter_subscribe') }}" class="d-flex gap-2">
+                    <input type="hidden" name="newsletter[_token]" value="{{ csrf_token('newsletter') }}">
+                    <input type="email" name="newsletter[email]" class="form-control form-control-sm" placeholder="votre@email.fr" required>
+                    <button type="submit" class="btn btn-light btn-sm">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </form>
+                <p class="text-light opacity-50 small mt-2">Pas de spam. Désinscription en 1 clic.</p>
+            </div>
+        </div>
+        <hr class="border-secondary mt-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-75">
+            <p class="mb-2 mb-md-0">&copy; {{ "now"|date('Y') }} {{ studio_name }} — Tous droits réservés.</p>
+            <a href="{{ path('app_login') }}" class="text-light opacity-50 text-decoration-none"><i class="bi bi-lock me-1"></i>Espace admin</a>
+        </div>
+    </div>
+</footer>

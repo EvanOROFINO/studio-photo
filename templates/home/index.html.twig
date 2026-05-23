@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ studio_name }} — {{ studio_tagline }}{% endblock %}
+
+{% block body %}
+<section class="hero">
+    <div class="container text-center">
+        <p class="text-uppercase mb-3" style="letter-spacing: 0.3em; font-size: 0.8rem;" data-aos="fade-down">Photographe à {{ studio_city }}</p>
+        <h1 class="mb-4" data-aos="fade-up">Capturer<br>l'instant. Pour toujours.</h1>
+        <p class="lead mx-auto mb-5" data-aos="fade-up" data-aos-delay="150">{{ studio_tagline }}. Mariages, portraits, événements professionnels — chaque image raconte votre histoire.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap" data-aos="fade-up" data-aos-delay="300">
+            <a href="{{ path('app_gallery') }}" class="btn btn-light btn-lg px-4">Voir la galerie</a>
+            <a href="{{ path('app_contact') }}" class="btn btn-outline-light btn-lg px-4">Réserver une séance</a>
+        </div>
+    </div>
+</section>
+
+{# Featured photos #}
+{% if featuredPhotos|length > 0 %}
+<section class="section">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-subtitle">Sélection</p>
+            <h2 class="section-title">Mes derniers travaux</h2>
+        </div>
+        <div class="photo-grid">
+            {% for photo in featuredPhotos %}
+                {% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/800/' ~ (700 + (photo.id * 37) % 400) %}
+                <a class="photo-card" href="{{ path('app_photo_show', { id: photo.id }) }}" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 100 }}">
+                    <img src="{{ img }}" alt="{{ photo.title }}" loading="lazy">
+                    <div class="overlay">
+                        <div>
+                            <h5>{{ photo.title }}</h5>
+                            <small>{{ photo.category.name }}</small>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ path('app_gallery') }}" class="btn btn-dark px-4">Voir toute la galerie <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# Categories #}
+{% if categories|length > 0 %}
+<section class="section bg-white border-top">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-subtitle">Univers</p>
+            <h2 class="section-title">Explorer par thème</h2>
+        </div>
+        <div class="row g-3">
+            {% for category in categories|slice(0, 4) %}
+                {% set firstPhoto = category.photos|first %}
+                {% set bg = firstPhoto and firstPhoto.imageName
+                    ? asset('uploads/photos/' ~ firstPhoto.imageName)
+                    : 'https://picsum.photos/seed/cat' ~ category.id ~ '/800/1000' %}
+                <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <a class="category-card" href="{{ path('app_gallery_category', { slug: category.slug }) }}">
+                        <div class="bg" style="background-image: url('{{ bg }}');"></div>
+                        <div class="label">
+                            <h3>{{ category.name }}</h3>
+                            <small>{{ category.photos|length }} photo{{ category.photos|length > 1 ? 's' : '' }}</small>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# Services preview #}
+{% if services|length > 0 %}
+<section class="section">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-subtitle">Prestations</p>
+            <h2 class="section-title">Mes formules</h2>
+        </div>
+        <div class="row g-4">
+            {% for service in services|slice(0, 3) %}
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="service-card text-center">
+                        <i class="bi {{ service.icon }} icon"></i>
+                        <h4 class="serif">{{ service.title }}</h4>
+                        <p class="text-muted small">{{ service.description|length > 120 ? service.description|slice(0, 120) ~ '…' : service.description }}</p>
+                        {% if service.priceFrom %}
+                            <p class="price">À partir de {{ service.priceFrom|number_format(0, ',', ' ') }} €</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ path('app_services') }}" class="btn btn-outline-dark px-4">Voir toutes les prestations</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# Testimonials #}
+{% if testimonials|length > 0 %}
+<section class="section bg-white border-top">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <p class="section-subtitle">Ils m'ont fait confiance</p>
+            <h2 class="section-title">Avis clients</h2>
+        </div>
+        <div class="row g-4">
+            {% for t in testimonials %}
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="testimonial-card h-100">
+                        <div class="text-warning mb-3">
+                            {% for i in 1..t.rating %}<i class="bi bi-star-fill"></i>{% endfor %}
+                        </div>
+                        <blockquote class="serif fs-5 mb-3">« {{ t.content|length > 180 ? t.content|slice(0, 180) ~ '…' : t.content }} »</blockquote>
+                        <footer>
+                            <strong>{{ t.authorName }}</strong>
+                            {% if t.authorRole %}
+                                <div class="text-muted small">{{ t.authorRole }}</div>
+                            {% endif %}
+                        </footer>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ path('app_testimonials') }}" class="btn btn-outline-dark px-4">Lire tous les avis</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# CTA #}
+<section class="section bg-dark text-white text-center">
+    <div class="container">
+        <p class="section-subtitle text-light">On en parle ?</p>
+        <h2 class="section-title" data-aos="fade-up">Votre projet mérite d'être immortalisé.</h2>
+        <p class="lead opacity-75 mb-4" data-aos="fade-up" data-aos-delay="150">Discutons de votre envie. Un appel gratuit, sans engagement.</p>
+        <a href="{{ path('app_contact') }}" class="btn btn-light btn-lg px-4" data-aos="fade-up" data-aos-delay="300">Demander un devis</a>
+    </div>
+</section>
+{% endblock %}

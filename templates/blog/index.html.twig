@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ currentCategory ? currentCategory.name ~ ' — Blog' : 'Blog' }} — {{ studio_name }}{% endblock %}
+{% block meta_description %}{{ currentCategory ? currentCategory.description : 'Conseils, coulisses et inspirations photo — le blog de ' ~ studio_name }}{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">Blog</p>
+        <h1>{{ currentCategory ? currentCategory.name : 'Articles & conseils' }}</h1>
+        <p>{{ currentCategory ? currentCategory.description|default('Articles dans la catégorie ' ~ currentCategory.name) : 'Conseils, coulisses et inspirations photo' }}</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                {% if articles|length == 0 %}
+                    <p class="text-center text-muted py-5">Aucun article publié pour le moment. Revenez bientôt !</p>
+                {% else %}
+                    <div class="row g-4">
+                        {% for article in articles %}
+                            <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 2) * 100 }}">
+                                <article class="blog-card h-100">
+                                    {% if article.coverImageName %}
+                                        <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="blog-card-cover">
+                                            <img src="{{ asset('uploads/articles/' ~ article.coverImageName) }}" alt="{{ article.title }}" loading="lazy">
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="blog-card-cover">
+                                            <img src="https://picsum.photos/seed/article{{ article.id }}/800/500" alt="{{ article.title }}" loading="lazy">
+                                        </a>
+                                    {% endif %}
+                                    <div class="blog-card-body">
+                                        <p class="blog-card-meta small text-muted mb-2">
+                                            <a href="{{ path('app_blog_category', { slug: article.category.slug }) }}" class="text-accent text-decoration-none">{{ article.category.name }}</a>
+                                            <span class="mx-2">•</span>
+                                            {{ article.publishedAt|date('d M Y') }}
+                                            <span class="mx-2">•</span>
+                                            {{ article.readingTimeMinutes }} min de lecture
+                                        </p>
+                                        <h3 class="serif mb-2 fs-4">
+                                            <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="text-decoration-none text-dark">{{ article.title }}</a>
+                                        </h3>
+                                        <p class="text-muted">{{ article.excerpt|length > 130 ? article.excerpt|slice(0, 130) ~ '…' : article.excerpt }}</p>
+                                        <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="text-accent text-decoration-none small fw-bold">
+                                            Lire l'article<i class="bi bi-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </article>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if totalPages > 1 %}
+                        <nav class="mt-5">
+                            <ul class="pagination justify-content-center">
+                                {% set route = currentCategory ? 'app_blog_category' : 'app_blog' %}
+                                {% set params = currentCategory ? { slug: currentCategory.slug } : {} %}
+                                <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ path(route, params|merge({ page: currentPage - 1 })) }}"><i class="bi bi-chevron-left"></i></a>
+                                </li>
+                                {% for p in 1..totalPages %}
+                                    <li class="page-item {{ p == currentPage ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ path(route, params|merge({ page: p })) }}">{{ p }}</a>
+                                    </li>
+                                {% endfor %}
+                                <li class="page-item {{ currentPage >= totalPages ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ path(route, params|merge({ page: currentPage + 1 })) }}"><i class="bi bi-chevron-right"></i></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <aside class="col-lg-4">
+                {% include 'blog/_sidebar.html.twig' %}
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

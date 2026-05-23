@@ -1,0 +1,117 @@
+# ----------------------------------------------------------------------
+# Apache rewrite + sécurité pour Symfony
+# ----------------------------------------------------------------------
+
+# Use the front controller as index file. It serves as a fallback solution
+# when every other rewrite/redirect fails (e.g. in an aliased environment
+# without proper mod_rewrite support). Additionally, this reduces the matching
+# process for the start page (path "/") because otherwise Apache will apply
+# the rewriting rules to each configured DirectoryIndex file (e.g. index.php).
+DirectoryIndex index.php
+
+# By default, Apache does not evaluate symbolic links if you did not enable
+# this feature in your server configuration. Uncomment the following line if
+# you install assets as symlinks or if you experience problems related to
+# symlinks when compiling LESS/Sass/CoffeScript assets.
+# Options +FollowSymlinks
+
+# Disabling MultiViews prevents unwanted negotiation, e.g. "/index" should not
+# resolve to the front controller "/index.php" but be rewritten to "/index.php/index".
+<IfModule mod_negotiation.c>
+    Options -MultiViews
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Force HTTPS in production (uncomment after enabling SSL on the host)
+    # RewriteCond %{HTTPS} off
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Redirect /sitemap.xml to the dynamic route /sitemap so SEO tools can find it
+    RewriteRule ^sitemap\.xml$ /sitemap [L]
+
+    # Redirect /feed.xml to /feed for the same reason
+    RewriteRule ^feed\.xml$ /feed [L]
+
+    # Determine the RewriteBase automatically and set it as environment variable.
+    # If you are using Apache aliases to do mass virtual hosting or installed the
+    # project in a subdirectory, the base path will be prepended to allow proper
+    # resolution of the index.php file and to redirect to the correct URI. It will
+    # work in environments without path prefix as well, providing a safe, one-size
+    # fits all solution.
+    RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
+    RewriteRule ^(.*) - [E=BASE:%1]
+
+    # Sets the HTTP_AUTHORIZATION header removed by Apache
+    RewriteCond %{HTTP:Authorization} .+
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
+
+    # Redirect to URI without front controller to prevent duplicate content
+    # (with and without `/index.php`). Only do this redirect on the initial
+    # rewrite by Apache and not on subsequent cycles. Otherwise we would get an
+    # endless redirect loop (request -> rewrite to front controller ->
+    # redirect -> request -> ...).
+    # So in case the front controller has been rewritten to, redirect to the
+    # same URI but without front controller.
+    RewriteCond %{ENV:REDIRECT_STATUS} =""
+    RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
+
+    # If the requested filename exists, simply serve it.
+    # We only want to let Apache serve files and not directories.
+    # Rewrite all other queries to the front controller.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ %{ENV:BASE}/index.php [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    <IfModule mod_alias.c>
+        # When mod_rewrite is not available, we instruct a temporary redirect of
+        # the start page to the front controller explicitly so that the website
+        # and the generated links can still be used.
+        RedirectMatch 307 ^/$ /index.php/
+        # RedirectTemp cannot be used instead
+    </IfModule>
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Security headers
+# ----------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Don't tell the browser to sniff content types
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Anti clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Limit referrer info sent to third parties
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Strict permissions (camera/microphone/geolocation disabled by default)
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self)"
+
+    # HSTS (uncomment AFTER you've validated HTTPS works for at least a day)
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Cache static assets aggressively
+    <FilesMatch "\.(jpe?g|png|webp|gif|svg|ico|css|js|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Compression (gzip)
+# ----------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json application/xml application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml application/x-font-ttf font/woff font/woff2
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Block access to sensitive files
+# ----------------------------------------------------------------------
+<FilesMatch "(^\.|composer\.(json|lock)|\.env|\.git)">
+    Require all denied
+</FilesMatch>

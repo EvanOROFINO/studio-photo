@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ category.name }} — Galerie — {{ studio_name }}{% endblock %}
+{% block meta_description %}{{ category.description|default(category.name ~ ' — Galerie photo de ' ~ studio_name) }}{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">Galerie</p>
+        <h1>{{ category.name }}</h1>
+        {% if category.description %}
+            <p class="lead opacity-75 mx-auto" style="max-width: 600px;">{{ category.description }}</p>
+        {% else %}
+            <p>{{ photos|length }} photo{{ photos|length > 1 ? 's' : '' }}</p>
+        {% endif %}
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        <div class="category-pills d-flex flex-wrap gap-2 justify-content-center mb-5">
+            <a href="{{ path('app_gallery') }}" class="btn">Tout voir</a>
+            {% for c in categories %}
+                <a href="{{ path('app_gallery_category', { slug: c.slug }) }}" class="btn {{ c.id == category.id ? 'active' : '' }}">{{ c.name }}</a>
+            {% endfor %}
+        </div>
+
+        {% if photos|length == 0 %}
+            <p class="text-center text-muted py-5">Aucune photo dans cette catégorie pour le moment.</p>
+        {% else %}
+            <div class="photo-grid">
+                {% for photo in photos %}
+                    {% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/800/' ~ (700 + (photo.id * 37) % 400) %}
+                    <a class="photo-card" href="{{ path('app_photo_show', { id: photo.id }) }}" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 50 }}">
+                        <img src="{{ img }}" alt="{{ photo.title }}" loading="lazy">
+                        <div class="overlay">
+                            <div>
+                                <h5>{{ photo.title }}</h5>
+                                {% if photo.takenAt %}
+                                    <small>{{ photo.takenAt|date('M Y') }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

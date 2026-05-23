@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ photo.title }} — {{ studio_name }}{% endblock %}
+{% block meta_description %}{{ photo.description|default(photo.title ~ ' — ' ~ photo.category.name) }}{% endblock %}
+
+{% block body %}
+{% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/1600/1100' %}
+
+<section class="bg-dark py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ path('app_gallery') }}" class="text-light opacity-75 text-decoration-none">Galerie</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('app_gallery_category', { slug: photo.category.slug }) }}" class="text-light opacity-75 text-decoration-none">{{ photo.category.name }}</a></li>
+                <li class="breadcrumb-item active text-light" aria-current="page">{{ photo.title }}</li>
+            </ol>
+        </nav>
+        <div class="text-center">
+            <img src="{{ img }}" alt="{{ photo.title }}" class="img-fluid rounded shadow-lg" style="max-height: 75vh;">
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container" style="max-width: 800px;">
+        <div class="row align-items-center mb-5">
+            <div class="col">
+                <p class="section-subtitle">{{ photo.category.name }}</p>
+                <h1 class="section-title">{{ photo.title }}</h1>
+                {% if photo.takenAt %}
+                    <p class="text-muted"><i class="bi bi-calendar3 me-1"></i>{{ photo.takenAt|date('F Y')|capitalize }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% if photo.description %}
+            <p class="lead">{{ photo.description }}</p>
+        {% endif %}
+
+        <hr class="my-5">
+
+        <div class="d-flex justify-content-between align-items-center">
+            {% if previous %}
+                <a href="{{ path('app_photo_show', { id: previous.id }) }}" class="btn btn-outline-dark">
+                    <i class="bi bi-arrow-left me-2"></i>Photo précédente
+                </a>
+            {% else %}
+                <span></span>
+            {% endif %}
+
+            <a href="{{ path('app_gallery') }}" class="btn btn-dark">
+                <i class="bi bi-grid-3x3-gap me-2"></i>Toute la galerie
+            </a>
+
+            {% if next %}
+                <a href="{{ path('app_photo_show', { id: next.id }) }}" class="btn btn-outline-dark">
+                    Photo suivante<i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            {% else %}
+                <span></span>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
