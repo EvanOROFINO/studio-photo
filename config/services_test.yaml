@@ -1,6 +1,3 @@
-services:
-    # Expose CartService publicly so functional tests can grab it directly
-    # via static::getContainer()->get(CartService::class) without going
-    # through the TestContainer's privateServices map.
-    App\Service\CartService:
-        public: true
+# services_test.yaml — empty on purpose.
+# In tests, static::getContainer() returns a TestContainer that exposes
+# private services automatically, so no need to re-declare anything here.
