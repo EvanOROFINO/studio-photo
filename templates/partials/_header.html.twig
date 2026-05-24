@@ -16,6 +16,7 @@
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_before_after' ? 'active' : '' }}" href="{{ path('app_before_after') }}">Avant/Après</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_showreel' ? 'active' : '' }}" href="{{ path('app_showreel') }}">Showreel</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_blog' ? 'active' : '' }}" href="{{ path('app_blog') }}">Blog</a></li>
+                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_shop' or app.request.attributes.get('_route') starts with 'app_cart' or app.request.attributes.get('_route') starts with 'app_order' ? 'active' : '' }}" href="{{ path('app_shop_index') }}"><i class="bi bi-bag me-1"></i>Boutique</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_faq' ? 'active' : '' }}" href="{{ path('app_faq') }}">FAQ</a></li>
                 <li class="nav-item ms-lg-2">

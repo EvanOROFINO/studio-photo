@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande annulée — {{ studio_name }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container" style="max-width: 720px;">
+        <div class="bg-white p-4 p-md-5 rounded shadow-sm border text-center">
+            <i class="bi bi-x-circle text-muted" style="font-size: 4rem;"></i>
+            <h1 class="serif mt-3 mb-3">Paiement annulé</h1>
+            <p class="lead text-muted mb-4">Aucun montant n'a été débité. Votre panier est conservé.</p>
+
+            <div class="mt-4 d-flex gap-2 justify-content-center flex-wrap">
+                <a href="{{ path('app_cart_show') }}" class="btn btn-dark">Reprendre ma commande</a>
+                <a href="{{ path('app_shop_index') }}" class="btn btn-outline-dark">Voir la boutique</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

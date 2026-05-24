@@ -12,6 +12,7 @@ use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
 use App\Entity\NewsletterSubscriber;
 use App\Entity\Photo;
+use App\Entity\Product;
 use App\Entity\Service;
 use App\Entity\Testimonial;
 use App\Entity\User;
@@ -207,6 +208,28 @@ class AppFixtures extends Fixture
             $v->setPosition($position);
             $v->setPublished(true);
             $manager->persist($v);
+        }
+
+        // --- Boutique : tirages d'art -----------------------------------
+        $productsData = [
+            ['Sérénité', 'Tirage fine art d\'un paysage de montagne au lever du soleil. Imprimé sur papier Hahnemühle Photo Rag 308 g, signé et numéroté.', '30×40 cm — papier mat', '89.00', 8, true, 1],
+            ['Premier regard', 'Photographie de mariage capturée à l\'instant exact où les mariés se découvrent. Tirage limité à 25 exemplaires.', '40×60 cm — papier baryté', '149.00', 25, true, 2],
+            ['Quai de Saône', 'Vue minimaliste de Lyon au petit matin, brume légère sur la Saône. Édition ouverte.', '20×30 cm — papier satiné', '49.00', -1, false, 3],
+            ['Mains d\'enfant', 'Détail tendre d\'une séance grossesse. Noir et blanc argentique.', '30×30 cm — papier mat carré', '69.00', 12, false, 4],
+            ['Coulisses de scène', 'Photographie d\'événement, lumière naturelle. Tirage signé, certificat d\'authenticité fourni.', '50×75 cm — papier fine art', '199.00', 5, true, 5],
+            ['Carnet de voyage — Marseille', 'Triptyque de photos du Vieux-Port (livré en 3 tirages 20×30 cm).', '3× 20×30 cm — papier baryté', '129.00', 10, false, 6],
+        ];
+        foreach ($productsData as [$title, $description, $format, $price, $stock, $featured, $position]) {
+            $p = new Product();
+            $p->setTitle($title);
+            $p->setDescription($description);
+            $p->setFormat($format);
+            $p->setPrice($price);
+            $p->setStock($stock);
+            $p->setFeatured($featured);
+            $p->setPosition($position);
+            $p->setPublished(true);
+            $manager->persist($p);
         }
 
         // --- Sample contact request --------------------------------------

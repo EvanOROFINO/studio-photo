@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande confirmée — {{ studio_name }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container" style="max-width: 720px;">
+        <div class="bg-white p-4 p-md-5 rounded shadow-sm border text-center">
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 90px; height: 90px; background: #d4edda;">
+                    <i class="bi bi-bag-check" style="font-size: 3rem; color: #198754;"></i>
+                </div>
+            </div>
+
+            <p class="section-subtitle">{{ demo_mode ? 'Démo — Paiement simulé' : 'Commande confirmée' }}</p>
+            <h1 class="serif mb-3">Merci {{ order.customerName|split(' ')|first }} !</h1>
+            <p class="lead text-muted mb-4">Votre commande est bien enregistrée.</p>
+
+            <div class="bg-light p-4 rounded text-start mb-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Référence</small>
+                        <strong>{{ order.reference }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Total payé</small>
+                        <strong class="text-success">{{ order.totalAmount|number_format(0, ',', ' ') }} €</strong>
+                    </div>
+                    <div class="col-12">
+                        <small class="text-muted d-block">Livraison</small>
+                        <strong>{{ order.shippingAddress }}, {{ order.shippingZip }} {{ order.shippingCity }} — {{ order.shippingCountry }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-start">
+                <h6 class="serif mb-2">Articles commandés</h6>
+                {% for item in order.items %}
+                    <div class="d-flex justify-content-between mb-1 small">
+                        <span>{{ item.quantity }}× {{ item.productTitle }}</span>
+                        <span>{{ item.lineTotal|number_format(0, ',', ' ') }} €</span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <p class="text-muted mt-4">
+                Un email de confirmation a été envoyé à <strong>{{ order.customerEmail }}</strong>.
+                Vous serez prévenu dès l'expédition.
+            </p>
+
+            {% if demo_mode %}
+                <div class="alert alert-warning small mt-4 text-start">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Mode démo actif :</strong> aucune carte n'a été débitée, aucune commande n'a été expédiée.
+                </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2 justify-content-center flex-wrap">
+                <a href="{{ path('app_shop_index') }}" class="btn btn-outline-dark">Continuer mes achats</a>
+                <a href="{{ path('app_home') }}" class="btn btn-dark">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

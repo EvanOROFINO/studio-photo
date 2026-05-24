@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Finaliser ma commande — {{ studio_name }}{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <h1>Finaliser ma commande</h1>
+        <p>Plus qu'une étape avant la livraison</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if demo_mode %}
+            <div class="alert alert-info mx-auto mb-4" style="max-width: 900px;">
+                <i class="bi bi-info-circle me-1"></i>
+                <strong>Mode démo</strong> — Stripe n'est pas configuré. Aucune carte ne sera débitée.
+            </div>
+        {% endif %}
+
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <div class="bg-white p-4 p-md-5 rounded shadow-sm border">
+                    <h3 class="serif mb-4">Adresse de livraison</h3>
+                    {{ form_start(form, { 'attr': { 'novalidate': 'novalidate' } }) }}
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form_row(form.customerName) }}</div>
+                            <div class="col-md-6">{{ form_row(form.customerEmail) }}</div>
+                            <div class="col-md-6">{{ form_row(form.customerPhone) }}</div>
+                            <div class="col-12">{{ form_row(form.shippingAddress) }}</div>
+                            <div class="col-md-4">{{ form_row(form.shippingZip) }}</div>
+                            <div class="col-md-4">{{ form_row(form.shippingCity) }}</div>
+                            <div class="col-md-4">{{ form_row(form.shippingCountry) }}</div>
+                            <div class="col-12">{{ form_row(form.notes) }}</div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-dark btn-lg px-4 w-100">
+                                    <i class="bi bi-credit-card me-2"></i>Procéder au paiement
+                                </button>
+                                <p class="small text-muted mt-2 mb-0 text-center">
+                                    <i class="bi bi-shield-lock me-1"></i>Paiement 100% sécurisé via Stripe
+                                </p>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="serif mb-3">Votre commande</h5>
+                        {% for item in items %}
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span>{{ item.quantity }}× {{ item.product.title }}</span>
+                                <strong>{{ item.lineTotal|number_format(0, ',', ' ') }} €</strong>
+                            </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2 small text-muted">
+                            <span>Sous-total</span>
+                            <span>{{ subtotal|number_format(0, ',', ' ') }} €</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 small text-muted">
+                            <span>Livraison</span>
+                            <span>{{ shipping|number_format(0, ',', ' ') }} €</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total TTC</strong>
+                            <strong class="h5">{{ (subtotal + shipping)|number_format(0, ',', ' ') }} €</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

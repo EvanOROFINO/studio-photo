@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.title }} — Boutique — {{ studio_name }}{% endblock %}
+{% block meta_description %}{{ product.title }} — {{ product.format }}. Tirage d'art signé par {{ studio_name }}.{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_shop_index') }}" class="text-decoration-none">Boutique</a></li>
+                <li class="breadcrumb-item active">{{ product.title }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5">
+            <div class="col-lg-7">
+                {% set img = product.imageName ? asset('uploads/products/' ~ product.imageName) : 'https://picsum.photos/seed/product' ~ product.id ~ '/1200/1500' %}
+                <a href="{{ img }}" class="glightbox" data-gallery="product">
+                    <img src="{{ img }}" alt="{{ product.title }}" class="img-fluid rounded shadow-sm">
+                </a>
+            </div>
+            <div class="col-lg-5">
+                <p class="section-subtitle">Tirage d'art</p>
+                <h1 class="serif mb-3">{{ product.title }}</h1>
+
+                {% if product.format %}
+                    <p class="text-muted mb-3"><i class="bi bi-rulers me-1"></i>{{ product.format }}</p>
+                {% endif %}
+
+                <div class="display-6 mb-4">{{ product.price|number_format(0, ',', ' ') }} €</div>
+
+                {% if product.inStock %}
+                    {% if product.printOnDemand %}
+                        <p class="text-success mb-3"><i class="bi bi-printer me-1"></i>Impression à la demande — délai 7-10 jours</p>
+                    {% elseif product.stock <= 5 %}
+                        <p class="text-warning mb-3"><i class="bi bi-exclamation-triangle me-1"></i>Plus que {{ product.stock }} exemplaire{{ product.stock > 1 ? 's' : '' }}</p>
+                    {% else %}
+                        <p class="text-success mb-3"><i class="bi bi-check-circle me-1"></i>En stock — expédié sous 48h</p>
+                    {% endif %}
+
+                    <form method="post" action="{{ path('app_cart_add', { id: product.id }) }}" class="mb-4">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-4">
+                                <label class="form-label small">Quantité</label>
+                                <input type="number" name="quantity" value="1" min="1"{% if not product.printOnDemand %} max="{{ product.stock }}"{% endif %} class="form-control">
+                            </div>
+                            <div class="col-8">
+                                <button type="submit" class="btn btn-dark btn-lg w-100">
+                                    <i class="bi bi-bag-plus me-2"></i>Ajouter au panier
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="text-danger mb-4"><i class="bi bi-x-circle me-1"></i>Épuisé</p>
+                    <a href="{{ path('app_contact') }}" class="btn btn-outline-dark">Me prévenir du retour en stock</a>
+                {% endif %}
+
+                <hr>
+                <h5 class="serif">Description</h5>
+                <p class="mb-4">{{ product.description }}</p>
+
+                <h6 class="text-uppercase small fw-bold mb-2"><i class="bi bi-truck me-1"></i>Livraison</h6>
+                <p class="small text-muted mb-2">
+                    France métropolitaine : 8€ — délai 3-5 jours ouvrés. Tirages emballés sous tube cartonné rigide pour éviter les pliures.
+                </p>
+                <h6 class="text-uppercase small fw-bold mb-2 mt-3"><i class="bi bi-shield-check me-1"></i>Garantie</h6>
+                <p class="small text-muted mb-0">
+                    Satisfait ou remboursé sous 14 jours. Certificat d'authenticité fourni avec chaque tirage en édition limitée.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

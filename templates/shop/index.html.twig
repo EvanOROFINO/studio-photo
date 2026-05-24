@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique — Tirages d'art — {{ studio_name }}{% endblock %}
+{% block meta_description %}Tirages d'art en édition limitée signés par {{ studio_name }}. Livraison rapide partout en France.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">Boutique</p>
+        <h1>Tirages d'art</h1>
+        <p>Mes plus belles images, imprimées en édition limitée</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container">
+        {% if products|length == 0 %}
+            <p class="text-center text-muted py-5">Bientôt des tirages à vendre ici. Revenez vite !</p>
+        {% else %}
+            <div class="row g-4">
+                {% for product in products %}
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 100 }}">
+                        <article class="product-card h-100">
+                            <a href="{{ path('app_shop_show', { slug: product.slug }) }}" class="product-cover">
+                                {% if product.imageName %}
+                                    <img src="{{ asset('uploads/products/' ~ product.imageName) }}" alt="{{ product.title }}" loading="lazy">
+                                {% else %}
+                                    <img src="https://picsum.photos/seed/product{{ product.id }}/800/1000" alt="{{ product.title }}" loading="lazy">
+                                {% endif %}
+                                {% if product.featured %}
+                                    <span class="product-badge">Édition limitée</span>
+                                {% endif %}
+                            </a>
+                            <div class="product-body">
+                                <h3 class="serif mb-1 fs-5">
+                                    <a href="{{ path('app_shop_show', { slug: product.slug }) }}" class="text-decoration-none text-dark">{{ product.title }}</a>
+                                </h3>
+                                {% if product.format %}
+                                    <small class="text-muted d-block mb-2">{{ product.format }}</small>
+                                {% endif %}
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <strong class="fs-5">{{ product.price|number_format(0, ',', ' ') }} €</strong>
+                                    {% if product.inStock %}
+                                        <a href="{{ path('app_shop_show', { slug: product.slug }) }}" class="btn btn-sm btn-dark">Découvrir</a>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Épuisé</span>
+                                    {% endif %}
+                                </div>
+                                {% if not product.printOnDemand and product.stock <= 5 and product.stock > 0 %}
+                                    <small class="text-warning mt-2 d-block"><i class="bi bi-exclamation-triangle me-1"></i>Plus que {{ product.stock }} en stock</small>
+                                {% endif %}
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-5 small text-muted">
+            <i class="bi bi-truck me-1"></i>Livraison France 8€ — Tirages emballés sous tube cartonné rigide.
+        </div>
+    </div>
+</section>
+{% endblock %}
