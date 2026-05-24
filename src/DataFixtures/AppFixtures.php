@@ -15,6 +15,7 @@ use App\Entity\Photo;
 use App\Entity\Service;
 use App\Entity\Testimonial;
 use App\Entity\User;
+use App\Entity\Video;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -189,6 +190,23 @@ class AppFixtures extends Fixture
             $testimonial->setPosition($position);
             $testimonial->setPublished(true);
             $manager->persist($testimonial);
+        }
+
+        // --- Demo showreel videos ----------------------------------------
+        $videosData = [
+            ['Highlights — Mariage Sophie & Julien', 'Le résumé de leur journée, condensé en 3 minutes.', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', true, 1],
+            ['Séance grossesse — Camille', 'Un moment d\'intimité capturé en lumière douce.', 'https://www.youtube.com/watch?v=jNQXAC9IVRw', false, 2],
+            ['Behind the scenes — Reportage corporate', 'Coulisses d\'un shooting d\'entreprise à Lyon.', 'https://www.youtube.com/watch?v=9bZkp7q19f0', false, 3],
+        ];
+        foreach ($videosData as [$title, $description, $url, $featured, $position]) {
+            $v = new Video();
+            $v->setTitle($title);
+            $v->setDescription($description);
+            $v->setUrl($url);
+            $v->setFeatured($featured);
+            $v->setPosition($position);
+            $v->setPublished(true);
+            $manager->persist($v);
         }
 
         // --- Sample contact request --------------------------------------

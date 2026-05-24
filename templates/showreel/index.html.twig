@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Showreel — {{ studio_name }}{% endblock %}
+{% block meta_description %}Découvrez le showreel vidéo de {{ studio_name }} — clips de mariages, événements et portraits.{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">En mouvement</p>
+        <h1>Showreel</h1>
+        <p>Une sélection de mes vidéos</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container" style="max-width: 1100px;">
+        {% if videos|length == 0 %}
+            <p class="text-center text-muted py-5">Bientôt des vidéos ici. Revenez vite !</p>
+        {% else %}
+            {% set featured = videos|filter(v => v.featured)|first %}
+            {% if featured %}
+                <div class="video-feature mb-5" data-aos="fade-up">
+                    <div class="video-embed">
+                        <iframe src="{{ featured.embedUrl }}?rel=0"
+                                title="{{ featured.title }}"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                                loading="lazy"></iframe>
+                    </div>
+                    <h3 class="serif mt-3 mb-1">{{ featured.title }}</h3>
+                    {% if featured.description %}
+                        <p class="text-muted">{{ featured.description }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="row g-4">
+                {% for video in videos %}
+                    {% if not video.featured or featured is null or video.id != featured.id %}
+                        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 100 }}">
+                            <div class="video-card">
+                                <a href="{{ video.embedUrl }}?autoplay=1"
+                                   class="video-thumb glightbox"
+                                   data-type="video"
+                                   data-gallery="showreel"
+                                   data-title="{{ video.title }}"
+                                   data-description="{{ video.description ?? '' }}">
+                                    {% if video.thumbnailUrl %}
+                                        <img src="{{ video.thumbnailUrl }}" alt="{{ video.title }}" loading="lazy">
+                                    {% else %}
+                                        <div class="video-thumb-placeholder"><i class="bi bi-camera-video"></i></div>
+                                    {% endif %}
+                                    <span class="video-play-overlay">
+                                        <i class="bi bi-play-fill"></i>
+                                    </span>
+                                </a>
+                                <h5 class="serif mt-2 mb-1 fs-6">{{ video.title }}</h5>
+                                <small class="text-muted">{{ video.source|capitalize }}</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <p class="text-muted mb-3">Envie de votre propre film ?</p>
+            <a href="{{ path('app_contact') }}" class="btn btn-dark px-4">Discuter de votre projet</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

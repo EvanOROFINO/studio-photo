@@ -17,6 +17,7 @@ use App\Entity\Service;
 use App\Entity\Tag;
 use App\Entity\Testimonial;
 use App\Entity\User;
+use App\Entity\Video;
 use App\Repository\ContactRequestRepository;
 use App\Repository\PhotoRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -65,6 +66,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Prestations', 'fa fa-tag', Service::class);
         yield MenuItem::linkToCrud('Témoignages', 'fa fa-star', Testimonial::class);
         yield MenuItem::linkToCrud('Avant / Après', 'fa fa-sliders-h', BeforeAfter::class);
+        yield MenuItem::linkToCrud('Showreel / Vidéos', 'fa fa-video', Video::class);
 
         yield MenuItem::section('Galeries clients');
         yield MenuItem::linkToCrud('Galeries privées', 'fa fa-lock', ClientGallery::class);
