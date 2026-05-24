@@ -7,6 +7,7 @@ use App\Entity\Service;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Service\AvailabilityService;
+use App\Service\MailService;
 use App\Service\StripeCheckoutService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -23,6 +24,7 @@ class BookingController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly StripeCheckoutService $stripe,
         private readonly AvailabilityService $availability,
+        private readonly MailService $mailService,
     ) {
     }
 
@@ -88,6 +90,7 @@ class BookingController extends AbstractController
             $booking->setPaidAt(new \DateTimeImmutable());
             $booking->setStripeSessionId('demo_'.bin2hex(random_bytes(8)));
             $this->em->flush();
+            $this->mailService->sendBookingConfirmation($booking);
             return $this->redirectToRoute('app_booking_success', ['reference' => $reference]);
         }
 
@@ -114,6 +117,7 @@ class BookingController extends AbstractController
                 $booking->setPaidAt(new \DateTimeImmutable());
                 $booking->setStripePaymentIntentId((string) $info['payment_intent']);
                 $this->em->flush();
+                $this->mailService->sendBookingConfirmation($booking);
             }
         }
 

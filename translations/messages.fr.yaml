@@ -1,0 +1,41 @@
+nav:
+    home: Accueil
+    gallery: Galerie
+    services: Prestations
+    availability: Disponibilités
+    testimonials: Avis
+    before_after: Avant/Après
+    blog: Blog
+    about: À propos
+    faq: FAQ
+    contact: Contact
+    contact_btn: Me contacter
+    admin: Espace admin
+
+footer:
+    navigation: Navigation
+    practical: Pratique
+    newsletter_title: Newsletter
+    newsletter_help: "Recevez mes dernières séances et conseils."
+    newsletter_placeholder: votre@email.fr
+    newsletter_promise: "Pas de spam. Désinscription en 1 clic."
+    contact: Contact
+    legal_notice: Mentions légales
+    privacy: Confidentialité
+    rights: "Tous droits réservés."
+
+common:
+    read_more: Lire la suite
+    learn_more: En savoir plus
+    book_now: Réserver
+    get_quote: Demander un devis
+    view_all: Voir tout
+    back_home: "Retour à l'accueil"
+    loading: Chargement…
+    sending: Envoi…
+
+theme:
+    toggle: Changer de thème
+
+language:
+    select: Langue

@@ -13,16 +13,26 @@
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_services' ? 'active' : '' }}" href="{{ path('app_services') }}">Prestations</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_availability' ? 'active' : '' }}" href="{{ path('app_availability') }}">Disponibilités</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_testimonials' ? 'active' : '' }}" href="{{ path('app_testimonials') }}">Avis</a></li>
+                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_before_after' ? 'active' : '' }}" href="{{ path('app_before_after') }}">Avant/Après</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_blog' ? 'active' : '' }}" href="{{ path('app_blog') }}">Blog</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a></li>
                 <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_faq' ? 'active' : '' }}" href="{{ path('app_faq') }}">FAQ</a></li>
                 <li class="nav-item ms-lg-2">
                     <a class="btn btn-dark btn-sm px-3" href="{{ path('app_contact') }}">
-                        <i class="bi bi-envelope me-1"></i>Me contacter
+                        <i class="bi bi-envelope me-1"></i>{{ 'nav.contact_btn'|trans }}
                     </a>
                 </li>
+                <li class="nav-item ms-lg-2 dropdown">
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-label="{{ 'language.select'|trans }}">
+                        {{ app.request.locale|upper }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item {{ app.request.locale == 'fr' ? 'active' : '' }}" href="{{ path('app_locale_switch', { locale: 'fr' }) }}">🇫🇷 Français</a></li>
+                        <li><a class="dropdown-item {{ app.request.locale == 'en' ? 'active' : '' }}" href="{{ path('app_locale_switch', { locale: 'en' }) }}">🇬🇧 English</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item ms-lg-2">
-                    <button type="button" id="themeToggle" class="btn btn-outline-secondary btn-sm theme-toggle" aria-label="Changer de thème">
+                    <button type="button" id="themeToggle" class="btn btn-outline-secondary btn-sm theme-toggle" aria-label="{{ 'theme.toggle'|trans }}">
                         <i class="bi bi-sun-fill theme-icon-light"></i>
                         <i class="bi bi-moon-stars-fill theme-icon-dark"></i>
                     </button>

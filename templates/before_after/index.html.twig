@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Avant / Après — {{ studio_name }}{% endblock %}
+{% block meta_description %}Découvrez la magie d'une retouche photo professionnelle — comparaisons avant/après par {{ studio_name }}.{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css">
+{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">Le pouvoir de la retouche</p>
+        <h1>Avant / Après</h1>
+        <p>Glissez le curseur pour comparer</p>
+    </div>
+</header>
+
+<section class="section">
+    <div class="container" style="max-width: 1100px;">
+        {% if items|length == 0 %}
+            <p class="text-center text-muted py-5">Bientôt des exemples ici. Revenez vite !</p>
+        {% else %}
+            {% for item in items %}
+                <div class="mb-5" data-aos="fade-up">
+                    <h3 class="serif mb-2">{{ item.title }}</h3>
+                    {% if item.description %}
+                        <p class="text-muted mb-3">{{ item.description }}</p>
+                    {% endif %}
+
+                    {% set before = item.beforeImageName ? asset('uploads/before-after/' ~ item.beforeImageName) : 'https://picsum.photos/seed/before' ~ item.id ~ '/1200/800?grayscale' %}
+                    {% set after = item.afterImageName ? asset('uploads/before-after/' ~ item.afterImageName) : 'https://picsum.photos/seed/after' ~ item.id ~ '/1200/800' %}
+
+                    <img-comparison-slider class="before-after-slider rounded shadow-sm">
+                        <img slot="first" src="{{ before }}" alt="Avant — {{ item.title }}" loading="lazy">
+                        <img slot="second" src="{{ after }}" alt="Après — {{ item.title }}" loading="lazy">
+                        <svg slot="handle" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="white" stroke="#1a1a1a" stroke-width="1">
+                            <circle cx="12" cy="12" r="11"/>
+                            <path d="M8 9l-3 3 3 3M16 9l3 3-3 3" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+                        </svg>
+                    </img-comparison-slider>
+
+                    <div class="d-flex justify-content-between text-muted small mt-2">
+                        <span><i class="bi bi-arrow-left me-1"></i>Avant</span>
+                        <span>Après<i class="bi bi-arrow-right ms-1"></i></span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <p class="text-muted mb-3">Envie d'un rendu professionnel pour vos photos ?</p>
+            <a href="{{ path('app_contact') }}" class="btn btn-dark px-4">Demander un devis</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+{% endblock %}

@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 {% import 'macros/images.html.twig' as img %}
 
-{% block title %}Galerie — {{ studio_name }}{% endblock %}
+{% block title %}{{ currentTag ? currentTag.name ~ ' — Galerie' : 'Galerie' }} — {{ studio_name }}{% endblock %}
 {% block meta_description %}Découvrez la galerie de {{ studio_name }} : mariages, portraits, événements et plus.{% endblock %}
 
 {% block body %}
 <header class="page-header">
     <div class="container">
-        <h1>Galerie</h1>
+        <h1>{{ currentTag ? currentTag.name : 'Galerie' }}</h1>
         <p>{{ totalPhotos }} photo{{ totalPhotos > 1 ? 's' : '' }} à découvrir</p>
     </div>
 </header>
@@ -15,16 +15,34 @@
 <section class="section">
     <div class="container">
         {% if categories|length > 0 %}
-            <div class="category-pills d-flex flex-wrap gap-2 justify-content-center mb-5" data-aos="fade-up">
-                <a href="{{ path('app_gallery') }}" class="btn active">Tout voir</a>
+            <div class="category-pills d-flex flex-wrap gap-2 justify-content-center mb-3" data-aos="fade-up">
+                <a href="{{ path('app_gallery') }}" class="btn {{ not currentTag ? 'active' : '' }}">Tout voir</a>
                 {% for category in categories %}
                     <a href="{{ path('app_gallery_category', { slug: category.slug }) }}" class="btn">{{ category.name }}</a>
                 {% endfor %}
             </div>
         {% endif %}
 
+        {% if tags|length > 0 %}
+            <div class="d-flex flex-wrap gap-1 justify-content-center mb-5" data-aos="fade-up">
+                <span class="text-muted small me-2 align-self-center">Filtres :</span>
+                {% for t in tags %}
+                    <a href="{{ path('app_gallery', { tag: t.slug }) }}" class="badge text-decoration-none {{ currentTag and currentTag.id == t.id ? 'bg-dark' : 'bg-light text-dark border' }}" style="padding: 0.5rem 0.75rem;">
+                        #{{ t.name }}
+                    </a>
+                {% endfor %}
+                {% if currentTag %}
+                    <a href="{{ path('app_gallery') }}" class="badge text-decoration-none bg-danger" style="padding: 0.5rem 0.75rem;">
+                        <i class="bi bi-x"></i> Effacer
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
         {% if totalPhotos == 0 %}
-            <p class="text-center text-muted py-5">La galerie est en cours de construction. Revenez très bientôt !</p>
+            <p class="text-center text-muted py-5">
+                {% if currentTag %}Aucune photo avec le tag <strong>#{{ currentTag.name }}</strong>.{% else %}La galerie est en cours de construction. Revenez très bientôt !{% endif %}
+            </p>
         {% else %}
             <div class="photo-grid">
                 {% for photo in photos %}
@@ -41,20 +59,21 @@
             </div>
 
             {% if totalPages > 1 %}
+                {% set pageParams = currentTag ? { tag: currentTag.slug } : {} %}
                 <nav aria-label="Pagination de la galerie" class="mt-5">
                     <ul class="pagination justify-content-center">
                         <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ currentPage > 1 ? path('app_gallery', { page: currentPage - 1 }) : '#' }}">
+                            <a class="page-link" href="{{ currentPage > 1 ? path('app_gallery', pageParams|merge({ page: currentPage - 1 })) : '#' }}">
                                 <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
                         {% for p in 1..totalPages %}
                             <li class="page-item {{ p == currentPage ? 'active' : '' }}">
-                                <a class="page-link" href="{{ path('app_gallery', { page: p }) }}">{{ p }}</a>
+                                <a class="page-link" href="{{ path('app_gallery', pageParams|merge({ page: p })) }}">{{ p }}</a>
                             </li>
                         {% endfor %}
                         <li class="page-item {{ currentPage >= totalPages ? 'disabled' : '' }}">
-                            <a class="page-link" href="{{ currentPage < totalPages ? path('app_gallery', { page: currentPage + 1 }) : '#' }}">
+                            <a class="page-link" href="{{ currentPage < totalPages ? path('app_gallery', pageParams|merge({ page: currentPage + 1 })) : '#' }}">
                                 <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>

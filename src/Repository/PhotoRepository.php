@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Category;
 use App\Entity\Photo;
+use App\Entity\Tag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -45,6 +46,20 @@ class PhotoRepository extends ServiceEntityRepository
     public function paginate(int $page = 1, int $perPage = 24): Paginator
     {
         $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage);
+
+        return new Paginator($qb->getQuery(), fetchJoinCollection: false);
+    }
+
+    /** @return Paginator<Photo> */
+    public function paginateByTag(Tag $tag, int $page = 1, int $perPage = 24): Paginator
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->innerJoin('p.tags', 't')
+            ->andWhere('t = :tag')
+            ->setParameter('tag', $tag)
             ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $perPage)
             ->setMaxResults($perPage);

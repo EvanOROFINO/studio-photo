@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Article;
 use App\Entity\ArticleCategory;
+use App\Entity\BeforeAfter;
 use App\Entity\BlockedDate;
 use App\Entity\Booking;
 use App\Entity\Category;
@@ -13,6 +14,7 @@ use App\Entity\ContactRequest;
 use App\Entity\NewsletterSubscriber;
 use App\Entity\Photo;
 use App\Entity\Service;
+use App\Entity\Tag;
 use App\Entity\Testimonial;
 use App\Entity\User;
 use App\Repository\ContactRequestRepository;
@@ -59,8 +61,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Site public');
         yield MenuItem::linkToCrud('Photos', 'fa fa-image', Photo::class);
         yield MenuItem::linkToCrud('Catégories', 'fa fa-folder', Category::class);
+        yield MenuItem::linkToCrud('Tags', 'fa fa-hashtag', Tag::class);
         yield MenuItem::linkToCrud('Prestations', 'fa fa-tag', Service::class);
         yield MenuItem::linkToCrud('Témoignages', 'fa fa-star', Testimonial::class);
+        yield MenuItem::linkToCrud('Avant / Après', 'fa fa-sliders-h', BeforeAfter::class);
 
         yield MenuItem::section('Galeries clients');
         yield MenuItem::linkToCrud('Galeries privées', 'fa fa-lock', ClientGallery::class);

@@ -56,6 +56,11 @@ class PhotoCrudController extends AbstractCrudController
 
         yield BooleanField::new('featured', 'À la une');
 
+        yield AssociationField::new('tags', 'Tags')
+            ->setFormTypeOption('by_reference', false)
+            ->hideOnIndex()
+            ->setHelp('Étiquettes pour filtrer dans la galerie (ex: noir-et-blanc, été, extérieur).');
+
         yield DateTimeField::new('takenAt', 'Prise de vue')
             ->hideOnIndex()
             ->setFormTypeOption('input', 'datetime_immutable');

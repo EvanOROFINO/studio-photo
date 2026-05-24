@@ -1,0 +1,22 @@
+{% extends 'emails/layout.html.twig' %}
+
+{% block subject %}Nouvelle demande de {{ contact.fullName }}{% endblock %}
+
+{% block content %}
+    <h2>Nouvelle demande de contact</h2>
+
+    <div class="info-box">
+        <dl>
+            <dt>Nom</dt><dd>{{ contact.fullName }}</dd>
+            <dt>Email</dt><dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd>
+            {% if contact.phone %}<dt>Téléphone</dt><dd>{{ contact.phone }}</dd>{% endif %}
+            <dt>Type de projet</dt><dd>{{ contact.projectType|capitalize }}</dd>
+            {% if contact.eventDate %}<dt>Date événement</dt><dd>{{ contact.eventDate|date('d/m/Y') }}</dd>{% endif %}
+            <dt>Message</dt><dd style="white-space: pre-line;">{{ contact.message }}</dd>
+        </dl>
+    </div>
+
+    <p style="text-align:center;">
+        <a href="mailto:{{ contact.email }}?subject=Re:%20Votre%20demande%20{{ contact.projectType }}" class="btn">Répondre directement</a>
+    </p>
+{% endblock %}

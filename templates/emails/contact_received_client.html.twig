@@ -1,0 +1,23 @@
+{% extends 'emails/layout.html.twig' %}
+
+{% block subject %}Votre demande a bien été reçue — {{ studio_name }}{% endblock %}
+
+{% block content %}
+    <h2>Merci {{ contact.fullName|split(' ')|first }} !</h2>
+    <p>Votre demande est bien arrivée. Je l'étudie et je vous réponds personnellement <strong>sous 48 heures ouvrées</strong>.</p>
+
+    <div class="info-box">
+        <dl>
+            <dt>Type de projet</dt><dd>{{ contact.projectType|capitalize }}</dd>
+            {% if contact.eventDate %}<dt>Date envisagée</dt><dd>{{ contact.eventDate|date('d/m/Y') }}</dd>{% endif %}
+            <dt>Votre message</dt><dd style="white-space: pre-line;">{{ contact.message }}</dd>
+        </dl>
+    </div>
+
+    <p>En attendant ma réponse, n'hésitez pas à parcourir mes derniers travaux :</p>
+    <p style="text-align:center;">
+        <a href="{{ url('app_gallery') }}" class="btn">Voir la galerie</a>
+    </p>
+
+    <p style="margin-top:24px;">À très bientôt,<br><strong>{{ studio_name }}</strong></p>
+{% endblock %}

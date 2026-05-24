@@ -25,11 +25,18 @@
                                 {% for i in t.rating+1..5 %}<i class="bi bi-star text-muted opacity-25"></i>{% endfor %}
                             </div>
                             <blockquote class="serif fs-5 mb-3">« {{ t.content }} »</blockquote>
-                            <footer>
-                                <strong>{{ t.authorName }}</strong>
-                                {% if t.authorRole %}
-                                    <div class="text-muted small">{{ t.authorRole }}</div>
+                            <footer class="d-flex align-items-center gap-3">
+                                {% if t.avatarName %}
+                                    <img src="{{ asset('uploads/avatars/' ~ t.avatarName) }}" alt="{{ t.authorName }}" class="testimonial-avatar">
+                                {% else %}
+                                    <span class="testimonial-avatar-placeholder" aria-hidden="true">{{ t.initials }}</span>
                                 {% endif %}
+                                <div>
+                                    <strong>{{ t.authorName }}</strong>
+                                    {% if t.authorRole %}
+                                        <div class="text-muted small">{{ t.authorRole }}</div>
+                                    {% endif %}
+                                </div>
                             </footer>
                         </div>
                     </div>

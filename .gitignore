@@ -25,6 +25,10 @@
 !/public/uploads/photos/.gitkeep
 /public/uploads/articles/*
 !/public/uploads/articles/.gitkeep
+/public/uploads/avatars/*
+!/public/uploads/avatars/.gitkeep
+/public/uploads/before-after/*
+!/public/uploads/before-after/.gitkeep
 
 # LiipImagineBundle generated thumbnails — regenerated on demand
 /public/media/cache/

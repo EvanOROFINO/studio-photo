@@ -1,0 +1,25 @@
+{% extends 'emails/layout.html.twig' %}
+
+{% block subject %}Réservation confirmée — {{ booking.reference }}{% endblock %}
+
+{% block content %}
+    <h2>Acompte reçu, votre séance est réservée 🎉</h2>
+    <p>Merci {{ booking.clientName|split(' ')|first }} ! Je viens de recevoir votre acompte et votre séance est officiellement bloquée dans mon agenda.</p>
+
+    <div class="info-box">
+        <dl>
+            <dt>Référence</dt><dd><strong>{{ booking.reference }}</strong></dd>
+            <dt>Prestation</dt><dd>{{ booking.service.title }}</dd>
+            <dt>Date</dt><dd>{{ booking.eventDate|date('d/m/Y') }}</dd>
+            {% if booking.location %}<dt>Lieu</dt><dd>{{ booking.location }}</dd>{% endif %}
+            <dt>Acompte payé</dt><dd style="color:#198754; font-weight:600;">{{ booking.depositAmount|number_format(0, ',', ' ') }} €</dd>
+            <dt>Solde après séance</dt><dd>{{ (booking.amountTotal - booking.depositAmount)|number_format(0, ',', ' ') }} €</dd>
+        </dl>
+    </div>
+
+    <p>Je vous recontacte sous 48h pour finaliser les détails (lieu précis, horaires, déroulé…).</p>
+
+    <p>Si vous avez la moindre question, répondez simplement à ce message.</p>
+
+    <p style="margin-top:24px;">À très bientôt,<br><strong>{{ studio_name }}</strong></p>
+{% endblock %}

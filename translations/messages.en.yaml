@@ -1,0 +1,41 @@
+nav:
+    home: Home
+    gallery: Gallery
+    services: Services
+    availability: Availability
+    testimonials: Reviews
+    before_after: Before/After
+    blog: Blog
+    about: About
+    faq: FAQ
+    contact: Contact
+    contact_btn: Get in touch
+    admin: Admin
+
+footer:
+    navigation: Navigation
+    practical: Useful links
+    newsletter_title: Newsletter
+    newsletter_help: "Get my latest sessions and tips."
+    newsletter_placeholder: your@email.com
+    newsletter_promise: "No spam. One-click unsubscribe."
+    contact: Contact
+    legal_notice: Legal notice
+    privacy: Privacy
+    rights: "All rights reserved."
+
+common:
+    read_more: Read more
+    learn_more: Learn more
+    book_now: Book now
+    get_quote: Request a quote
+    view_all: View all
+    back_home: Back to home
+    loading: Loading…
+    sending: Sending…
+
+theme:
+    toggle: Toggle theme
+
+language:
+    select: Language

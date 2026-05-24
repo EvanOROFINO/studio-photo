@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Photo;
 use App\Repository\CategoryRepository;
 use App\Repository\PhotoRepository;
+use App\Repository\TagRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,13 +22,26 @@ class GalleryController extends AbstractController
         Request $request,
         CategoryRepository $categoryRepository,
         PhotoRepository $photoRepository,
+        TagRepository $tagRepository,
     ): Response {
         $page = max(1, $request->query->getInt('page', 1));
-        $paginator = $photoRepository->paginate($page, self::PHOTOS_PER_PAGE);
+        $tagSlug = trim((string) $request->query->get('tag', ''));
+
+        $tag = null;
+        if ($tagSlug !== '') {
+            $tag = $tagRepository->findOneBySlug($tagSlug);
+        }
+
+        $paginator = $tag
+            ? $photoRepository->paginateByTag($tag, $page, self::PHOTOS_PER_PAGE)
+            : $photoRepository->paginate($page, self::PHOTOS_PER_PAGE);
+
         $totalPages = (int) ceil(count($paginator) / self::PHOTOS_PER_PAGE);
 
         return $this->render('gallery/index.html.twig', [
             'categories' => $categoryRepository->findAllOrdered(),
+            'tags' => $tagRepository->findAllWithPhotoCount(),
+            'currentTag' => $tag,
             'photos' => $paginator,
             'currentPage' => $page,
             'totalPages' => $totalPages,

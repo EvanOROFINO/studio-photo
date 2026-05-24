@@ -25,3 +25,17 @@ vich_uploader:
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
+        testimonial_avatars:
+            uri_prefix: /uploads/avatars
+            upload_destination: '%kernel.project_dir%/public/uploads/avatars'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
+        before_after:
+            uri_prefix: /uploads/before-after
+            upload_destination: '%kernel.project_dir%/public/uploads/before-after'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
