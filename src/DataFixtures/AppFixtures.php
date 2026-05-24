@@ -10,6 +10,7 @@ use App\Entity\Category;
 use App\Entity\ClientGallery;
 use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
+use App\Entity\Coupon;
 use App\Entity\NewsletterSubscriber;
 use App\Entity\Photo;
 use App\Entity\Product;
@@ -230,6 +231,28 @@ class AppFixtures extends Fixture
             $p->setPosition($position);
             $p->setPublished(true);
             $manager->persist($p);
+        }
+
+        // --- Coupons promo -----------------------------------------------
+        $couponsData = [
+            ['BIENVENUE10', Coupon::TYPE_PERCENT, '10', null, null, '+6 months'],
+            ['NOEL2024', Coupon::TYPE_PERCENT, '20', '100', 100, '+3 months'],
+            ['LIVRAISONOFFERTE', Coupon::TYPE_FIXED, '8', '50', null, '+1 year'],
+        ];
+        foreach ($couponsData as [$code, $type, $value, $minAmount, $maxUses, $validUntilStr]) {
+            $c = new Coupon();
+            $c->setCode($code);
+            $c->setType($type);
+            $c->setValue($value);
+            if ($minAmount !== null) {
+                $c->setMinAmount($minAmount);
+            }
+            if ($maxUses !== null) {
+                $c->setMaxUses($maxUses);
+            }
+            $c->setValidUntil(new \DateTimeImmutable($validUntilStr));
+            $c->setActive(true);
+            $manager->persist($c);
         }
 
         // --- Sample contact request --------------------------------------

@@ -64,6 +64,26 @@
                 </div>
 
                 <div class="col-lg-4">
+                    {# Coupon form #}
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body">
+                            <h6 class="serif mb-3"><i class="bi bi-ticket-perforated me-2"></i>Code promo</h6>
+                            {% if coupon %}
+                                <div class="alert alert-success small mb-2 d-flex justify-content-between align-items-center">
+                                    <span><strong>{{ coupon.code }}</strong> appliqué ({{ coupon.humanLabel }})</span>
+                                    <a href="{{ path('app_cart_remove_coupon') }}" class="text-danger text-decoration-none">
+                                        <i class="bi bi-x"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <form method="post" action="{{ path('app_cart_apply_coupon') }}" class="d-flex gap-2">
+                                    <input type="text" name="coupon_code" class="form-control form-control-sm" placeholder="VOTRECODE" maxlength="40" required>
+                                    <button type="submit" class="btn btn-outline-dark btn-sm">Appliquer</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
                             <h5 class="serif mb-3">Récapitulatif</h5>
@@ -71,6 +91,12 @@
                                 <span>Sous-total</span>
                                 <strong>{{ subtotal|number_format(0, ',', ' ') }} €</strong>
                             </div>
+                            {% if discount > 0 %}
+                                <div class="d-flex justify-content-between mb-2 text-success">
+                                    <span>Remise ({{ coupon.code }})</span>
+                                    <strong>−{{ discount|number_format(0, ',', ' ') }} €</strong>
+                                </div>
+                            {% endif %}
                             <div class="d-flex justify-content-between mb-3 text-muted small">
                                 <span>Livraison France</span>
                                 <span>8 €</span>
@@ -78,7 +104,7 @@
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <strong>Total TTC</strong>
-                                <strong class="h5 mb-0">{{ (subtotal + 8)|number_format(0, ',', ' ') }} €</strong>
+                                <strong class="h5 mb-0">{{ (subtotalAfterDiscount + 8)|number_format(0, ',', ' ') }} €</strong>
                             </div>
                             <a href="{{ path('app_order_new') }}" class="btn btn-dark w-100 btn-lg">
                                 <i class="bi bi-credit-card me-2"></i>Commander

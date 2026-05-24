@@ -12,7 +12,9 @@ use App\Entity\ClientGallery;
 use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
 use App\Entity\NewsletterSubscriber;
+use App\Entity\Order;
 use App\Entity\Photo;
+use App\Entity\Product;
 use App\Entity\Service;
 use App\Entity\Tag;
 use App\Entity\Testimonial;
@@ -79,6 +81,11 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Réservations');
         yield MenuItem::linkToCrud('Réservations', 'fa fa-calendar-check', Booking::class);
         yield MenuItem::linkToCrud('Dates bloquées', 'fa fa-calendar-times', BlockedDate::class);
+
+        yield MenuItem::section('Boutique');
+        yield MenuItem::linkToCrud('Tirages / Produits', 'fa fa-tags', Product::class);
+        yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-bag', Order::class);
+        yield MenuItem::linkToCrud('Codes promo', 'fa fa-ticket-alt', \App\Entity\Coupon::class);
 
         yield MenuItem::section('Audience');
         yield MenuItem::linkToCrud('Demandes de contact', 'fa fa-envelope', ContactRequest::class);

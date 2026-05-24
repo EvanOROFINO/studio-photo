@@ -2,25 +2,26 @@
 
 namespace App\Service;
 
+use App\Entity\Coupon;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Product;
+use App\Repository\CouponRepository;
 use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Session-backed shopping cart for products.
- *
- * The cart stores only `[productId => quantity]` pairs in the session, so we
- * always re-query the database for fresh price + stock and prevent tampering.
+ * Session-backed shopping cart for products + coupon support.
  */
 class CartService
 {
     private const SESSION_KEY = 'shop_cart';
+    private const COUPON_KEY = 'shop_coupon_code';
 
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly ProductRepository $productRepository,
+        private readonly CouponRepository $couponRepository,
     ) {
     }
 
@@ -55,6 +56,7 @@ class CartService
     public function clear(): void
     {
         $this->save([]);
+        $this->clearCoupon();
     }
 
     public function isEmpty(): bool
@@ -67,16 +69,13 @@ class CartService
         return array_sum($this->raw());
     }
 
-    /**
-     * @return list<array{product: Product, quantity: int, lineTotal: float}>
-     */
+    /** @return list<array{product: Product, quantity: int, lineTotal: float}> */
     public function getDetailedItems(): array
     {
         $raw = $this->raw();
         if (empty($raw)) {
             return [];
         }
-
         $products = $this->productRepository->findBy(['id' => array_keys($raw)]);
         $items = [];
         foreach ($products as $product) {
@@ -102,10 +101,59 @@ class CartService
         return round($total, 2);
     }
 
-    /**
-     * Materialise the current cart into a brand new Order with OrderItems.
-     * Does NOT persist — the caller is in charge of em->persist() + flush().
-     */
+    // -- Coupons ---------------------------------------------------------
+
+    public function applyCoupon(string $code): ?string
+    {
+        $code = strtoupper(trim($code));
+        if ($code === '') {
+            return 'Code promo manquant.';
+        }
+        $coupon = $this->couponRepository->findOneByCode($code);
+        if (!$coupon) {
+            return 'Code promo introuvable.';
+        }
+        $reason = $coupon->getNotUsableReason($this->getSubtotal());
+        if ($reason !== null) {
+            return $reason;
+        }
+        $this->requestStack->getSession()->set(self::COUPON_KEY, $coupon->getCode());
+        return null;
+    }
+
+    public function clearCoupon(): void
+    {
+        $this->requestStack->getSession()->remove(self::COUPON_KEY);
+    }
+
+    public function getCoupon(): ?Coupon
+    {
+        $code = $this->requestStack->getSession()->get(self::COUPON_KEY);
+        if (!$code) {
+            return null;
+        }
+        $coupon = $this->couponRepository->findOneByCode($code);
+        if (!$coupon || !$coupon->isUsable($this->getSubtotal())) {
+            $this->clearCoupon();
+            return null;
+        }
+        return $coupon;
+    }
+
+    public function getDiscount(): float
+    {
+        $coupon = $this->getCoupon();
+        if (!$coupon) {
+            return 0.0;
+        }
+        return $coupon->computeDiscount($this->getSubtotal());
+    }
+
+    public function getSubtotalAfterDiscount(): float
+    {
+        return max(0.0, round($this->getSubtotal() - $this->getDiscount(), 2));
+    }
+
     public function buildOrder(): Order
     {
         $order = new Order();
@@ -123,20 +171,35 @@ class CartService
             $order->addItem($orderItem);
         }
         $order->recalculateTotals();
+
+        $discount = $this->getDiscount();
+        if ($discount > 0) {
+            $newSubtotal = max(0, (float) $order->getSubtotal() - $discount);
+            $order->setSubtotal((string) round($newSubtotal, 2));
+            $order->setTotalAmount((string) round($newSubtotal + (float) $order->getShippingFee(), 2));
+
+            $coupon = $this->getCoupon();
+            $note = sprintf(
+                'Code promo : %s (%s, -%s €)',
+                $coupon?->getCode() ?? '?',
+                $coupon?->getHumanLabel() ?? '?',
+                number_format($discount, 2, ',', ' '),
+            );
+            $order->setNotes(trim(($order->getNotes() ?? '')."\n".$note));
+        }
+
         return $order;
     }
 
     /** @return array<int, int> */
     private function raw(): array
     {
-        $session = $this->requestStack->getSession();
-        return $session->get(self::SESSION_KEY, []);
+        return $this->requestStack->getSession()->get(self::SESSION_KEY, []);
     }
 
     /** @param array<int, int> $cart */
     private function save(array $cart): void
     {
-        $session = $this->requestStack->getSession();
-        $session->set(self::SESSION_KEY, $cart);
+        $this->requestStack->getSession()->set(self::SESSION_KEY, $cart);
     }
 }

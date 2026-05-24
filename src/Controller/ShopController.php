@@ -38,7 +38,31 @@ class ShopController extends AbstractController
         return $this->render('shop/cart.html.twig', [
             'items' => $cart->getDetailedItems(),
             'subtotal' => $cart->getSubtotal(),
+            'coupon' => $cart->getCoupon(),
+            'discount' => $cart->getDiscount(),
+            'subtotalAfterDiscount' => $cart->getSubtotalAfterDiscount(),
         ]);
+    }
+
+    #[Route('/panier/promo', name: 'app_cart_apply_coupon', methods: ['POST'])]
+    public function applyCoupon(Request $request, CartService $cart): RedirectResponse
+    {
+        $code = (string) $request->request->get('coupon_code', '');
+        $error = $cart->applyCoupon($code);
+        if ($error !== null) {
+            $this->addFlash('danger', $error);
+        } else {
+            $this->addFlash('success', 'Code promo appliqué !');
+        }
+        return $this->redirectToRoute('app_cart_show');
+    }
+
+    #[Route('/panier/promo/retirer', name: 'app_cart_remove_coupon')]
+    public function removeCoupon(CartService $cart): RedirectResponse
+    {
+        $cart->clearCoupon();
+        $this->addFlash('info', 'Code promo retiré.');
+        return $this->redirectToRoute('app_cart_show');
     }
 
     #[Route('/panier/ajouter/{id}', name: 'app_cart_add', requirements: ['id' => '\d+'], methods: ['POST', 'GET'])]
