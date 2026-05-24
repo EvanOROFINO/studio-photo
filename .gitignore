@@ -26,6 +26,9 @@
 /public/uploads/articles/*
 !/public/uploads/articles/.gitkeep
 
+# LiipImagineBundle generated thumbnails — regenerated on demand
+/public/media/cache/
+
 # Private client galleries (stored outside public/)
 /var/client-galleries/
 

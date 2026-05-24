@@ -3,12 +3,10 @@
 {% block title %}{{ article.effectiveMetaTitle }} — {{ studio_name }}{% endblock %}
 {% block meta_description %}{{ article.effectiveMetaDescription }}{% endblock %}
 
+{% import 'macros/images.html.twig' as img %}
+
 {% block og_image %}
-    {% if article.coverImageName %}
-        <meta property="og:image" content="{{ absolute_url(asset('uploads/articles/' ~ article.coverImageName)) }}">
-    {% else %}
-        <meta property="og:image" content="https://picsum.photos/seed/article{{ article.id }}/1200/630">
-    {% endif %}
+    <meta property="og:image" content="{{ absolute_url(img.article_cover_url(article, 'og_cover')) }}">
     <meta property="og:type" content="article">
     <meta property="article:published_time" content="{{ article.publishedAt|date('c') }}">
     <meta property="article:section" content="{{ article.category.name }}">
@@ -34,10 +32,10 @@
         </div>
     </header>
 
-    {% set cover = article.coverImageName ? asset('uploads/articles/' ~ article.coverImageName) : 'https://picsum.photos/seed/article' ~ article.id ~ '/1600/700' %}
+    {% set cover = img.article_cover_url(article, 'full') %}
     <div class="blog-cover-wrap">
         <div class="container" style="max-width: 1100px;">
-            <img src="{{ cover }}" alt="{{ article.title }}" class="img-fluid rounded shadow-sm">
+            <img src="{{ cover }}" alt="{{ article.title }}" class="img-fluid rounded shadow-sm" loading="eager">
         </div>
     </div>
 
@@ -94,9 +92,8 @@
             {% for a in recentArticles|slice(0, 3) %}
                 <div class="col-md-4">
                     <article class="blog-card h-100">
-                        {% set img = a.coverImageName ? asset('uploads/articles/' ~ a.coverImageName) : 'https://picsum.photos/seed/article' ~ a.id ~ '/800/500' %}
                         <a href="{{ path('app_blog_show', { slug: a.slug }) }}" class="blog-card-cover">
-                            <img src="{{ img }}" alt="{{ a.title }}" loading="lazy">
+                            {{ img.article_cover(a, 'card') }}
                         </a>
                         <div class="blog-card-body">
                             <p class="small text-muted mb-2">{{ a.publishedAt|date('d M Y') }} • {{ a.category.name }}</p>

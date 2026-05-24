@@ -4,7 +4,7 @@
 {% block meta_description %}{{ photo.description|default(photo.title ~ ' — ' ~ photo.category.name) }}{% endblock %}
 
 {% block body %}
-{% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/1600/1100' %}
+{% set img = photo.imageName ? ('/uploads/photos/' ~ photo.imageName) | imagine_filter('full') : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/1600/1100' %}
 
 <section class="bg-dark py-5">
     <div class="container">

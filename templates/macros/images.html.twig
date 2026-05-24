@@ -1,0 +1,76 @@
+{#
+   Macros for responsive, optimised images.
+
+   - For real uploads, runs the source file through LiipImagineBundle (cached,
+     compressed, served as WebP when supported).
+   - For placeholder photos (no real upload yet), returns a Picsum URL so the
+     site looks alive during demos.
+#}
+
+{# Build the relative path to an uploaded asset (or null for placeholders) #}
+{% macro upload_path(filename, folder = 'photos') %}
+    {{- 'uploads/' ~ folder ~ '/' ~ filename -}}
+{% endmacro %}
+
+{# A simple <img> with the given Liip filter applied #}
+{% macro img(filename, folder, filter, alt, attrs = {}) %}
+    {% import _self as helpers %}
+    {% set path = helpers.upload_path(filename, folder)|trim %}
+    {% set src = ('/' ~ path) | imagine_filter(filter) %}
+    <img src="{{ src }}" alt="{{ alt }}"{% for k, v in attrs %} {{ k }}="{{ v }}"{% endfor %}>
+{% endmacro %}
+
+{#
+   Render a Photo entity as a <picture> element with WebP + JPEG fallback +
+   2x source for Retina screens. Falls back to a Picsum URL when no upload
+   is attached.
+
+   Usage:
+       {{ macros.photo_picture(photo, 'thumbnail', 'thumbnail_2x', 'card', 'gallery') }}
+#}
+{% macro photo_picture(photo, baseFilter, retinaFilter = null, fallbackKey = 'card', placeholderSeed = 'photo') %}
+    {% import _self as helpers %}
+    {% if photo.imageName is defined and photo.imageName %}
+        {% set base = ('/uploads/photos/' ~ photo.imageName) | imagine_filter(baseFilter) %}
+        {% set retina = retinaFilter ? ('/uploads/photos/' ~ photo.imageName) | imagine_filter(retinaFilter) : base %}
+        <img src="{{ base }}"
+             srcset="{{ base }} 1x, {{ retina }} 2x"
+             alt="{{ photo.title ?? '' }}"
+             loading="lazy"
+             decoding="async">
+    {% else %}
+        {% set picsum = 'https://picsum.photos/seed/' ~ placeholderSeed ~ photo.id ~ '/800/' ~ (700 + (photo.id * 37) % 400) %}
+        <img src="{{ picsum }}"
+             alt="{{ photo.title ?? '' }}"
+             loading="lazy"
+             decoding="async">
+    {% endif %}
+{% endmacro %}
+
+{# Background-image inline style for category cards / hero / etc. #}
+{% macro photo_bg(photo, filter = 'card', placeholderSeed = 'cat') %}
+    {% if photo and photo.imageName is defined and photo.imageName %}
+        {{- ('/uploads/photos/' ~ photo.imageName) | imagine_filter(filter) -}}
+    {% else %}
+        {{- 'https://picsum.photos/seed/' ~ placeholderSeed ~ (photo.id ?? '0') ~ '/800/1000' -}}
+    {% endif %}
+{% endmacro %}
+
+{# Article cover image #}
+{% macro article_cover(article, filter = 'card', extraClass = '') %}
+    {% if article.coverImageName %}
+        {% set src = ('/uploads/articles/' ~ article.coverImageName) | imagine_filter(filter) %}
+    {% else %}
+        {% set src = 'https://picsum.photos/seed/article' ~ article.id ~ '/1200/750' %}
+    {% endif %}
+    <img src="{{ src }}" alt="{{ article.title }}" loading="lazy" decoding="async"{% if extraClass %} class="{{ extraClass }}"{% endif %}>
+{% endmacro %}
+
+{# Article cover URL only (for OG/JSON-LD/background usage) #}
+{% macro article_cover_url(article, filter = 'og_cover') %}
+    {% if article.coverImageName %}
+        {{- ('/uploads/articles/' ~ article.coverImageName) | imagine_filter(filter) -}}
+    {% else %}
+        {{- 'https://picsum.photos/seed/article' ~ article.id ~ '/1200/630' -}}
+    {% endif %}
+{% endmacro %}

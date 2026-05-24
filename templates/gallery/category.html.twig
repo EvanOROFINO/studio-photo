@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/images.html.twig' as img %}
 
 {% block title %}{{ category.name }} — Galerie — {{ studio_name }}{% endblock %}
 {% block meta_description %}{{ category.description|default(category.name ~ ' — Galerie photo de ' ~ studio_name) }}{% endblock %}
@@ -30,9 +31,8 @@
         {% else %}
             <div class="photo-grid">
                 {% for photo in photos %}
-                    {% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/800/' ~ (700 + (photo.id * 37) % 400) %}
                     <a class="photo-card" href="{{ path('app_photo_show', { id: photo.id }) }}" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 50 }}">
-                        <img src="{{ img }}" alt="{{ photo.title }}" loading="lazy">
+                        {{ img.photo_picture(photo, 'thumbnail', 'thumbnail_2x', 'card', 'photo') }}
                         <div class="overlay">
                             <div>
                                 <h5>{{ photo.title }}</h5>

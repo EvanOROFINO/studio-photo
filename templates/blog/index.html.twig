@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/images.html.twig' as img %}
 
 {% block title %}{{ currentCategory ? currentCategory.name ~ ' — Blog' : 'Blog' }} — {{ studio_name }}{% endblock %}
 {% block meta_description %}{{ currentCategory ? currentCategory.description : 'Conseils, coulisses et inspirations photo — le blog de ' ~ studio_name }}{% endblock %}
@@ -23,15 +24,9 @@
                         {% for article in articles %}
                             <div class="col-md-6" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 2) * 100 }}">
                                 <article class="blog-card h-100">
-                                    {% if article.coverImageName %}
-                                        <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="blog-card-cover">
-                                            <img src="{{ asset('uploads/articles/' ~ article.coverImageName) }}" alt="{{ article.title }}" loading="lazy">
-                                        </a>
-                                    {% else %}
-                                        <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="blog-card-cover">
-                                            <img src="https://picsum.photos/seed/article{{ article.id }}/800/500" alt="{{ article.title }}" loading="lazy">
-                                        </a>
-                                    {% endif %}
+                                    <a href="{{ path('app_blog_show', { slug: article.slug }) }}" class="blog-card-cover">
+                                        {{ img.article_cover(article, 'card') }}
+                                    </a>
                                     <div class="blog-card-body">
                                         <p class="blog-card-meta small text-muted mb-2">
                                             <a href="{{ path('app_blog_category', { slug: article.category.slug }) }}" class="text-accent text-decoration-none">{{ article.category.name }}</a>

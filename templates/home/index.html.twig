@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/images.html.twig' as img %}
 
 {% block title %}{{ studio_name }} — {{ studio_tagline }}{% endblock %}
 
@@ -25,9 +26,8 @@
         </div>
         <div class="photo-grid">
             {% for photo in featuredPhotos %}
-                {% set img = photo.imageName ? asset('uploads/photos/' ~ photo.imageName) : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/800/' ~ (700 + (photo.id * 37) % 400) %}
                 <a class="photo-card" href="{{ path('app_photo_show', { id: photo.id }) }}" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 100 }}">
-                    <img src="{{ img }}" alt="{{ photo.title }}" loading="lazy">
+                    {{ img.photo_picture(photo, 'thumbnail', 'thumbnail_2x', 'card', 'photo') }}
                     <div class="overlay">
                         <div>
                             <h5>{{ photo.title }}</h5>
@@ -56,7 +56,7 @@
             {% for category in categories|slice(0, 4) %}
                 {% set firstPhoto = category.photos|first %}
                 {% set bg = firstPhoto and firstPhoto.imageName
-                    ? asset('uploads/photos/' ~ firstPhoto.imageName)
+                    ? ('/uploads/photos/' ~ firstPhoto.imageName) | imagine_filter('card')
                     : 'https://picsum.photos/seed/cat' ~ category.id ~ '/800/1000' %}
                 <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
                     <a class="category-card" href="{{ path('app_gallery_category', { slug: category.slug }) }}">
