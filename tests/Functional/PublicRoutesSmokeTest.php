@@ -20,6 +20,9 @@ class PublicRoutesSmokeTest extends AbstractAppWebTestCase
         yield 'blog' => ['/blog', 'Articles'];
         yield 'feed' => ['/feed', '<rss'];
         yield 'sitemap' => ['/sitemap', '<urlset'];
+        yield 'before_after' => ['/avant-apres', 'Avant'];
+        yield 'showreel' => ['/showreel', 'Showreel'];
+        yield 'health' => ['/health', '"status"'];
         yield 'legal_notice' => ['/mentions-legales', 'Mentions légales'];
         yield 'privacy' => ['/politique-de-confidentialite', 'confidentialité'];
         yield 'login' => ['/login', 'Espace administrateur'];
