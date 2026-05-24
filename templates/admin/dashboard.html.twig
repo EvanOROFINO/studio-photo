@@ -2,60 +2,227 @@
 
 {% block content_title %}Bienvenue, {{ app.user.fullName ?? app.user.email }} 👋{% endblock %}
 
+{% block head_javascript %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+{% endblock %}
+
 {% block main %}
-<div class="row g-4 mb-4">
+{# KPI cards ----------------------------------------------------------- #}
+<div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small text-uppercase mb-1">Photos publiées</div>
-                <div class="h2 mb-0">{{ totalPhotos }}</div>
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-euro-sign me-1"></i>CA encaissé</div>
+                <div class="h3 mb-0 text-success">{{ kpis.totalRevenue|number_format(0, ',', ' ') }} €</div>
+                <small class="text-muted">{{ kpis.paidBookings }} acompte{{ kpis.paidBookings > 1 ? 's' : '' }} payé{{ kpis.paidBookings > 1 ? 's' : '' }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 {{ kpis.newMessages > 0 ? 'border-warning border-2' : '' }}">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-envelope me-1"></i>Messages</div>
+                <div class="h3 mb-0 {{ kpis.newMessages > 0 ? 'text-warning' : '' }}">{{ kpis.newMessages }}</div>
+                <small class="text-muted">non lus</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small text-uppercase mb-1">À la une</div>
-                <div class="h2 mb-0">{{ featuredPhotos }}</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm h-100 {{ newMessages > 0 ? 'border-warning' : '' }}">
-            <div class="card-body">
-                <div class="text-muted small text-uppercase mb-1">Nouveaux messages</div>
-                <div class="h2 mb-0 {{ newMessages > 0 ? 'text-warning' : '' }}">{{ newMessages }}</div>
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-image me-1"></i>Photos publiées</div>
+                <div class="h3 mb-0">{{ kpis.totalPhotos }}</div>
+                <small class="text-muted">{{ kpis.featuredPhotos }} à la une</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small text-uppercase mb-1">Total demandes</div>
-                <div class="h2 mb-0">{{ totalMessages }}</div>
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-newspaper me-1"></i>Blog</div>
+                <div class="h3 mb-0">{{ kpis.totalArticles }}</div>
+                <small class="text-muted">{{ kpis.totalArticleViews|number_format(0, ',', ' ') }} vues cumulées</small>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <h5 class="mb-3">Démarrer</h5>
-        <p class="text-muted">Voici quelques actions courantes :</p>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ ea_url().setController('App\\Controller\\Admin\\PhotoCrudController').setAction('new') }}" class="btn btn-primary">
-                <i class="fa fa-plus me-1"></i> Ajouter une photo
-            </a>
-            <a href="{{ ea_url().setController('App\\Controller\\Admin\\CategoryCrudController').setAction('index') }}" class="btn btn-outline-primary">
-                Gérer les catégories
-            </a>
-            <a href="{{ ea_url().setController('App\\Controller\\Admin\\ContactRequestCrudController').setAction('index') }}" class="btn btn-outline-primary">
-                Voir les demandes
-            </a>
-            <a href="/" target="_blank" class="btn btn-outline-secondary">
-                <i class="fa fa-external-link-alt me-1"></i> Voir le site
-            </a>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-bell me-1"></i>Newsletter</div>
+                <div class="h3 mb-0">{{ kpis.newsletterSubscribers }}</div>
+                <small class="text-muted">abonnés actifs</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-lock me-1"></i>Galeries clients</div>
+                <div class="h3 mb-0">{{ kpis.clientGalleries }}</div>
+                <small class="text-muted">actives</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-2">Démarrer rapidement</div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\PhotoCrudController').setAction('new') }}" class="btn btn-sm btn-primary">
+                        <i class="fa fa-plus me-1"></i>Ajouter une photo
+                    </a>
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ClientGalleryCrudController').setAction('new') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fa fa-lock me-1"></i>Nouvelle galerie client
+                    </a>
+                    <a href="{{ ea_url().setController('App\\Controller\\Admin\\ArticleCrudController').setAction('new') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fa fa-newspaper me-1"></i>Écrire un article
+                    </a>
+                    <a href="/" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="fa fa-external-link-alt me-1"></i>Voir le site
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+{# Charts ------------------------------------------------------------- #}
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3">Réservations par mois</h5>
+                <canvas id="chartBookings" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="mb-3">Top prestations</h5>
+                <canvas id="chartServices"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3">CA encaissé (€) par mois</h5>
+                <canvas id="chartRevenue" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="mb-3">Demandes par type</h5>
+                <canvas id="chartContacts"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3">Photos par catégorie</h5>
+                <canvas id="chartCategories"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3">Articles les plus vus</h5>
+                <canvas id="chartArticles"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    Chart.defaults.font.family = 'system-ui, -apple-system, sans-serif';
+    Chart.defaults.font.size = 12;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.responsive = true;
+    Chart.defaults.maintainAspectRatio = false;
+
+    const palette = ['#c8a97e', '#1a1a1a', '#198754', '#0d6efd', '#dc3545', '#6f42c1', '#fd7e14', '#20c997'];
+
+    new Chart(document.getElementById('chartBookings'), {
+        type: 'bar',
+        data: {
+            labels: {{ bookingsPerMonth.labels|json_encode|raw }},
+            datasets: [
+                { label: 'Acompte payé', data: {{ bookingsPerMonth.paid|json_encode|raw }}, backgroundColor: '#198754', borderRadius: 4 },
+                { label: 'En attente', data: {{ bookingsPerMonth.pending|json_encode|raw }}, backgroundColor: '#ffc107', borderRadius: 4 },
+            ],
+        },
+        options: {
+            scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, ticks: { precision: 0 } } },
+            plugins: { legend: { position: 'bottom' } },
+        },
+    });
+
+    new Chart(document.getElementById('chartServices'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ topServices.labels|json_encode|raw }},
+            datasets: [{ data: {{ topServices.values|json_encode|raw }}, backgroundColor: palette, borderWidth: 0 }],
+        },
+        options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' },
+    });
+
+    new Chart(document.getElementById('chartRevenue'), {
+        type: 'line',
+        data: {
+            labels: {{ revenuePerMonth.labels|json_encode|raw }},
+            datasets: [{
+                label: 'CA (€)',
+                data: {{ revenuePerMonth.values|json_encode|raw }},
+                borderColor: '#c8a97e',
+                backgroundColor: 'rgba(200, 169, 126, 0.15)',
+                tension: 0.35, fill: true, pointRadius: 4, pointBackgroundColor: '#c8a97e',
+            }],
+        },
+        options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } },
+    });
+
+    new Chart(document.getElementById('chartContacts'), {
+        type: 'pie',
+        data: {
+            labels: {{ contactsByType.labels|json_encode|raw }},
+            datasets: [{ data: {{ contactsByType.values|json_encode|raw }}, backgroundColor: palette, borderWidth: 0 }],
+        },
+        options: { plugins: { legend: { position: 'bottom' } } },
+    });
+
+    new Chart(document.getElementById('chartCategories'), {
+        type: 'bar',
+        data: {
+            labels: {{ photosByCategory.labels|json_encode|raw }},
+            datasets: [{ data: {{ photosByCategory.values|json_encode|raw }}, backgroundColor: '#c8a97e', borderRadius: 4 }],
+        },
+        options: { indexAxis: 'y', scales: { x: { ticks: { precision: 0 } } }, plugins: { legend: { display: false } } },
+    });
+
+    new Chart(document.getElementById('chartArticles'), {
+        type: 'bar',
+        data: {
+            labels: {{ topArticles.labels|json_encode|raw }},
+            datasets: [{ data: {{ topArticles.values|json_encode|raw }}, backgroundColor: '#1a1a1a', borderRadius: 4 }],
+        },
+        options: { indexAxis: 'y', scales: { x: { ticks: { precision: 0 } } }, plugins: { legend: { display: false } } },
+    });
+})();
+</script>
 {% endblock %}

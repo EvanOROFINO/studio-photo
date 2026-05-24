@@ -7,6 +7,19 @@
         <title>{% block title %}{{ studio_name }}{% endblock %}</title>
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
+        {# Apply dark theme as early as possible to avoid flash of light content #}
+        <script>
+            (function () {
+                try {
+                    const stored = localStorage.getItem('siteTheme');
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const theme = stored || (prefersDark ? 'dark' : 'light');
+                    document.documentElement.setAttribute('data-theme', theme);
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                } catch (e) {}
+            })();
+        </script>
+
         {# Open Graph / Twitter Card #}
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="{{ studio_name }}">
@@ -83,6 +96,18 @@
                     accept.addEventListener('click', () => {
                         localStorage.setItem('cookieConsent', '1');
                         banner.hidden = true;
+                    });
+                }
+
+                // Theme toggle
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) {
+                    toggle.addEventListener('click', () => {
+                        const current = document.documentElement.getAttribute('data-theme') || 'light';
+                        const next = current === 'dark' ? 'light' : 'dark';
+                        document.documentElement.setAttribute('data-theme', next);
+                        document.documentElement.setAttribute('data-bs-theme', next);
+                        localStorage.setItem('siteTheme', next);
                     });
                 }
             });
