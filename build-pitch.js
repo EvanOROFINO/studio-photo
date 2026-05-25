@@ -88,11 +88,11 @@ function addFooter(slide, pageNum, total) {
         fontSize: 30, color: INK, fontFace: TITLE_FONT, bold: true,
     });
 
-    // 3 colonnes de stats
+    // 3 colonnes de stats (NBSP pour éviter les wraps moches)
     const stats = [
-        ["70%", "des sites de photographes pro sont des WordPress avec galerie statique — aucune vraie automatisation."],
-        ["3h+", "passées chaque semaine par le photographe à faire de la facturation, du suivi et de la livraison manuelle."],
-        ["—40%", "de chiffre d'affaires potentiel perdu : pas de boutique tirages, pas de réservation directe en ligne."],
+        ["70 %", "des sites de photographes pro sont des WordPress avec galerie statique — aucune vraie automatisation."],
+        ["3 h+", "passées chaque semaine par le photographe à faire de la facturation, du suivi et de la livraison manuelle."],
+        ["−40 %", "de chiffre d'affaires potentiel perdu : pas de boutique tirages, pas de réservation directe en ligne."],
     ];
 
     const cardW = 3.9, cardH = 3.4, gap = 0.3;
@@ -114,18 +114,18 @@ function addFooter(slide, pageNum, total) {
             fill: { color: GOLD }, line: { color: GOLD, width: 0 },
         });
 
-        // Big number
+        // Big number (centered both ways, smaller font to avoid wrapping)
         s.addText(num, {
-            x: x + 0.3, y: y + 0.4, w: cardW - 0.6, h: 1.6,
-            fontSize: 72, color: INK, fontFace: TITLE_FONT, bold: true,
-            valign: "top",
+            x: x + 0.3, y: y + 0.5, w: cardW - 0.6, h: 1.4,
+            fontSize: 60, color: INK, fontFace: TITLE_FONT, bold: true,
+            align: "center", valign: "middle",
         });
 
-        // Description
+        // Description (centered)
         s.addText(desc, {
-            x: x + 0.3, y: y + 2.0, w: cardW - 0.6, h: cardH - 2.2,
-            fontSize: 14, color: MUTED, fontFace: BODY_FONT,
-            valign: "top",
+            x: x + 0.4, y: y + 2.1, w: cardW - 0.8, h: cardH - 2.3,
+            fontSize: 13, color: MUTED, fontFace: BODY_FONT,
+            align: "center", valign: "top",
         });
     });
 
@@ -439,11 +439,11 @@ function addFooter(slide, pageNum, total) {
         fontSize: 30, color: INK, fontFace: TITLE_FONT, bold: true,
     });
 
-    // 3 cards horizontales avec gros chiffres
+    // 3 cards horizontales avec gros chiffres (labels propres, pas d'espaces qui wrappent)
     const roi = [
-        ["+3 séances", "/ mois", "supplémentaires grâce à la réservation directe en ligne (au lieu d'aller-retours email)."],
-        ["+450 €", "/ mois", "estimés via la boutique tirages (5 tirages vendus à 90 € de marge moyenne)."],
-        ["—2h", "/ semaine", "économisées sur la facturation et la livraison manuelle (Stripe + galerie auto)."],
+        ["+3", "séances / mois", "supplémentaires grâce à la réservation directe en ligne (au lieu d'aller-retours email)."],
+        ["+450€", "par mois", "estimés via la boutique tirages (5 tirages vendus à 90€ de marge moyenne)."],
+        ["−2h", "par semaine", "économisées sur la facturation et la livraison manuelle (Stripe + galerie auto)."],
     ];
 
     const rW = 4.0, rH = 4.0, rGap = 0.3;
@@ -460,14 +460,14 @@ function addFooter(slide, pageNum, total) {
         });
 
         s.addText(big, {
-            x: x + 0.3, y: rY + 0.7, w: rW - 0.6, h: 1.4,
-            fontSize: 56, color: i === 1 ? GOLD : INK, fontFace: TITLE_FONT, bold: true,
+            x: x + 0.3, y: rY + 0.7, w: rW - 0.6, h: 1.5,
+            fontSize: 64, color: i === 1 ? GOLD : INK, fontFace: TITLE_FONT, bold: true,
             align: "center", valign: "middle",
         });
 
         s.addText(sub, {
-            x: x + 0.3, y: rY + 2.1, w: rW - 0.6, h: 0.4,
-            fontSize: 16, color: i === 1 ? PAPER : MUTED, fontFace: BODY_FONT,
+            x: x + 0.3, y: rY + 2.25, w: rW - 0.6, h: 0.4,
+            fontSize: 14, color: i === 1 ? PAPER : MUTED, fontFace: BODY_FONT,
             align: "center", italic: true,
         });
 
@@ -513,13 +513,14 @@ function addFooter(slide, pageNum, total) {
         fontSize: 14, color: MUTED, fontFace: BODY_FONT, italic: true,
     });
 
-    // Big price
-    s.addText("2 500 €", {
-        x: 2.2, y: 3.1, w: 5.5, h: 1.4,
-        fontSize: 100, color: INK, fontFace: TITLE_FONT, bold: true,
+    // Big price (NBSP between digits and € to keep it on one line)
+    s.addText("3 000 €", {
+        x: 2.2, y: 3.2, w: 5.5, h: 1.6,
+        fontSize: 80, color: INK, fontFace: TITLE_FONT, bold: true,
+        valign: "middle",
     });
     s.addText("TTC, payable en 2 fois sans frais", {
-        x: 2.2, y: 4.5, w: 5.5, h: 0.4,
+        x: 2.2, y: 4.85, w: 5.5, h: 0.4,
         fontSize: 12, color: MUTED, fontFace: BODY_FONT,
     });
 
