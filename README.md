@@ -5,8 +5,27 @@
 ![CI](https://github.com/EvanOROFINO/studio-photo/actions/workflows/ci.yml/badge.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)
 ![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-31%20passing-brightgreen)
-![Coverage](https://img.shields.io/badge/license-MIT-blue)
+![Tests](https://img.shields.io/badge/tests-49%20passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+---
+
+## 📸 Aperçu visuel
+
+<table>
+  <tr>
+    <td width="50%"><a href="docs/screenshots/home.png"><img src="docs/screenshots/home.png" alt="Page d'accueil"></a><br><sub><strong>Accueil</strong> — Hero, photos à la une, catégories</sub></td>
+    <td width="50%"><a href="docs/screenshots/gallery.png"><img src="docs/screenshots/gallery.png" alt="Galerie"></a><br><sub><strong>Galerie</strong> — Filtres par tag, lightbox, masonry</sub></td>
+  </tr>
+  <tr>
+    <td><a href="docs/screenshots/shop.png"><img src="docs/screenshots/shop.png" alt="Boutique"></a><br><sub><strong>Boutique tirages</strong> — Catalogue + panier Stripe</sub></td>
+    <td><a href="docs/screenshots/availability.png"><img src="docs/screenshots/availability.png" alt="Disponibilités"></a><br><sub><strong>Calendrier</strong> — FullCalendar des dispos</sub></td>
+  </tr>
+  <tr>
+    <td><a href="docs/screenshots/blog.png"><img src="docs/screenshots/blog.png" alt="Blog"></a><br><sub><strong>Blog SEO</strong> — Markdown + RSS + JSON-LD</sub></td>
+    <td><a href="docs/screenshots/testimonials.png"><img src="docs/screenshots/testimonials.png" alt="Témoignages"></a><br><sub><strong>Avis clients</strong> — Avatars + notation 5★</sub></td>
+  </tr>
+</table>
 
 ---
 
