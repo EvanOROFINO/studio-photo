@@ -128,7 +128,27 @@ php bin/console doctrine:query:sql "SELECT token FROM client_gallery LIMIT 1"
 ```
 Puis ouvrir `/galerie-client/{token}` avec le mot de passe `demo1234`.
 
-## 🌐 Déploiement production
+## ☁️ Déploiement Railway (gratuit, 1 clic)
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/EvanOROFINO/studio-photo)
+
+Le projet inclut **`Dockerfile`**, **`docker-entrypoint.sh`** et **`railway.toml`** pour un déploiement direct :
+
+1. Sur [railway.app](https://railway.app/), clique **"New Project"** → **"Deploy from GitHub repo"** → choisis `studio-photo`
+2. Ajoute un service **MySQL** : "+ New" → **"Database"** → **"MySQL"** (Railway connecte automatiquement `DATABASE_URL`)
+3. Dans **Variables**, ajoute :
+   ```
+   APP_ENV=prod
+   APP_SECRET=<32 hex chars — générer avec : openssl rand -hex 32>
+   APP_DEBUG=0
+   ```
+4. Railway build l'image Docker, lance les migrations + fixtures au démarrage, et expose le site sur une URL `xxx.up.railway.app`.
+
+→ **Healthcheck** automatique sur `/health` (configuré dans `railway.toml`).
+
+---
+
+## 🌐 Déploiement production traditionnel
 
 Le projet inclut tout ce qu'il faut pour partir en production :
 
