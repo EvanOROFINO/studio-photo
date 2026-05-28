@@ -12,6 +12,10 @@
 
 ## 📸 Aperçu visuel
 
+<p align="center">
+  <img src="docs/studio-photo-demo.gif" alt="Démo animée du site Studio Photo" width="900">
+</p>
+
 <table>
   <tr>
     <td width="50%"><a href="docs/screenshots/home.png"><img src="docs/screenshots/home.png" alt="Page d'accueil"></a><br><sub><strong>Accueil</strong> — Hero, photos à la une, catégories</sub></td>

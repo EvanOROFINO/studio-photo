@@ -57,3 +57,4 @@ Thumbs.db
 # Local secrets
 /secrets/
 ###< studio-photo ###
+/docs/demo-frames/
