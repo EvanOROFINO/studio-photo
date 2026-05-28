@@ -1,0 +1,25 @@
+# Files NOT copied into the Docker image — keeps it lean
+.git
+.github
+.idea
+.vscode
+.phpunit.cache
+node_modules
+release
+build
+dist
+tests
+docs/screenshots
+pitch-slides
+pitch-deck.pptx
+build-pitch.js
+*.zip
+~$*
+var/cache
+var/log
+var/test.db
+var/test-client-galleries
+.env.local
+.env.test
+.env.*.local
+phpunit.dist.xml

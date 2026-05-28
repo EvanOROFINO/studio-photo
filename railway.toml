@@ -1,0 +1,17 @@
+# =============================================================================
+# railway.toml — Configuration de déploiement Railway
+# -----------------------------------------------------------------------------
+# Railway lit ce fichier au déploiement pour savoir comment builder/lancer.
+# La BDD MySQL doit être ajoutée séparément via "+ New" → "Database" → "MySQL"
+# Railway injecte automatiquement DATABASE_URL et PORT.
+# =============================================================================
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
