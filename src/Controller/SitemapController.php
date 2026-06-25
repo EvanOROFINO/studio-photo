@@ -6,12 +6,17 @@ use App\Repository\ArticleCategoryRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\PhotoRepository;
+use App\Service\SiteContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SitemapController extends AbstractController
 {
+    public function __construct(private readonly SiteContext $siteContext)
+    {
+    }
+
     #[Route('/sitemap', name: 'app_sitemap')]
     public function sitemap(
         CategoryRepository $categoryRepository,
@@ -19,6 +24,33 @@ class SitemapController extends AbstractController
         ArticleRepository $articleRepository,
         ArticleCategoryRepository $articleCategoryRepository,
     ): Response {
+        // URLs adaptées au site courant (Photo vs Vidéo)
+        if ($this->siteContext->isVideo()) {
+            $urls = [
+                ['route' => 'app_home', 'priority' => '1.0', 'changefreq' => 'weekly'],
+                ['route' => 'app_showreel', 'priority' => '0.9', 'changefreq' => 'weekly'],
+                ['route' => 'app_video_packages', 'priority' => '0.9', 'changefreq' => 'monthly'],
+                ['route' => 'app_blog', 'priority' => '0.7', 'changefreq' => 'weekly'],
+                ['route' => 'app_about', 'priority' => '0.7', 'changefreq' => 'monthly'],
+                ['route' => 'app_testimonials', 'priority' => '0.6', 'changefreq' => 'monthly'],
+                ['route' => 'app_contact', 'priority' => '0.7', 'changefreq' => 'monthly'],
+                ['route' => 'app_faq', 'priority' => '0.4', 'changefreq' => 'monthly'],
+                ['route' => 'app_legal_notice', 'priority' => '0.2', 'changefreq' => 'yearly'],
+                ['route' => 'app_privacy', 'priority' => '0.2', 'changefreq' => 'yearly'],
+            ];
+
+            $response = $this->render('sitemap/sitemap.xml.twig', [
+                'urls' => $urls,
+                'categories' => [],
+                'photos' => [],
+                'articles' => $articleRepository->findAllPublished(),
+                'articleCategories' => $articleCategoryRepository->findAllOrdered(),
+            ]);
+            $response->headers->set('Content-Type', 'application/xml');
+            return $response;
+        }
+
+        // Site Photo (par défaut)
         $urls = [
             ['route' => 'app_home', 'priority' => '1.0', 'changefreq' => 'weekly'],
             ['route' => 'app_gallery', 'priority' => '0.9', 'changefreq' => 'weekly'],

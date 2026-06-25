@@ -20,6 +20,19 @@ class ContactController extends AbstractController
         MailService $mailService,
     ): Response {
         $contactRequest = new ContactRequest();
+
+        // Pré-remplissage si l'utilisateur vient d'un forfait vidéo (?forfait=signature)
+        $selectedPackage = null;
+        $forfait = $request->query->get('forfait');
+        if ($forfait && $request->isMethod('GET')) {
+            $selectedPackage = ucfirst($forfait);
+            $contactRequest->setProjectType('pro');
+            $contactRequest->setMessage(sprintf(
+                "Bonjour,\n\nJe suis intéressé(e) par le forfait « %s ». Pourriez-vous me recontacter pour en discuter ?\n\nMon projet : ",
+                $selectedPackage
+            ));
+        }
+
         $form = $this->createForm(ContactRequestType::class, $contactRequest);
         $form->handleRequest($request);
 
@@ -42,6 +55,7 @@ class ContactController extends AbstractController
 
         return $this->render('contact/index.html.twig', [
             'form' => $form,
+            'selectedPackage' => $selectedPackage,
         ]);
     }
 

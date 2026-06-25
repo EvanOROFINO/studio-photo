@@ -8,17 +8,29 @@
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}" href="{{ path('app_home') }}">Accueil</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_gallery' or app.request.attributes.get('_route') == 'app_photo_show' ? 'active' : '' }}" href="{{ path('app_gallery') }}">Galerie</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_services' ? 'active' : '' }}" href="{{ path('app_services') }}">Prestations</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_availability' ? 'active' : '' }}" href="{{ path('app_availability') }}">Disponibilités</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_testimonials' ? 'active' : '' }}" href="{{ path('app_testimonials') }}">Avis</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_before_after' ? 'active' : '' }}" href="{{ path('app_before_after') }}">Avant/Après</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_showreel' ? 'active' : '' }}" href="{{ path('app_showreel') }}">Showreel</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_blog' ? 'active' : '' }}" href="{{ path('app_blog') }}">Blog</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_shop' or app.request.attributes.get('_route') starts with 'app_cart' or app.request.attributes.get('_route') starts with 'app_order' ? 'active' : '' }}" href="{{ path('app_shop_index') }}"><i class="bi bi-bag me-1"></i>Boutique</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a></li>
-                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_faq' ? 'active' : '' }}" href="{{ path('app_faq') }}">FAQ</a></li>
+                {% set route = app.request.attributes.get('_route') %}
+                <li class="nav-item"><a class="nav-link {{ route == 'app_home' ? 'active' : '' }}" href="{{ path('app_home') }}">Accueil</a></li>
+                {% if current_site.videoSite %}
+                    {# ===== Navigation SITE VIDÉO ===== #}
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'app_showreel' or route == 'app_video_detail' ? 'active' : '' }}" href="{{ path('app_showreel') }}">Showreel</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_video_packages' ? 'active' : '' }}" href="{{ path('app_video_packages') }}">Forfaits</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_testimonials' ? 'active' : '' }}" href="{{ path('app_testimonials') }}">Avis</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'app_blog' ? 'active' : '' }}" href="{{ path('app_blog') }}">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_faq' ? 'active' : '' }}" href="{{ path('app_faq') }}">FAQ</a></li>
+                {% else %}
+                    {# ===== Navigation SITE PHOTO ===== #}
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'app_gallery' or route == 'app_photo_show' ? 'active' : '' }}" href="{{ path('app_gallery') }}">Galerie</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_services' ? 'active' : '' }}" href="{{ path('app_services') }}">Prestations</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_availability' ? 'active' : '' }}" href="{{ path('app_availability') }}">Disponibilités</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_testimonials' ? 'active' : '' }}" href="{{ path('app_testimonials') }}">Avis</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_before_after' ? 'active' : '' }}" href="{{ path('app_before_after') }}">Avant/Après</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_showreel' or route == 'app_video_detail' ? 'active' : '' }}" href="{{ path('app_showreel') }}">Showreel</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'app_blog' ? 'active' : '' }}" href="{{ path('app_blog') }}">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'app_shop' or route starts with 'app_cart' or route starts with 'app_order' ? 'active' : '' }}" href="{{ path('app_shop_index') }}"><i class="bi bi-bag me-1"></i>Boutique</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_about' ? 'active' : '' }}" href="{{ path('app_about') }}">À propos</a></li>
+                    <li class="nav-item"><a class="nav-link {{ route == 'app_faq' ? 'active' : '' }}" href="{{ path('app_faq') }}">FAQ</a></li>
+                {% endif %}
                 <li class="nav-item ms-lg-2">
                     <a class="btn btn-dark btn-sm px-3" href="{{ path('app_contact') }}">
                         <i class="bi bi-envelope me-1"></i>{{ 'nav.contact_btn'|trans }}
