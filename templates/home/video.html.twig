@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ current_site.name }} — Films corporate, mariage et clips à Lyon{% endblock %}
+{% block meta_description %}{{ current_site.tagline }} {{ current_site.name }} à {{ studio_city }} : mariage, corporate, événementiel, clips & brand content.{% endblock %}
+
+{% block body %}
+
+    {# ============ HERO VIDEO ============ #}
+    <section class="position-relative overflow-hidden text-white py-6"
+             style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); min-height: 80vh; display: flex; align-items: center;">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-7" data-aos="fade-up">
+                    <div class="badge bg-transparent border mb-3 px-3 py-2"
+                         style="border-color: {{ current_site.accentColor }} !important; color: {{ current_site.accentColor }};">
+                        🎬 {{ current_site.name|upper }}
+                    </div>
+                    <h1 class="display-3 fw-bold mb-4" style="font-family: 'Playfair Display', serif; line-height: 1.05;">
+                        Raconter votre histoire<br>
+                        <span style="color: {{ current_site.accentColor }}; font-style: italic;">en images animées.</span>
+                    </h1>
+                    <p class="lead mb-4" style="max-width: 540px; opacity: 0.85;">
+                        {{ current_site.tagline|default('Du film de mariage aux contenus de marque, je capture l\'émotion et la mets en mouvement.') }}
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{{ path('app_showreel') }}" class="btn btn-lg px-4"
+                           style="background: {{ current_site.accentColor }}; color: #1a1a1a; font-weight: 700;">
+                            ▶ Voir mon showreel
+                        </a>
+                        <a href="{{ path('app_contact') }}" class="btn btn-lg btn-outline-light px-4">
+                            Discuter d'un projet
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center d-none d-lg-block" data-aos="fade-left" data-aos-delay="200">
+                    <div class="position-relative" style="aspect-ratio: 1/1; max-width: 380px; margin-left: auto;">
+                        {% if featuredVideos|length > 0 %}
+                            <img src="{{ featuredVideos[0].thumbnailUrl }}"
+                                 alt="{{ featuredVideos[0].title }}"
+                                 class="w-100 h-100 rounded-3 shadow-lg"
+                                 style="object-fit: cover; border: 3px solid {{ current_site.accentColor }};">
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 80px; height: 80px; background: {{ current_site.accentColor }}; color: #1a1a1a; font-size: 32px;">
+                                    ▶
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ============ SHOWREEL FEATURED ============ #}
+    {% if featuredVideos|length > 0 %}
+    <section class="py-6" style="background: var(--bs-body-bg);">
+        <div class="container py-5">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="text-uppercase small fw-semibold" style="color: {{ current_site.accentColor }}; letter-spacing: 0.2em;">— Showreel</span>
+                <h2 class="display-5 fw-bold mt-2" style="font-family: 'Playfair Display', serif;">Mes films <em style="color: {{ current_site.accentColor }};">en lumière</em></h2>
+            </div>
+
+            <div class="row g-4">
+                {% for video in featuredVideos %}
+                    <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                        <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                            <div class="position-relative" style="aspect-ratio: 16/9; background: #000;">
+                                <img src="{{ video.thumbnailUrl }}" alt="{{ video.title }}"
+                                     class="w-100 h-100" style="object-fit: cover;" loading="lazy">
+                                <a href="{{ video.embedUrl }}" class="glightbox position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-decoration-none"
+                                   data-type="video">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 60px; height: 60px; background: rgba(255,255,255,0.9); color: #1a1a1a; font-size: 22px;">▶</div>
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title mb-1 fw-bold">{{ video.title }}</h5>
+                                {% if video.category %}
+                                    <small class="text-muted">
+                                        {{ video.category.iconEmoji }} {{ video.category.name }}
+                                        {% if video.duration %} · {{ video.duration }}{% endif %}
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ path('app_showreel') }}" class="btn btn-lg btn-outline-dark px-4">
+                    Voir tous mes films →
+                </a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ============ CATÉGORIES ============ #}
+    {% if categories|length > 0 %}
+    <section class="py-6" style="background: var(--bs-tertiary-bg);">
+        <div class="container py-5">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="text-uppercase small fw-semibold" style="color: {{ current_site.accentColor }}; letter-spacing: 0.2em;">— Mes spécialités</span>
+                <h2 class="display-5 fw-bold mt-2" style="font-family: 'Playfair Display', serif;">Ce que je <em style="color: {{ current_site.accentColor }};">filme</em></h2>
+            </div>
+
+            <div class="row g-4">
+                {% for category in categories %}
+                    <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 100 }}">
+                        <a href="{{ path('app_showreel') }}?category={{ category.slug }}"
+                           class="card border-0 h-100 text-center text-decoration-none p-4 shadow-sm"
+                           style="background: var(--bs-body-bg); transition: transform 0.2s, box-shadow 0.2s;"
+                           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';">
+                            <div style="font-size: 56px;">{{ category.iconEmoji }}</div>
+                            <h4 class="mt-3 mb-1 fw-bold">{{ category.name }}</h4>
+                            {% if category.description %}
+                                <p class="small text-muted mb-0">{{ category.description }}</p>
+                            {% endif %}
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# ============ CTA FINAL ============ #}
+    <section class="py-6 text-white text-center" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
+        <div class="container py-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
+                Un projet vidéo <em style="color: {{ current_site.accentColor }};">en tête</em> ?
+            </h2>
+            <p class="lead mb-4 opacity-75" style="max-width: 600px; margin: 0 auto;">
+                Mariage, événement corporate, clip, film publicitaire — je vous accompagne de l'idée à la diffusion.
+            </p>
+            <a href="{{ path('app_contact') }}" class="btn btn-lg px-4"
+               style="background: {{ current_site.accentColor }}; color: #1a1a1a; font-weight: 700;">
+                Parlons de votre projet
+            </a>
+        </div>
+    </section>
+
+    {# Optional script for GLightbox if not already loaded by base #}
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof GLightbox !== 'undefined') {
+                GLightbox({ selector: '.glightbox' });
+            }
+        });
+    </script>
+
+{% endblock %}

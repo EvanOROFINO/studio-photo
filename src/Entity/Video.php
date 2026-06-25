@@ -56,6 +56,19 @@ class Video
     #[ORM\Column]
     private int $position = 0;
 
+    #[ORM\ManyToOne(targetEntity: VideoCategory::class, inversedBy: 'videos')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?VideoCategory $category = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $duration = null;
+
+    #[ORM\Column(length: 150, nullable: true)]
+    private ?string $clientName = null;
+
+    #[ORM\Column(length: 150, nullable: true)]
+    private ?string $location = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -138,6 +151,18 @@ class Video
 
     public function getPosition(): int { return $this->position; }
     public function setPosition(int $position): static { $this->position = $position; return $this; }
+
+    public function getCategory(): ?VideoCategory { return $this->category; }
+    public function setCategory(?VideoCategory $category): static { $this->category = $category; return $this; }
+
+    public function getDuration(): ?string { return $this->duration; }
+    public function setDuration(?string $duration): static { $this->duration = $duration; return $this; }
+
+    public function getClientName(): ?string { return $this->clientName; }
+    public function setClientName(?string $clientName): static { $this->clientName = $clientName; return $this; }
+
+    public function getLocation(): ?string { return $this->location; }
+    public function setLocation(?string $location): static { $this->location = $location; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
 
