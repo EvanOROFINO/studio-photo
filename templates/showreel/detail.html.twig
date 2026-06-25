@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% set accent = current_site.accentColor|default('#c8a97e') %}
+
+{% block title %}{{ video.title }} — {{ current_site.name }}{% endblock %}
+{% block meta_description %}{{ video.description ? video.description|slice(0, 150) : video.title ~ ' — un film signé ' ~ current_site.name }}{% endblock %}
+
+{% block body %}
+
+    {# ============ LECTEUR GRAND FORMAT ============ #}
+    <section style="background: #000;">
+        <div class="container-fluid p-0">
+            <div class="ratio ratio-16x9" style="max-height: 78vh;">
+                <iframe src="{{ video.embedUrl }}?rel=0"
+                        title="{{ video.title }}"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+
+    {# ============ INFOS DU FILM ============ #}
+    <section class="py-5" style="background: var(--bs-body-bg);">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8" data-aos="fade-up">
+                    {% if video.category %}
+                        <a href="{{ path('app_showreel') }}?category={{ video.category.slug }}"
+                           class="text-decoration-none text-uppercase small fw-semibold"
+                           style="color: {{ accent }}; letter-spacing: 0.15em;">
+                            {{ video.category.iconEmoji }} {{ video.category.name }}
+                        </a>
+                    {% endif %}
+                    <h1 class="display-5 fw-bold mt-2 mb-3" style="font-family: 'Playfair Display', serif;">{{ video.title }}</h1>
+                    {% if video.description %}
+                        <p class="lead text-muted">{{ video.description }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4" data-aos="fade-left">
+                    <div class="card border-0 shadow-sm" style="background: var(--bs-tertiary-bg);">
+                        <div class="card-body p-4">
+                            <h6 class="text-uppercase small fw-bold mb-3" style="letter-spacing: 0.1em; color: {{ accent }};">Fiche technique</h6>
+                            <ul class="list-unstyled mb-0 small">
+                                {% if video.clientName %}
+                                    <li class="d-flex justify-content-between py-2 border-bottom">
+                                        <span class="text-muted">Client</span><span class="fw-semibold">{{ video.clientName }}</span>
+                                    </li>
+                                {% endif %}
+                                {% if video.location %}
+                                    <li class="d-flex justify-content-between py-2 border-bottom">
+                                        <span class="text-muted">Lieu</span><span class="fw-semibold">{{ video.location }}</span>
+                                    </li>
+                                {% endif %}
+                                {% if video.duration %}
+                                    <li class="d-flex justify-content-between py-2 border-bottom">
+                                        <span class="text-muted">Durée</span><span class="fw-semibold">{{ video.duration }}</span>
+                                    </li>
+                                {% endif %}
+                                {% if video.category %}
+                                    <li class="d-flex justify-content-between py-2 border-bottom">
+                                        <span class="text-muted">Type</span><span class="fw-semibold">{{ video.category.name }}</span>
+                                    </li>
+                                {% endif %}
+                                <li class="d-flex justify-content-between py-2">
+                                    <span class="text-muted">Plateforme</span><span class="fw-semibold">{{ video.source|capitalize }}</span>
+                                </li>
+                            </ul>
+                            <a href="{{ path('app_contact') }}" class="btn w-100 mt-3" style="background: {{ accent }}; color: #1a1a1a; font-weight: 700;">
+                                Je veux un film similaire
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ============ VIDÉOS SIMILAIRES ============ #}
+    {% if related|length > 0 %}
+    <section class="py-6" style="background: var(--bs-tertiary-bg);">
+        <div class="container py-3">
+            <h3 class="fw-bold mb-4" style="font-family: 'Playfair Display', serif;">Dans la même veine</h3>
+            <div class="row g-4">
+                {% for v in related %}
+                    <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                        <article class="card border-0 shadow-sm h-100 overflow-hidden video-card">
+                            <a href="{{ path('app_video_detail', {id: v.id}) }}" class="text-decoration-none">
+                                <div class="position-relative" style="aspect-ratio: 16/9; background: #000; overflow: hidden;">
+                                    <img src="{{ v.thumbnailUrl }}" alt="{{ v.title }}" class="w-100 h-100 video-thumb" style="object-fit: cover; transition: transform 0.4s;" loading="lazy">
+                                    <div class="position-absolute top-50 start-50 translate-middle rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 48px; height: 48px; background: rgba(255,255,255,0.9); color: #1a1a1a;">▶</div>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-0">
+                                    <a href="{{ path('app_video_detail', {id: v.id}) }}" class="text-decoration-none text-reset stretched-link">{{ v.title }}</a>
+                                </h6>
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="container py-4 text-center">
+        <a href="{{ path('app_showreel') }}" class="btn btn-outline-secondary">← Retour au showreel</a>
+    </div>
+
+    <style>
+        .video-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.14) !important; }
+        .video-card:hover .video-thumb { transform: scale(1.06); }
+    </style>
+
+{% endblock %}

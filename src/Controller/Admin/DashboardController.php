@@ -21,6 +21,7 @@ use App\Entity\Testimonial;
 use App\Entity\User;
 use App\Entity\Video;
 use App\Entity\VideoCategory;
+use App\Entity\VideoPackage;
 use App\Entity\Site;
 use App\Repository\ContactRequestRepository;
 use App\Repository\PhotoRepository;
@@ -72,6 +73,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Avant / Après', 'fa fa-sliders-h', BeforeAfter::class);
         yield MenuItem::linkToCrud('Showreel / Vidéos', 'fa fa-video', Video::class);
         yield MenuItem::linkToCrud('Catégories vidéo', 'fa fa-film', VideoCategory::class);
+        yield MenuItem::linkToCrud('Forfaits vidéo', 'fa fa-clapperboard', VideoPackage::class);
 
         yield MenuItem::section('Multi-site');
         yield MenuItem::linkToCrud('Sites (Photo / Vidéo)', 'fa fa-globe', Site::class);

@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% set accent = current_site.accentColor|default('#a78bfa') %}
+
+{% block title %}Forfaits vidéo — {{ current_site.name }}{% endblock %}
+{% block meta_description %}Découvrez les forfaits vidéo de {{ current_site.name }} : du film essentiel au film prestige 4K. Tarifs transparents, livraison incluse.{% endblock %}
+
+{% block body %}
+
+    {# ============ HERO ============ #}
+    <section class="text-white py-6" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
+        <div class="container py-5 text-center" data-aos="fade-up">
+            <span class="text-uppercase small fw-semibold" style="color: {{ accent }}; letter-spacing: 0.25em;">— Forfaits</span>
+            <h1 class="display-3 fw-bold mt-2 mb-3" style="font-family: 'Playfair Display', serif;">
+                Choisissez votre <em style="color: {{ accent }};">film</em>
+            </h1>
+            <p class="lead opacity-75" style="max-width: 620px; margin: 0 auto;">
+                Trois formules pensées pour chaque budget et chaque ambition. Sur-mesure possible sur simple demande.
+            </p>
+        </div>
+    </section>
+
+    {# ============ GRILLE FORFAITS ============ #}
+    <section class="py-6" style="background: var(--bs-tertiary-bg);">
+        <div class="container py-4">
+            {% if packages|length > 0 %}
+                <div class="row g-4 justify-content-center align-items-stretch">
+                    {% for package in packages %}
+                        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 120 }}">
+                            <div class="card border-0 h-100 shadow-sm position-relative package-card
+                                        {{ package.featured ? 'package-featured' : '' }}"
+                                 style="{{ package.featured ? 'border: 2px solid ' ~ accent ~ ' !important; transform: scale(1.03);' : '' }}">
+                                {% if package.featured %}
+                                    <div class="position-absolute top-0 start-50 translate-middle badge px-3 py-2"
+                                         style="background: {{ accent }}; color: #1a1a1a; font-weight: 700; letter-spacing: 0.05em;">
+                                        ⭐ LE PLUS CHOISI
+                                    </div>
+                                {% endif %}
+                                <div class="card-body p-4 d-flex flex-column">
+                                    <h3 class="fw-bold mb-1" style="font-family: 'Playfair Display', serif;">{{ package.name }}</h3>
+                                    {% if package.tagline %}
+                                        <p class="text-muted small mb-3">{{ package.tagline }}</p>
+                                    {% endif %}
+
+                                    <div class="mb-3">
+                                        {% if package.priceSuffix %}
+                                            <span class="text-muted small d-block">{{ package.priceSuffix }}</span>
+                                        {% endif %}
+                                        <span class="display-5 fw-bold" style="{{ package.featured ? 'color: ' ~ accent ~ ';' : '' }}">{{ package.price|number_format(0, ',', ' ') }} €</span>
+                                    </div>
+
+                                    <ul class="list-unstyled flex-grow-1 mb-4">
+                                        {% for feature in package.featureLines %}
+                                            <li class="d-flex align-items-start py-1">
+                                                <span style="color: {{ accent }}; font-weight: 700; margin-right: 8px;">✓</span>
+                                                <span class="small">{{ feature }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+
+                                    {% if package.deliveryTime %}
+                                        <div class="small text-muted mb-3">⏱️ {{ package.deliveryTime }}</div>
+                                    {% endif %}
+
+                                    <a href="{{ path('app_contact') }}?forfait={{ package.name|lower }}"
+                                       class="btn w-100 {{ package.featured ? '' : 'btn-outline-dark' }}"
+                                       style="{{ package.featured ? 'background: ' ~ accent ~ '; color: #1a1a1a; font-weight: 700;' : '' }}">
+                                        {{ package.featured ? 'Réserver ce forfait' : 'Demander un devis' }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-muted py-5">Forfaits bientôt disponibles.</p>
+            {% endif %}
+
+            <p class="text-center text-muted small mt-5" style="max-width: 640px; margin-left: auto; margin-right: auto;">
+                💡 Tous les forfaits incluent un rendez-vous de préparation, le déplacement dans un rayon de 50 km autour de {{ studio_city }},
+                et la cession des droits d'usage personnels. Un projet hors cadre ? <a href="{{ path('app_contact') }}" style="color: {{ accent }};">Parlons-en</a>.
+            </p>
+        </div>
+    </section>
+
+    {# ============ COMPARATIF / RASSURANCE ============ #}
+    <section class="py-6" style="background: var(--bs-body-bg);">
+        <div class="container py-3">
+            <div class="row g-4 text-center">
+                <div class="col-md-3" data-aos="fade-up">
+                    <div style="font-size: 40px;">🎬</div>
+                    <h6 class="fw-bold mt-2">Matériel cinéma</h6>
+                    <p class="small text-muted">Caméras 4K, drone, stabilisateurs, son HD.</p>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                    <div style="font-size: 40px;">🎨</div>
+                    <h6 class="fw-bold mt-2">Étalonnage pro</h6>
+                    <p class="small text-muted">Colorimétrie cinématographique sur chaque film.</p>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                    <div style="font-size: 40px;">🔒</div>
+                    <h6 class="fw-bold mt-2">Galerie privée</h6>
+                    <p class="small text-muted">Vos films en ligne, protégés, partageables.</p>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                    <div style="font-size: 40px;">🤝</div>
+                    <h6 class="fw-bold mt-2">Accompagnement</h6>
+                    <p class="small text-muted">De la préparation à la livraison, je suis là.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ============ CTA ============ #}
+    <section class="py-6 text-white text-center" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
+        <div class="container py-4" data-aos="fade-up">
+            <h2 class="display-6 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
+                Un projet <em style="color: {{ accent }};">unique</em> en tête ?
+            </h2>
+            <p class="lead opacity-75 mb-4" style="max-width: 560px; margin: 0 auto;">
+                Chaque histoire mérite son propre traitement. Décrivez-moi votre projet, je vous fais une proposition sur-mesure.
+            </p>
+            <a href="{{ path('app_contact') }}" class="btn btn-lg px-4" style="background: {{ accent }}; color: #1a1a1a; font-weight: 700;">
+                Demander un devis personnalisé
+            </a>
+        </div>
+    </section>
+
+    <style>
+        .package-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .package-card:not(.package-featured):hover { transform: translateY(-6px); box-shadow: 0 14px 32px rgba(0,0,0,0.12) !important; }
+    </style>
+
+{% endblock %}
