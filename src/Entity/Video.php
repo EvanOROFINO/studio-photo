@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\SiteAwareTrait;
 use App\Repository\VideoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -10,6 +11,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class Video
 {
+    use SiteAwareTrait;
+
     public const SOURCE_YOUTUBE = 'youtube';
     public const SOURCE_VIMEO = 'vimeo';
 
