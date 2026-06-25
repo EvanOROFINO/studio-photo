@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
     <div class="container">
         <a class="navbar-brand fw-bold serif" href="{{ path('app_home') }}">
-            <i class="bi bi-camera-fill text-dark me-2"></i>{{ studio_name }}
+            <span class="me-2">{{ current_site.iconEmoji|default('📸') }}</span>{{ current_site.name|default(studio_name) }}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false">
             <span class="navbar-toggler-icon"></span>
@@ -24,6 +24,27 @@
                         <i class="bi bi-envelope me-1"></i>{{ 'nav.contact_btn'|trans }}
                     </a>
                 </li>
+                {% if all_sites|length > 1 %}
+                <li class="nav-item ms-lg-2 dropdown">
+                    <button type="button" class="btn btn-sm dropdown-toggle px-3" data-bs-toggle="dropdown"
+                            style="background: {{ current_site.accentColor }}; color: #1a1a1a; font-weight: 600; border: none;"
+                            aria-label="Changer de site">
+                        {{ current_site.iconEmoji }} {{ current_site.isVideoSite ? 'Vidéo' : 'Photo' }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Découvrir aussi</h6></li>
+                        {% for site in all_sites %}
+                            <li>
+                                <a class="dropdown-item {{ site.id == current_site.id ? 'active' : '' }}"
+                                   href="{{ site.id == current_site.id ? '#' : path('app_site_switch', { slug: site.slug }) }}">
+                                    {{ site.iconEmoji }} {{ site.name }}
+                                    {% if site.id == current_site.id %}<i class="bi bi-check-lg ms-1"></i>{% endif %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
                 <li class="nav-item ms-lg-2 dropdown">
                     <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-label="{{ 'language.select'|trans }}">
                         {{ app.request.locale|upper }}
