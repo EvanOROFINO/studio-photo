@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Photo;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -31,11 +32,22 @@ class PhotoCrudController extends AbstractCrudController
             ->setPageTitle('new', 'Ajouter une photo');
     }
 
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('site')
+            ->add('category')
+            ->add('featured');
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm();
 
         yield TextField::new('title', 'Titre');
+
+        yield AssociationField::new('site', 'Site')->hideOnIndex()
+            ->setHelp('Généralement Studio Photo.');
 
         yield AssociationField::new('category', 'Catégorie');
 
