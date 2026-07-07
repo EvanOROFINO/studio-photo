@@ -15,9 +15,12 @@ use App\Entity\NewsletterSubscriber;
 use App\Entity\Photo;
 use App\Entity\Product;
 use App\Entity\Service;
+use App\Entity\Site;
 use App\Entity\Testimonial;
 use App\Entity\User;
 use App\Entity\Video;
+use App\Entity\VideoCategory;
+use App\Entity\VideoPackage;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -34,6 +37,35 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        // --- Sites (multi-site : Photo + Vidéo) ---------------------------
+        $sitePhoto = new Site();
+        $sitePhoto->setSlug(Site::SLUG_PHOTO);
+        $sitePhoto->setName('Studio Photo');
+        $sitePhoto->setDomain('studio-photo.fr');
+        $sitePhoto->setDomainStaging('127.0.0.1:8000');
+        $sitePhoto->setTagline('Capturer l\'instant. Sublimer l\'émotion.');
+        $sitePhoto->setPrimaryColor('#1a1a1a');
+        $sitePhoto->setAccentColor('#c8a97e');
+        $sitePhoto->setIconEmoji('📸');
+        $sitePhoto->setPosition(1);
+        $sitePhoto->setIsDefault(true);
+        $sitePhoto->setIsActive(true);
+        $manager->persist($sitePhoto);
+
+        $siteVideo = new Site();
+        $siteVideo->setSlug(Site::SLUG_VIDEO);
+        $siteVideo->setName('Studio Vidéo');
+        $siteVideo->setDomain('studio-video.fr');
+        $siteVideo->setDomainStaging('video.localhost:8000');
+        $siteVideo->setTagline('Raconter une histoire. Animer une marque.');
+        $siteVideo->setPrimaryColor('#1a1a1a');
+        $siteVideo->setAccentColor('#a78bfa');
+        $siteVideo->setIconEmoji('🎬');
+        $siteVideo->setPosition(2);
+        $siteVideo->setIsDefault(false);
+        $siteVideo->setIsActive(true);
+        $manager->persist($siteVideo);
+
         // --- Admin user ---------------------------------------------------
         $admin = new User();
         $admin->setEmail('admin@studio-photo.local');
@@ -96,6 +128,7 @@ class AppFixtures extends Fixture
                 $photo->setCategory($category);
                 $photo->setTakenAt(new \DateTimeImmutable($date));
                 $photo->setFeatured($featuredCount < 6 && $i === 0);
+                $photo->setSite($sitePhoto);
                 $manager->persist($photo);
                 if ($photo->isFeatured()) {
                     $featuredCount++;
@@ -123,6 +156,7 @@ class AppFixtures extends Fixture
             $service->setIcon($icon);
             $service->setPosition($position);
             $service->setActive(true);
+            $service->setSite($sitePhoto);
             $manager->persist($service);
             $services[] = $service;
         }
@@ -208,7 +242,70 @@ class AppFixtures extends Fixture
             $v->setFeatured($featured);
             $v->setPosition($position);
             $v->setPublished(true);
+            $v->setSite($sitePhoto);
             $manager->persist($v);
+        }
+
+        // --- SITE VIDÉO : catégories, forfaits et films -------------------
+        $videoCategoriesData = [
+            ['mariage', 'Mariage', '💍', 'Films de mariage cinématographiques, racontés à votre rythme.', 1],
+            ['corporate', 'Corporate', '🏢', 'Films institutionnels, témoignages, événements pro.', 2],
+            ['clip', 'Clip & Brand', '🎵', 'Clips musicaux, films de marque, contenus publicitaires.', 3],
+            ['evenement', 'Événement', '🎉', 'Aftermovies, soirées, conférences, lancements.', 4],
+        ];
+        $videoCategories = [];
+        foreach ($videoCategoriesData as [$slug, $name, $emoji, $desc, $pos]) {
+            $vc = new VideoCategory();
+            $vc->setSlug($slug);
+            $vc->setName($name);
+            $vc->setIconEmoji($emoji);
+            $vc->setDescription($desc);
+            $vc->setPosition($pos);
+            $vc->setIsActive(true);
+            $manager->persist($vc);
+            $videoCategories[$slug] = $vc;
+        }
+
+        $videoSiteData = [
+            ['Mariage Camille & Antoine — Domaine de Saint-Trys', 'https://vimeo.com/76979871', 'mariage', '4:32', 'Camille & Antoine', 'Beaujolais', true, 1],
+            ['Film corporate — Banque Lyonnaise', 'https://vimeo.com/22439234', 'corporate', '2:18', 'Banque Lyonnaise', 'Lyon Confluence', true, 2],
+            ['Clip Pamplemousse — Brand film', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'clip', '3:12', 'Pamplemousse Studio', 'Lyon', true, 3],
+            ['Aftermovie La Soirée du Code', 'https://vimeo.com/33617840', 'evenement', '1:48', 'La Plage Digitale', 'Lyon Part-Dieu', false, 4],
+            ['Mariage Léa & Vincent — Château de Pizay', 'https://vimeo.com/142480565', 'mariage', '5:08', 'Léa & Vincent', 'Beaujolais', false, 5],
+        ];
+        foreach ($videoSiteData as [$title, $url, $catSlug, $duration, $client, $location, $featured, $pos]) {
+            $v = new Video();
+            $v->setTitle($title);
+            $v->setUrl($url);
+            $v->setCategory($videoCategories[$catSlug]);
+            $v->setDuration($duration);
+            $v->setClientName($client);
+            $v->setLocation($location);
+            $v->setFeatured($featured);
+            $v->setPosition($pos);
+            $v->setPublished(true);
+            $v->setSite($siteVideo);
+            $manager->persist($v);
+        }
+
+        $videoPackagesData = [
+            ['Essentiel', 'Pour immortaliser l\'essentiel', 1490, "Film souvenir 3-4 minutes\nCouverture cérémonie + temps forts\n1 caméra + stabilisateur\nMusique sous licence\nLivraison full HD\n1 série de retouches incluse", 'Livré sous 4 semaines', false, 1],
+            ['Signature', 'Le film complet, monté comme un court-métrage', 2490, "Film cinématique 6-8 minutes\nTeaser réseaux sociaux 1 min offert\n2 caméras + stabilisateur + drone\nCaptation son HD (micros-cravate)\nÉtalonnage colorimétrique pro\nMusique sur-mesure + voix off\n2 séries de retouches\nLivraison 4K + clé USB gravée", 'Livré sous 6 semaines', true, 2],
+            ['Prestige', 'L\'expérience haut de gamme, sans compromis', 3990, "Tout le forfait Signature +\nFilm long 10-15 min + version courte\nSecond cadreur sur la journée\nDrone cinématique + travelling\nInterviews proches + voix off\nAlbum vidéo interactif en ligne\nGalerie privée pour partager\nLivraison 4K HDR + coffret premium\nRévisions illimitées 30 jours", 'Livré sous 8 semaines', false, 3],
+        ];
+        foreach ($videoPackagesData as [$name, $tagline, $price, $features, $delivery, $featured, $pos]) {
+            $vp = new VideoPackage();
+            $vp->setName($name);
+            $vp->setTagline($tagline);
+            $vp->setPrice($price);
+            $vp->setPriceSuffix('à partir de');
+            $vp->setFeatures($features);
+            $vp->setDeliveryTime($delivery);
+            $vp->setFeatured($featured);
+            $vp->setIsActive(true);
+            $vp->setPosition($pos);
+            $vp->setSite($siteVideo);
+            $manager->persist($vp);
         }
 
         // --- Boutique : tirages d'art -----------------------------------
