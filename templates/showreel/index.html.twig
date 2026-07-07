@@ -1,72 +1,120 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Showreel — {{ studio_name }}{% endblock %}
-{% block meta_description %}Découvrez le showreel vidéo de {{ studio_name }} — clips de mariages, événements et portraits.{% endblock %}
+{% set accent = current_site.accentColor|default('#c8a97e') %}
+
+{% block title %}Showreel — {{ current_site.name }}{% endblock %}
+{% block meta_description %}Découvrez les films de {{ current_site.name }} : mariage, corporate, clips et événementiel à {{ studio_city }}.{% endblock %}
 
 {% block body %}
-<header class="page-header">
-    <div class="container">
-        <p class="section-subtitle text-light opacity-50 mb-2">En mouvement</p>
-        <h1>Showreel</h1>
-        <p>Une sélection de mes vidéos</p>
-    </div>
-</header>
 
-<section class="section">
-    <div class="container" style="max-width: 1100px;">
-        {% if videos|length == 0 %}
-            <p class="text-center text-muted py-5">Bientôt des vidéos ici. Revenez vite !</p>
-        {% else %}
-            {% set featured = videos|filter(v => v.featured)|first %}
-            {% if featured %}
-                <div class="video-feature mb-5" data-aos="fade-up">
-                    <div class="video-embed">
-                        <iframe src="{{ featured.embedUrl }}?rel=0"
-                                title="{{ featured.title }}"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowfullscreen
-                                loading="lazy"></iframe>
-                    </div>
-                    <h3 class="serif mt-3 mb-1">{{ featured.title }}</h3>
-                    {% if featured.description %}
-                        <p class="text-muted">{{ featured.description }}</p>
-                    {% endif %}
-                </div>
-            {% endif %}
+    {# ============ HERO ============ #}
+    <section class="text-white py-6" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
+        <div class="container py-5 text-center" data-aos="fade-up">
+            <span class="text-uppercase small fw-semibold" style="color: {{ accent }}; letter-spacing: 0.25em;">— Showreel</span>
+            <h1 class="display-3 fw-bold mt-2 mb-3" style="font-family: 'Playfair Display', serif;">
+                Mes <em style="color: {{ accent }};">films</em>
+            </h1>
+            <p class="lead opacity-75" style="max-width: 600px; margin: 0 auto;">
+                {{ videos|length }} réalisation{{ videos|length > 1 ? 's' : '' }}{% if activeCategory %} — catégorie « {{ activeCategory.name }} »{% endif %}.
+            </p>
+        </div>
+    </section>
 
-            <div class="row g-4">
-                {% for video in videos %}
-                    {% if not video.featured or featured is null or video.id != featured.id %}
-                        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 100 }}">
-                            <div class="video-card">
-                                <a href="{{ video.embedUrl }}?autoplay=1"
-                                   class="video-thumb glightbox"
-                                   data-type="video"
-                                   data-gallery="showreel"
-                                   data-title="{{ video.title }}"
-                                   data-description="{{ video.description ?? '' }}">
-                                    {% if video.thumbnailUrl %}
-                                        <img src="{{ video.thumbnailUrl }}" alt="{{ video.title }}" loading="lazy">
-                                    {% else %}
-                                        <div class="video-thumb-placeholder"><i class="bi bi-camera-video"></i></div>
-                                    {% endif %}
-                                    <span class="video-play-overlay">
-                                        <i class="bi bi-play-fill"></i>
-                                    </span>
-                                </a>
-                                <h5 class="serif mt-2 mb-1 fs-6">{{ video.title }}</h5>
-                                <small class="text-muted">{{ video.source|capitalize }}</small>
-                            </div>
-                        </div>
-                    {% endif %}
+    {# ============ FILTRES PAR CATÉGORIE ============ #}
+    {% if categories is defined and categories|length > 0 %}
+    <section class="py-4 border-bottom" style="background: var(--bs-body-bg);">
+        <div class="container">
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <a href="{{ path('app_showreel') }}"
+                   class="btn btn-sm rounded-pill px-3 {{ activeCategory is null ? '' : 'btn-outline-secondary' }}"
+                   style="{{ activeCategory is null ? 'background: ' ~ accent ~ '; border-color: ' ~ accent ~ '; color: #1a1a1a;' : '' }}">
+                    ✦ Tout
+                </a>
+                {% for category in categories %}
+                    <a href="{{ path('app_showreel') }}?category={{ category.slug }}"
+                       class="btn btn-sm rounded-pill px-3 {{ activeCategory and activeCategory.id == category.id ? '' : 'btn-outline-secondary' }}"
+                       style="{{ activeCategory and activeCategory.id == category.id ? 'background: ' ~ accent ~ '; border-color: ' ~ accent ~ '; color: #1a1a1a;' : '' }}">
+                        {{ category.iconEmoji }} {{ category.name }}
+                    </a>
                 {% endfor %}
             </div>
-        {% endif %}
-
-        <div class="text-center mt-5">
-            <p class="text-muted mb-3">Envie de votre propre film ?</p>
-            <a href="{{ path('app_contact') }}" class="btn btn-dark px-4">Discuter de votre projet</a>
         </div>
-    </div>
-</section>
+    </section>
+    {% endif %}
+
+    {# ============ GRILLE VIDÉOS ============ #}
+    <section class="py-6" style="background: var(--bs-tertiary-bg);">
+        <div class="container py-4">
+            {% if videos|length > 0 %}
+                <div class="row g-4">
+                    {% for video in videos %}
+                        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 100 }}">
+                            <article class="card border-0 shadow-sm h-100 overflow-hidden video-card">
+                                <a href="{{ path('app_video_detail', {id: video.id}) }}" class="text-decoration-none">
+                                    <div class="position-relative" style="aspect-ratio: 16/9; background: #000; overflow: hidden;">
+                                        {% if video.thumbnailUrl %}
+                                            <img src="{{ video.thumbnailUrl }}" alt="{{ video.title }}"
+                                                 class="w-100 h-100 video-thumb" style="object-fit: cover; transition: transform 0.4s;" loading="lazy">
+                                        {% endif %}
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                                             style="background: rgba(0,0,0,0.15);">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center play-btn"
+                                                 style="width: 56px; height: 56px; background: rgba(255,255,255,0.92); color: #1a1a1a; font-size: 20px; transition: transform 0.2s;">▶</div>
+                                        </div>
+                                        {% if video.duration %}
+                                            <span class="position-absolute bottom-0 end-0 m-2 badge bg-dark bg-opacity-75">{{ video.duration }}</span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                <div class="card-body">
+                                    {% if video.category %}
+                                        <small class="text-uppercase fw-semibold" style="color: {{ accent }}; letter-spacing: 0.1em; font-size: 11px;">
+                                            {{ video.category.iconEmoji }} {{ video.category.name }}
+                                        </small>
+                                    {% endif %}
+                                    <h5 class="card-title mt-1 mb-1 fw-bold">
+                                        <a href="{{ path('app_video_detail', {id: video.id}) }}" class="text-decoration-none text-reset stretched-link">{{ video.title }}</a>
+                                    </h5>
+                                    <div class="small text-muted">
+                                        {% if video.clientName %}{{ video.clientName }}{% endif %}
+                                        {% if video.location %} · {{ video.location }}{% endif %}
+                                        {% if not video.clientName and not video.location %}{{ video.source|capitalize }}{% endif %}
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <div style="font-size: 48px;">🎬</div>
+                    <p class="mt-3">Aucune vidéo dans cette catégorie pour le moment.</p>
+                    <a href="{{ path('app_showreel') }}" class="btn btn-outline-dark">Voir toutes les vidéos</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# ============ CTA ============ #}
+    <section class="py-6 text-white text-center" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
+        <div class="container py-4" data-aos="fade-up">
+            <h2 class="display-6 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
+                Envie d'un film <em style="color: {{ accent }};">comme ceux-là</em> ?
+            </h2>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                {% if current_site.videoSite %}
+                    <a href="{{ path('app_video_packages') }}" class="btn btn-lg px-4" style="background: {{ accent }}; color: #1a1a1a; font-weight: 700;">Voir les forfaits</a>
+                {% endif %}
+                <a href="{{ path('app_contact') }}" class="btn btn-lg btn-outline-light px-4">Me contacter</a>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .video-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.14) !important; }
+        .video-card:hover .video-thumb { transform: scale(1.06); }
+        .video-card:hover .play-btn { transform: scale(1.15); }
+    </style>
+
 {% endblock %}

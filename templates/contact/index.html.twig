@@ -12,6 +12,16 @@
 
 <section class="section">
     <div class="container">
+        {% if selectedPackage %}
+            <div class="alert d-flex align-items-center mb-4" role="alert"
+                 style="background: {{ current_site.accentColor|default('#c8a97e') }}1a; border: 1px solid {{ current_site.accentColor|default('#c8a97e') }};">
+                <span class="fs-4 me-3">🎬</span>
+                <div>
+                    <strong>Forfait « {{ selectedPackage }} » sélectionné.</strong>
+                    <div class="small text-muted">Le message ci-dessous est pré-rempli — complétez-le avec vos détails et envoyez. Je reviens vers vous sous 48h.</div>
+                </div>
+            </div>
+        {% endif %}
         <div class="row g-5">
             <div class="col-lg-5">
                 <h3 class="serif mb-4">Coordonnées</h3>

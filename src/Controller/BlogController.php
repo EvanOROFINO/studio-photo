@@ -6,6 +6,7 @@ use App\Entity\Article;
 use App\Entity\ArticleCategory;
 use App\Repository\ArticleCategoryRepository;
 use App\Repository\ArticleRepository;
+use App\Service\SiteContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,14 +18,19 @@ class BlogController extends AbstractController
 {
     private const ARTICLES_PER_PAGE = 9;
 
+    public function __construct(private readonly SiteContext $siteContext)
+    {
+    }
+
     #[Route('/blog', name: 'app_blog')]
     public function index(
         Request $request,
         ArticleRepository $articleRepository,
         ArticleCategoryRepository $categoryRepository,
     ): Response {
+        $site = $this->siteContext->getCurrent();
         $page = max(1, $request->query->getInt('page', 1));
-        $paginator = $articleRepository->paginatePublished($page, self::ARTICLES_PER_PAGE);
+        $paginator = $articleRepository->paginatePublished($page, self::ARTICLES_PER_PAGE, $site);
         $totalPages = (int) ceil(count($paginator) / self::ARTICLES_PER_PAGE);
 
         return $this->render('blog/index.html.twig', [
@@ -44,8 +50,9 @@ class BlogController extends AbstractController
         ArticleRepository $articleRepository,
         ArticleCategoryRepository $categoryRepository,
     ): Response {
+        $site = $this->siteContext->getCurrent();
         $page = max(1, $request->query->getInt('page', 1));
-        $paginator = $articleRepository->paginateByCategory($category, $page, self::ARTICLES_PER_PAGE);
+        $paginator = $articleRepository->paginateByCategory($category, $page, self::ARTICLES_PER_PAGE, $site);
         $totalPages = (int) ceil(count($paginator) / self::ARTICLES_PER_PAGE);
 
         return $this->render('blog/index.html.twig', [

@@ -7,6 +7,7 @@ use App\Entity\ArticleCategory;
 use App\Entity\BlockedDate;
 use App\Entity\Booking;
 use App\Entity\Category;
+use App\Entity\ClientFilm;
 use App\Entity\ClientGallery;
 use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
@@ -15,9 +16,12 @@ use App\Entity\NewsletterSubscriber;
 use App\Entity\Photo;
 use App\Entity\Product;
 use App\Entity\Service;
+use App\Entity\Site;
 use App\Entity\Testimonial;
 use App\Entity\User;
 use App\Entity\Video;
+use App\Entity\VideoCategory;
+use App\Entity\VideoPackage;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -34,6 +38,35 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        // --- Sites (multi-site : Photo + Vidéo) ---------------------------
+        $sitePhoto = new Site();
+        $sitePhoto->setSlug(Site::SLUG_PHOTO);
+        $sitePhoto->setName('Studio Photo');
+        $sitePhoto->setDomain('studio-photo.fr');
+        $sitePhoto->setDomainStaging('127.0.0.1:8000');
+        $sitePhoto->setTagline('Capturer l\'instant. Sublimer l\'émotion.');
+        $sitePhoto->setPrimaryColor('#1a1a1a');
+        $sitePhoto->setAccentColor('#c8a97e');
+        $sitePhoto->setIconEmoji('📸');
+        $sitePhoto->setPosition(1);
+        $sitePhoto->setIsDefault(true);
+        $sitePhoto->setIsActive(true);
+        $manager->persist($sitePhoto);
+
+        $siteVideo = new Site();
+        $siteVideo->setSlug(Site::SLUG_VIDEO);
+        $siteVideo->setName('Studio Vidéo');
+        $siteVideo->setDomain('studio-video.fr');
+        $siteVideo->setDomainStaging('video.localhost:8000');
+        $siteVideo->setTagline('Raconter une histoire. Animer une marque.');
+        $siteVideo->setPrimaryColor('#1a1a1a');
+        $siteVideo->setAccentColor('#a78bfa');
+        $siteVideo->setIconEmoji('🎬');
+        $siteVideo->setPosition(2);
+        $siteVideo->setIsDefault(false);
+        $siteVideo->setIsActive(true);
+        $manager->persist($siteVideo);
+
         // --- Admin user ---------------------------------------------------
         $admin = new User();
         $admin->setEmail('admin@studio-photo.local');
@@ -96,6 +129,7 @@ class AppFixtures extends Fixture
                 $photo->setCategory($category);
                 $photo->setTakenAt(new \DateTimeImmutable($date));
                 $photo->setFeatured($featuredCount < 6 && $i === 0);
+                $photo->setSite($sitePhoto);
                 $manager->persist($photo);
                 if ($photo->isFeatured()) {
                     $featuredCount++;
@@ -123,6 +157,7 @@ class AppFixtures extends Fixture
             $service->setIcon($icon);
             $service->setPosition($position);
             $service->setActive(true);
+            $service->setSite($sitePhoto);
             $manager->persist($service);
             $services[] = $service;
         }
@@ -191,7 +226,26 @@ class AppFixtures extends Fixture
             $testimonial->setRating($rating);
             $testimonial->setPosition($position);
             $testimonial->setPublished(true);
+            $testimonial->setSite($sitePhoto);
             $manager->persist($testimonial);
+        }
+
+        // --- Témoignages SITE VIDÉO --------------------------------------
+        $videoTestimonialsData = [
+            ['Élodie & Thomas', 'Film de mariage 2024', 'On revoit notre film au moins une fois par mois. À chaque fois, l\'émotion est intacte. Le montage, la musique, les plans au drone… c\'est un vrai court-métrage de notre journée. On ne regrette pas un centime.', 5, 1],
+            ['Startup Novae', 'Film corporate', 'Besoin d\'un film de présentation pour notre levée de fonds : livré en 2 semaines, résultat bluffant. Nos investisseurs ont adoré. Réactif, pro, et un vrai sens du storytelling.', 5, 2],
+            ['Marine V.', 'Clip artiste', 'Mon clip a dépassé les 50k vues et beaucoup me parlent de la réalisation. Travailler avec quelqu\'un qui comprend l\'image ET la musique, ça fait toute la différence.', 5, 3],
+        ];
+        foreach ($videoTestimonialsData as [$author, $role, $content, $rating, $position]) {
+            $t = new Testimonial();
+            $t->setAuthorName($author);
+            $t->setAuthorRole($role);
+            $t->setContent($content);
+            $t->setRating($rating);
+            $t->setPosition($position);
+            $t->setPublished(true);
+            $t->setSite($siteVideo);
+            $manager->persist($t);
         }
 
         // --- Demo showreel videos ----------------------------------------
@@ -208,7 +262,70 @@ class AppFixtures extends Fixture
             $v->setFeatured($featured);
             $v->setPosition($position);
             $v->setPublished(true);
+            $v->setSite($sitePhoto);
             $manager->persist($v);
+        }
+
+        // --- SITE VIDÉO : catégories, forfaits et films -------------------
+        $videoCategoriesData = [
+            ['mariage', 'Mariage', '💍', 'Films de mariage cinématographiques, racontés à votre rythme.', 1],
+            ['corporate', 'Corporate', '🏢', 'Films institutionnels, témoignages, événements pro.', 2],
+            ['clip', 'Clip & Brand', '🎵', 'Clips musicaux, films de marque, contenus publicitaires.', 3],
+            ['evenement', 'Événement', '🎉', 'Aftermovies, soirées, conférences, lancements.', 4],
+        ];
+        $videoCategories = [];
+        foreach ($videoCategoriesData as [$slug, $name, $emoji, $desc, $pos]) {
+            $vc = new VideoCategory();
+            $vc->setSlug($slug);
+            $vc->setName($name);
+            $vc->setIconEmoji($emoji);
+            $vc->setDescription($desc);
+            $vc->setPosition($pos);
+            $vc->setIsActive(true);
+            $manager->persist($vc);
+            $videoCategories[$slug] = $vc;
+        }
+
+        $videoSiteData = [
+            ['Mariage Camille & Antoine — Domaine de Saint-Trys', 'https://vimeo.com/76979871', 'mariage', '4:32', 'Camille & Antoine', 'Beaujolais', true, 1],
+            ['Film corporate — Banque Lyonnaise', 'https://vimeo.com/22439234', 'corporate', '2:18', 'Banque Lyonnaise', 'Lyon Confluence', true, 2],
+            ['Clip Pamplemousse — Brand film', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'clip', '3:12', 'Pamplemousse Studio', 'Lyon', true, 3],
+            ['Aftermovie La Soirée du Code', 'https://vimeo.com/33617840', 'evenement', '1:48', 'La Plage Digitale', 'Lyon Part-Dieu', false, 4],
+            ['Mariage Léa & Vincent — Château de Pizay', 'https://vimeo.com/142480565', 'mariage', '5:08', 'Léa & Vincent', 'Beaujolais', false, 5],
+        ];
+        foreach ($videoSiteData as [$title, $url, $catSlug, $duration, $client, $location, $featured, $pos]) {
+            $v = new Video();
+            $v->setTitle($title);
+            $v->setUrl($url);
+            $v->setCategory($videoCategories[$catSlug]);
+            $v->setDuration($duration);
+            $v->setClientName($client);
+            $v->setLocation($location);
+            $v->setFeatured($featured);
+            $v->setPosition($pos);
+            $v->setPublished(true);
+            $v->setSite($siteVideo);
+            $manager->persist($v);
+        }
+
+        $videoPackagesData = [
+            ['Essentiel', 'Pour immortaliser l\'essentiel', 1490, "Film souvenir 3-4 minutes\nCouverture cérémonie + temps forts\n1 caméra + stabilisateur\nMusique sous licence\nLivraison full HD\n1 série de retouches incluse", 'Livré sous 4 semaines', false, 1],
+            ['Signature', 'Le film complet, monté comme un court-métrage', 2490, "Film cinématique 6-8 minutes\nTeaser réseaux sociaux 1 min offert\n2 caméras + stabilisateur + drone\nCaptation son HD (micros-cravate)\nÉtalonnage colorimétrique pro\nMusique sur-mesure + voix off\n2 séries de retouches\nLivraison 4K + clé USB gravée", 'Livré sous 6 semaines', true, 2],
+            ['Prestige', 'L\'expérience haut de gamme, sans compromis', 3990, "Tout le forfait Signature +\nFilm long 10-15 min + version courte\nSecond cadreur sur la journée\nDrone cinématique + travelling\nInterviews proches + voix off\nAlbum vidéo interactif en ligne\nGalerie privée pour partager\nLivraison 4K HDR + coffret premium\nRévisions illimitées 30 jours", 'Livré sous 8 semaines', false, 3],
+        ];
+        foreach ($videoPackagesData as [$name, $tagline, $price, $features, $delivery, $featured, $pos]) {
+            $vp = new VideoPackage();
+            $vp->setName($name);
+            $vp->setTagline($tagline);
+            $vp->setPrice($price);
+            $vp->setPriceSuffix('à partir de');
+            $vp->setFeatures($features);
+            $vp->setDeliveryTime($delivery);
+            $vp->setFeatured($featured);
+            $vp->setIsActive(true);
+            $vp->setPosition($pos);
+            $vp->setSite($siteVideo);
+            $manager->persist($vp);
         }
 
         // --- Boutique : tirages d'art -----------------------------------
@@ -342,6 +459,44 @@ class AppFixtures extends Fixture
             $a->setPublished(true);
             $a->setPublishedAt(new \DateTimeImmutable('-'.$data['days_ago'].' days'));
             $a->setViewCount(random_int(40, 800));
+            $a->setSite($sitePhoto);
+            $manager->persist($a);
+        }
+
+        // --- Blog SITE VIDÉO : coulisses de tournage ---------------------
+        $videoArticlesData = [
+            [
+                'title' => 'Comment je filme un mariage en 2 caméras',
+                'excerpt' => 'Mon workflow complet pour un film de mariage cinématique : repérages, placement des caméras, captation du son, et montage.',
+                'content' => "## Le repérage, la clé de tout\n\nAvant chaque mariage, je fais un repérage : où sera la cérémonie, d'où vient la lumière, où placer mes caméras sans gêner.\n\n## Deux caméras, deux rôles\n\n- **Caméra A** : plans larges, fixe sur trépied, pour ne jamais rater un moment.\n- **Caméra B** : à l'épaule ou au stabilisateur, pour les mouvements et les détails.\n\n## Le son, souvent négligé\n\nJ'utilise deux micros-cravate (mariés) + un enregistreur sur la sono. Le son fait 50% de l'émotion d'un film.\n\n## Le montage\n\nJe monte sur la musique d'abord, les images ensuite. Un bon film de mariage se ressent comme un court-métrage, pas comme un reportage.\n\n---\n\n**Un projet de film ?** [Voir mes forfaits](/forfaits-video).",
+                'meta_title' => 'Comment je filme un mariage — coulisses vidéaste Lyon',
+                'meta_desc' => 'Vidéaste mariage Lyon : mon workflow 2 caméras, captation son et montage cinématique.',
+                'days_ago' => 10,
+                'category' => 1,
+            ],
+            [
+                'title' => 'Drone : ce que ça change pour vos films',
+                'excerpt' => 'Les plans aériens transforment un film. Voici quand et comment j\'utilise le drone, et pourquoi la réglementation compte.',
+                'content' => "## Un plan aérien = une émotion instantanée\n\nUn survol du lieu de réception, un plan qui s'élève pendant que les mariés s'embrassent : le drone crée une respiration cinématographique unique.\n\n## Quand je l'utilise\n\n- Ouverture du film (établir le lieu)\n- Transitions entre les moments\n- Plans de fin, quand la lumière est dorée\n\n## La réglementation, non négociable\n\nJe suis **déclaré et assuré** pour le vol de drone. Je vérifie systématiquement les zones de restriction (aéroports, sites sensibles). Un vidéaste qui ne le fait pas vous met en risque.\n\n## Le matériel\n\nUn drone 4K stabilisé suffit largement. Ce n'est pas la taille qui compte, c'est le mouvement maîtrisé.",
+                'meta_title' => 'Drone pour films de mariage et corporate — Lyon',
+                'meta_desc' => 'Vidéaste Lyon : pourquoi et comment j\'utilise le drone pour vos films, réglementation incluse.',
+                'days_ago' => 20,
+                'category' => 1,
+            ],
+        ];
+        foreach ($videoArticlesData as $data) {
+            $a = new Article();
+            $a->setTitle($data['title']);
+            $a->setCategory($blogCats[$data['category']]);
+            $a->setExcerpt($data['excerpt']);
+            $a->setContent($data['content']);
+            $a->setMetaTitle($data['meta_title']);
+            $a->setMetaDescription($data['meta_desc']);
+            $a->setAuthor($admin);
+            $a->setPublished(true);
+            $a->setPublishedAt(new \DateTimeImmutable('-'.$data['days_ago'].' days'));
+            $a->setViewCount(random_int(40, 400));
+            $a->setSite($siteVideo);
             $manager->persist($a);
         }
 
@@ -403,6 +558,17 @@ class AppFixtures extends Fixture
             $gallery->addPhoto($photo);
             $manager->persist($photo);
         }
+
+        // --- Film livré dans la galerie (le film de mariage) -------------
+        $film = new ClientFilm();
+        $film->setTitle('Votre film de mariage — Sophie & Julien');
+        $film->setDescription("Le film complet de votre journée, monté avec amour.\nN'hésitez pas à le partager avec vos proches via ce lien privé.");
+        $film->setUrl('https://vimeo.com/76979871');
+        $film->setDuration('6:24');
+        $film->setDownloadUrl('https://wetransfer.com/downloads/demo-placeholder');
+        $film->setPosition(1);
+        $gallery->addFilm($film);
+        $manager->persist($film);
 
         $manager->persist($gallery);
     }

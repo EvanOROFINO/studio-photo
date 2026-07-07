@@ -43,6 +43,16 @@ Une seule plateforme, branchée à Stripe et à un back-office riche pour pilote
 
 ## 🚀 Fonctionnalités
 
+### 🌐 Architecture multi-site (Photo + Vidéo)
+Une **seule application Symfony** pilote **deux sites distincts** avec un **back-office commun** :
+
+- 🏷️ **Entité `Site`** (slug, domaine, branding : couleur d'accent, icône, tagline)
+- 🎯 **Détection automatique du site par domaine** via un `SiteListener` (EventListener, priorité 100) — fallback sur le site par défaut
+- 🔀 **Sélecteur de site** dans la nav : redirige vers le vrai domaine en production, bascule par session en dev (`?_site=video`)
+- 🧭 **Navigation, footer, SEO (canonical/OG/sitemap) adaptés** à chaque site
+- 🧩 **`SiteAwareTrait`** réutilisable — les contenus (photos, vidéos, prestations, forfaits…) appartiennent à un site
+- **Site Vidéo dédié** : home cinématique, showreel filtrable par catégorie, pages détail par film, **forfaits vidéo** (Essentiel / Signature / Prestige) gérables en admin, formulaire de contact pré-rempli par forfait
+
 ### Site public
 - 🏠 **Page d'accueil** hero responsive + photos à la une + catégories + témoignages
 - 🖼️ **Galerie** avec filtres par catégorie et tags, pagination, lightbox, mode masonry
@@ -95,10 +105,11 @@ Une seule plateforme, branchée à Stripe et à un back-office riche pour pilote
 vendor/bin/phpunit --testdox
 ```
 
-**31 tests, 63 assertions** :
-- Smoke tests des 14 routes publiques
-- Tests fonctionnels métier (galerie privée, réservation Stripe en mode démo)
-- Tests unitaires (`StripeCheckoutService`, `AvailabilityService`)
+**63 tests, 145+ assertions** :
+- Smoke tests des routes publiques (Photo + Vidéo)
+- Tests fonctionnels métier (galerie privée, réservation Stripe en mode démo, panier + coupons)
+- **Tests multi-site** (détection de site, bascule, showreel filtré, forfaits, isolation des données)
+- Tests unitaires (`StripeCheckoutService`, `AvailabilityService`, parsing `Video`)
 - Validation des règles d'accès (auth, expiration, dates passées)
 
 ## 🚦 Installation locale

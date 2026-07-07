@@ -9,6 +9,9 @@ use App\Entity\Product;
 use App\Repository\CouponRepository;
 use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Session-backed shopping cart for products + coupon support.
@@ -18,11 +21,31 @@ class CartService
     private const SESSION_KEY = 'shop_cart';
     private const COUPON_KEY = 'shop_coupon_code';
 
+    /**
+     * In-memory fallback used when no HTTP session is available
+     * (CLI commands, unit tests calling the cart directly).
+     */
+    private ?SessionInterface $fallbackSession = null;
+
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly ProductRepository $productRepository,
         private readonly CouponRepository $couponRepository,
     ) {
+    }
+
+    /**
+     * Returns the active HTTP session, or a resilient in-memory fallback
+     * so the cart never crashes outside a web request.
+     */
+    private function session(): SessionInterface
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request !== null && $request->hasSession()) {
+            return $request->getSession();
+        }
+
+        return $this->fallbackSession ??= new Session(new MockArraySessionStorage());
     }
 
     public function add(int $productId, int $quantity = 1): void
@@ -117,18 +140,18 @@ class CartService
         if ($reason !== null) {
             return $reason;
         }
-        $this->requestStack->getSession()->set(self::COUPON_KEY, $coupon->getCode());
+        $this->session()->set(self::COUPON_KEY, $coupon->getCode());
         return null;
     }
 
     public function clearCoupon(): void
     {
-        $this->requestStack->getSession()->remove(self::COUPON_KEY);
+        $this->session()->remove(self::COUPON_KEY);
     }
 
     public function getCoupon(): ?Coupon
     {
-        $code = $this->requestStack->getSession()->get(self::COUPON_KEY);
+        $code = $this->session()->get(self::COUPON_KEY);
         if (!$code) {
             return null;
         }
@@ -194,12 +217,12 @@ class CartService
     /** @return array<int, int> */
     private function raw(): array
     {
-        return $this->requestStack->getSession()->get(self::SESSION_KEY, []);
+        return $this->session()->get(self::SESSION_KEY, []);
     }
 
     /** @param array<int, int> $cart */
     private function save(array $cart): void
     {
-        $this->requestStack->getSession()->set(self::SESSION_KEY, $cart);
+        $this->session()->set(self::SESSION_KEY, $cart);
     }
 }

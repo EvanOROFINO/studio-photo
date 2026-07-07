@@ -2,23 +2,42 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-4">
-                <h5 class="serif mb-3"><i class="bi bi-camera-fill me-2"></i>{{ studio_name }}</h5>
-                <p class="text-light opacity-75 mb-2">{{ studio_tagline }}</p>
+                <h5 class="serif mb-3"><span class="me-2">{{ current_site.iconEmoji|default('📸') }}</span>{{ current_site.name|default(studio_name) }}</h5>
+                <p class="text-light opacity-75 mb-2">{{ current_site.tagline|default(studio_tagline) }}</p>
                 <p class="text-light opacity-75 small mb-3">{{ studio_city }}, France</p>
                 <div class="d-flex gap-3">
                     <a href="{{ social_instagram }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-instagram"></i></a>
                     <a href="{{ social_facebook }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-facebook"></i></a>
                     <a href="https://wa.me/{{ contact_phone|replace({' ': '', '+': '', '.': ''}) }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-whatsapp"></i></a>
                 </div>
+                {% if all_sites|length > 1 %}
+                    <div class="mt-3 pt-3 border-top border-secondary">
+                        <p class="text-light opacity-50 small mb-2 text-uppercase" style="letter-spacing: 0.1em;">Mes univers</p>
+                        {% for site in all_sites %}
+                            <a href="{{ site.id == current_site.id ? path('app_home') : path('app_site_switch', { slug: site.slug }) }}"
+                               class="badge text-decoration-none me-1 mb-1 {{ site.id == current_site.id ? '' : 'bg-secondary' }}"
+                               style="{{ site.id == current_site.id ? 'background: ' ~ site.accentColor ~ '; color: #1a1a1a;' : '' }}">
+                                {{ site.iconEmoji }} {{ site.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             <div class="col-lg-2 col-md-4">
                 <h6 class="text-uppercase small fw-bold mb-3">Navigation</h6>
                 <ul class="list-unstyled small">
                     <li class="mb-2"><a href="{{ path('app_home') }}" class="text-light opacity-75 text-decoration-none">Accueil</a></li>
-                    <li class="mb-2"><a href="{{ path('app_gallery') }}" class="text-light opacity-75 text-decoration-none">Galerie</a></li>
-                    <li class="mb-2"><a href="{{ path('app_services') }}" class="text-light opacity-75 text-decoration-none">Prestations</a></li>
-                    <li class="mb-2"><a href="{{ path('app_testimonials') }}" class="text-light opacity-75 text-decoration-none">Avis clients</a></li>
-                    <li class="mb-2"><a href="{{ path('app_about') }}" class="text-light opacity-75 text-decoration-none">À propos</a></li>
+                    {% if current_site.videoSite %}
+                        <li class="mb-2"><a href="{{ path('app_showreel') }}" class="text-light opacity-75 text-decoration-none">Showreel</a></li>
+                        <li class="mb-2"><a href="{{ path('app_video_packages') }}" class="text-light opacity-75 text-decoration-none">Forfaits</a></li>
+                        <li class="mb-2"><a href="{{ path('app_testimonials') }}" class="text-light opacity-75 text-decoration-none">Avis clients</a></li>
+                        <li class="mb-2"><a href="{{ path('app_about') }}" class="text-light opacity-75 text-decoration-none">À propos</a></li>
+                    {% else %}
+                        <li class="mb-2"><a href="{{ path('app_gallery') }}" class="text-light opacity-75 text-decoration-none">Galerie</a></li>
+                        <li class="mb-2"><a href="{{ path('app_services') }}" class="text-light opacity-75 text-decoration-none">Prestations</a></li>
+                        <li class="mb-2"><a href="{{ path('app_testimonials') }}" class="text-light opacity-75 text-decoration-none">Avis clients</a></li>
+                        <li class="mb-2"><a href="{{ path('app_about') }}" class="text-light opacity-75 text-decoration-none">À propos</a></li>
+                    {% endif %}
                 </ul>
             </div>
             <div class="col-lg-2 col-md-4">
@@ -45,7 +64,7 @@
         </div>
         <hr class="border-secondary mt-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-75">
-            <p class="mb-2 mb-md-0">&copy; {{ "now"|date('Y') }} {{ studio_name }} — Tous droits réservés.</p>
+            <p class="mb-2 mb-md-0">&copy; {{ "now"|date('Y') }} {{ current_site.name|default(studio_name) }} — Tous droits réservés.</p>
             <a href="{{ path('app_login') }}" class="text-light opacity-50 text-decoration-none"><i class="bi bi-lock me-1"></i>Espace admin</a>
         </div>
     </div>

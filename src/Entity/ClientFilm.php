@@ -2,29 +2,31 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\SiteAwareTrait;
-use App\Repository\VideoRepository;
+use App\Repository\ClientFilmRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: VideoRepository::class)]
+/**
+ * A finished film delivered to a client inside a private ClientGallery
+ * (e.g. the wedding movie, the corporate aftermovie).
+ * Uses a private/unlisted YouTube or Vimeo link.
+ */
+#[ORM\Entity(repositoryClass: ClientFilmRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Video
+#[ORM\Table(name: 'client_film')]
+class ClientFilm
 {
-    use SiteAwareTrait;
-
     public const SOURCE_YOUTUBE = 'youtube';
     public const SOURCE_VIMEO = 'vimeo';
-
-    public const SOURCES = [
-        'YouTube' => self::SOURCE_YOUTUBE,
-        'Vimeo' => self::SOURCE_VIMEO,
-    ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: ClientGallery::class, inversedBy: 'films')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ClientGallery $gallery = null;
 
     #[ORM\Column(length: 150)]
     #[Assert\NotBlank]
@@ -33,41 +35,30 @@ class Video
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    /**
-     * Full URL pasted by the photographer; the externalId is extracted in a hook.
-     */
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Url]
     private ?string $url = null;
 
     #[ORM\Column(length: 20)]
-    private string $source = self::SOURCE_YOUTUBE;
+    private string $source = self::SOURCE_VIMEO;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $externalId = null;
 
-    #[ORM\Column]
-    private bool $featured = false;
-
-    #[ORM\Column]
-    private bool $published = true;
-
-    #[ORM\Column]
-    private int $position = 0;
-
-    #[ORM\ManyToOne(targetEntity: VideoCategory::class, inversedBy: 'videos')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?VideoCategory $category = null;
-
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $duration = null;
 
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $clientName = null;
+    /**
+     * Optional direct download link (e.g. WeTransfer, S3 signed URL) for the
+     * full-resolution file the client can keep.
+     */
+    #[ORM\Column(length: 500, nullable: true)]
+    #[Assert\Url]
+    private ?string $downloadUrl = null;
 
-    #[ORM\Column(length: 150, nullable: true)]
-    private ?string $location = null;
+    #[ORM\Column]
+    private int $position = 0;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -77,9 +68,6 @@ class Video
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    /**
-     * Detect YouTube/Vimeo from the URL and extract the video ID.
-     */
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
     public function parseUrl(): void
@@ -87,15 +75,11 @@ class Video
         if (!$this->url) {
             return;
         }
-
-        // YouTube — handles watch?v=, youtu.be/, embed/, shorts/
         if (preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{6,})~', $this->url, $m)) {
             $this->source = self::SOURCE_YOUTUBE;
             $this->externalId = $m[1];
             return;
         }
-
-        // Vimeo — handles vimeo.com/123, vimeo.com/channels/xxx/123
         if (preg_match('~vimeo\.com/(?:channels/[^/]+/|video/)?(\d+)~', $this->url, $m)) {
             $this->source = self::SOURCE_VIMEO;
             $this->externalId = $m[1];
@@ -128,6 +112,9 @@ class Video
 
     public function getId(): ?int { return $this->id; }
 
+    public function getGallery(): ?ClientGallery { return $this->gallery; }
+    public function setGallery(?ClientGallery $gallery): static { $this->gallery = $gallery; return $this; }
+
     public function getTitle(): ?string { return $this->title; }
     public function setTitle(string $title): static { $this->title = $title; return $this; }
 
@@ -143,26 +130,14 @@ class Video
     public function getExternalId(): ?string { return $this->externalId; }
     public function setExternalId(?string $externalId): static { $this->externalId = $externalId; return $this; }
 
-    public function isFeatured(): bool { return $this->featured; }
-    public function setFeatured(bool $featured): static { $this->featured = $featured; return $this; }
-
-    public function isPublished(): bool { return $this->published; }
-    public function setPublished(bool $published): static { $this->published = $published; return $this; }
-
-    public function getPosition(): int { return $this->position; }
-    public function setPosition(int $position): static { $this->position = $position; return $this; }
-
-    public function getCategory(): ?VideoCategory { return $this->category; }
-    public function setCategory(?VideoCategory $category): static { $this->category = $category; return $this; }
-
     public function getDuration(): ?string { return $this->duration; }
     public function setDuration(?string $duration): static { $this->duration = $duration; return $this; }
 
-    public function getClientName(): ?string { return $this->clientName; }
-    public function setClientName(?string $clientName): static { $this->clientName = $clientName; return $this; }
+    public function getDownloadUrl(): ?string { return $this->downloadUrl; }
+    public function setDownloadUrl(?string $downloadUrl): static { $this->downloadUrl = $downloadUrl; return $this; }
 
-    public function getLocation(): ?string { return $this->location; }
-    public function setLocation(?string $location): static { $this->location = $location; return $this; }
+    public function getPosition(): int { return $this->position; }
+    public function setPosition(int $position): static { $this->position = $position; return $this; }
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
 
