@@ -90,6 +90,55 @@
     </div>
 </div>
 
+{# KPI Studio Vidéo ---------------------------------------------------- #}
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="text-muted small text-uppercase mb-1" style="letter-spacing: 0.1em;">
+            <i class="fa fa-clapperboard me-1"></i>Studio Vidéo
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100" style="border-left: 3px solid #a78bfa !important;">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-film me-1"></i>Vidéos publiées</div>
+                <div class="h3 mb-0">{{ videoKpis.totalVideos }}</div>
+                <small class="text-muted">showreel</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100" style="border-left: 3px solid #a78bfa !important;">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-tags me-1"></i>Forfaits vidéo</div>
+                <div class="h3 mb-0">{{ videoKpis.videoPackages }}</div>
+                <small class="text-muted">{{ videoKpis.videoCategories }} catégories</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100" style="border-left: 3px solid #a78bfa !important;">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1"><i class="fa fa-video me-1"></i>Films livrés</div>
+                <div class="h3 mb-0">{{ videoKpis.deliveredFilms }}</div>
+                <small class="text-muted">aux clients</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-2">Studio Vidéo</div>
+                <a href="{{ ea_url().setController('App\\Controller\\Admin\\ClientFilmCrudController').setAction('new') }}" class="btn btn-sm w-100 mb-2" style="background: #a78bfa; color: #1a1a1a; font-weight: 600;">
+                    <i class="fa fa-plus me-1"></i>Livrer un film
+                </a>
+                <a href="/?_site=video" target="_blank" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="fa fa-external-link-alt me-1"></i>Voir le site vidéo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 {# Charts ------------------------------------------------------------- #}
 <div class="row g-3 mb-4">
     <div class="col-lg-8">
