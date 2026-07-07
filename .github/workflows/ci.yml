@@ -65,4 +65,4 @@ jobs:
           tools: composer:v2
 
       - name: Audit dependencies
-        run: composer audit --no-interaction
+        run: composer audit --no-interaction --locked
