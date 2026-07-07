@@ -132,4 +132,34 @@ class MultiSiteTest extends AbstractAppWebTestCase
         $this->assertCount(3, $repo->findActiveForSite($siteVideo));
         $this->assertCount(0, $repo->findActiveForSite($sitePhoto));
     }
+
+    // -- Site-aware blog & testimonials ---------------------------------
+
+    public function testBlogShowsVideoArticlesOnVideoSite(): void
+    {
+        $this->client->request('GET', '/blog?_site=video');
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        // Un article vidéo doit apparaître, pas un article purement photo
+        $this->assertStringContainsString('filme un mariage', $content);
+        $this->assertStringNotContainsString('tenue pour une séance portrait', $content);
+    }
+
+    public function testBlogShowsPhotoArticlesOnPhotoSite(): void
+    {
+        $this->client->request('GET', '/blog');
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('photos de mariage', $content);
+    }
+
+    public function testTestimonialsAreSiteScoped(): void
+    {
+        $this->client->request('GET', '/temoignages?_site=video');
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        // Avis vidéo présent, avis photo absent
+        $this->assertStringContainsString('Film de mariage', $content);
+        $this->assertStringNotContainsString('Séance grossesse', $content);
+    }
 }

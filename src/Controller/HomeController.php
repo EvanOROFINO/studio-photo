@@ -28,13 +28,15 @@ class HomeController extends AbstractController
         VideoRepository $videoRepository,
         VideoCategoryRepository $videoCategoryRepository,
     ): Response {
+        $site = $this->siteContext->getCurrent();
+
         // Site Vidéo → home dédiée
         if ($this->siteContext->isVideo()) {
             return $this->render('home/video.html.twig', [
-                'featuredVideos' => $videoRepository->findFeaturedForSite($this->siteContext->getCurrent(), 6),
+                'featuredVideos' => $videoRepository->findFeaturedForSite($site, 6),
                 'categories' => $videoCategoryRepository->findActiveOrdered(),
                 'services' => $serviceRepository->findActiveOrdered(),
-                'testimonials' => $testimonialRepository->findPublishedOrdered(3),
+                'testimonials' => $testimonialRepository->findPublishedOrdered(3, $site),
             ]);
         }
 
@@ -43,7 +45,7 @@ class HomeController extends AbstractController
             'featuredPhotos' => $photoRepository->findFeatured(6),
             'categories' => $categoryRepository->findAllOrdered(),
             'services' => $serviceRepository->findActiveOrdered(),
-            'testimonials' => $testimonialRepository->findPublishedOrdered(3),
+            'testimonials' => $testimonialRepository->findPublishedOrdered(3, $site),
         ]);
     }
 

@@ -226,7 +226,26 @@ class AppFixtures extends Fixture
             $testimonial->setRating($rating);
             $testimonial->setPosition($position);
             $testimonial->setPublished(true);
+            $testimonial->setSite($sitePhoto);
             $manager->persist($testimonial);
+        }
+
+        // --- Témoignages SITE VIDÉO --------------------------------------
+        $videoTestimonialsData = [
+            ['Élodie & Thomas', 'Film de mariage 2024', 'On revoit notre film au moins une fois par mois. À chaque fois, l\'émotion est intacte. Le montage, la musique, les plans au drone… c\'est un vrai court-métrage de notre journée. On ne regrette pas un centime.', 5, 1],
+            ['Startup Novae', 'Film corporate', 'Besoin d\'un film de présentation pour notre levée de fonds : livré en 2 semaines, résultat bluffant. Nos investisseurs ont adoré. Réactif, pro, et un vrai sens du storytelling.', 5, 2],
+            ['Marine V.', 'Clip artiste', 'Mon clip a dépassé les 50k vues et beaucoup me parlent de la réalisation. Travailler avec quelqu\'un qui comprend l\'image ET la musique, ça fait toute la différence.', 5, 3],
+        ];
+        foreach ($videoTestimonialsData as [$author, $role, $content, $rating, $position]) {
+            $t = new Testimonial();
+            $t->setAuthorName($author);
+            $t->setAuthorRole($role);
+            $t->setContent($content);
+            $t->setRating($rating);
+            $t->setPosition($position);
+            $t->setPublished(true);
+            $t->setSite($siteVideo);
+            $manager->persist($t);
         }
 
         // --- Demo showreel videos ----------------------------------------
@@ -440,6 +459,44 @@ class AppFixtures extends Fixture
             $a->setPublished(true);
             $a->setPublishedAt(new \DateTimeImmutable('-'.$data['days_ago'].' days'));
             $a->setViewCount(random_int(40, 800));
+            $a->setSite($sitePhoto);
+            $manager->persist($a);
+        }
+
+        // --- Blog SITE VIDÉO : coulisses de tournage ---------------------
+        $videoArticlesData = [
+            [
+                'title' => 'Comment je filme un mariage en 2 caméras',
+                'excerpt' => 'Mon workflow complet pour un film de mariage cinématique : repérages, placement des caméras, captation du son, et montage.',
+                'content' => "## Le repérage, la clé de tout\n\nAvant chaque mariage, je fais un repérage : où sera la cérémonie, d'où vient la lumière, où placer mes caméras sans gêner.\n\n## Deux caméras, deux rôles\n\n- **Caméra A** : plans larges, fixe sur trépied, pour ne jamais rater un moment.\n- **Caméra B** : à l'épaule ou au stabilisateur, pour les mouvements et les détails.\n\n## Le son, souvent négligé\n\nJ'utilise deux micros-cravate (mariés) + un enregistreur sur la sono. Le son fait 50% de l'émotion d'un film.\n\n## Le montage\n\nJe monte sur la musique d'abord, les images ensuite. Un bon film de mariage se ressent comme un court-métrage, pas comme un reportage.\n\n---\n\n**Un projet de film ?** [Voir mes forfaits](/forfaits-video).",
+                'meta_title' => 'Comment je filme un mariage — coulisses vidéaste Lyon',
+                'meta_desc' => 'Vidéaste mariage Lyon : mon workflow 2 caméras, captation son et montage cinématique.',
+                'days_ago' => 10,
+                'category' => 1,
+            ],
+            [
+                'title' => 'Drone : ce que ça change pour vos films',
+                'excerpt' => 'Les plans aériens transforment un film. Voici quand et comment j\'utilise le drone, et pourquoi la réglementation compte.',
+                'content' => "## Un plan aérien = une émotion instantanée\n\nUn survol du lieu de réception, un plan qui s'élève pendant que les mariés s'embrassent : le drone crée une respiration cinématographique unique.\n\n## Quand je l'utilise\n\n- Ouverture du film (établir le lieu)\n- Transitions entre les moments\n- Plans de fin, quand la lumière est dorée\n\n## La réglementation, non négociable\n\nJe suis **déclaré et assuré** pour le vol de drone. Je vérifie systématiquement les zones de restriction (aéroports, sites sensibles). Un vidéaste qui ne le fait pas vous met en risque.\n\n## Le matériel\n\nUn drone 4K stabilisé suffit largement. Ce n'est pas la taille qui compte, c'est le mouvement maîtrisé.",
+                'meta_title' => 'Drone pour films de mariage et corporate — Lyon',
+                'meta_desc' => 'Vidéaste Lyon : pourquoi et comment j\'utilise le drone pour vos films, réglementation incluse.',
+                'days_ago' => 20,
+                'category' => 1,
+            ],
+        ];
+        foreach ($videoArticlesData as $data) {
+            $a = new Article();
+            $a->setTitle($data['title']);
+            $a->setCategory($blogCats[$data['category']]);
+            $a->setExcerpt($data['excerpt']);
+            $a->setContent($data['content']);
+            $a->setMetaTitle($data['meta_title']);
+            $a->setMetaDescription($data['meta_desc']);
+            $a->setAuthor($admin);
+            $a->setPublished(true);
+            $a->setPublishedAt(new \DateTimeImmutable('-'.$data['days_ago'].' days'));
+            $a->setViewCount(random_int(40, 400));
+            $a->setSite($siteVideo);
             $manager->persist($a);
         }
 
