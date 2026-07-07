@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Entity\ClientFilm;
 use App\Entity\ClientGallery;
 use App\Tests\AbstractAppWebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -73,5 +74,37 @@ class ClientGalleryAccessTest extends AbstractAppWebTestCase
         $gallery = $this->createGallery();
         $this->client->request('GET', '/galerie-client/'.$gallery->getToken().'/photos');
         $this->assertResponseRedirects('/galerie-client/'.$gallery->getToken());
+    }
+
+    public function testDeliveredFilmAppearsInUnlockedGallery(): void
+    {
+        $gallery = $this->createGallery('filmpass');
+
+        $film = new ClientFilm();
+        $film->setTitle('Votre film de mariage');
+        $film->setUrl('https://vimeo.com/76979871');
+        $film->setDuration('6:24');
+        $gallery->addFilm($film);
+        $this->em->persist($film);
+        $this->em->flush();
+
+        // Le parsing d'URL doit détecter Vimeo + l'ID
+        $this->assertSame(ClientFilm::SOURCE_VIMEO, $film->getSource());
+        $this->assertSame('76979871', $film->getExternalId());
+        $this->assertStringContainsString('player.vimeo.com/video/76979871', $film->getEmbedUrl());
+
+        // Déverrouillage puis affichage du film dans la galerie
+        $crawler = $this->client->request('GET', '/galerie-client/'.$gallery->getToken());
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
+        $this->client->request('POST', '/galerie-client/'.$gallery->getToken(), [
+            'password' => 'filmpass',
+            '_token' => $token,
+        ]);
+        $this->client->followRedirect();
+
+        $this->assertResponseIsSuccessful();
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('Votre film de mariage', $content);
+        $this->assertStringContainsString('player.vimeo.com/video/76979871', $content);
     }
 }

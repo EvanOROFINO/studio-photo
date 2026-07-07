@@ -7,6 +7,7 @@ use App\Entity\ArticleCategory;
 use App\Entity\BlockedDate;
 use App\Entity\Booking;
 use App\Entity\Category;
+use App\Entity\ClientFilm;
 use App\Entity\ClientGallery;
 use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
@@ -500,6 +501,17 @@ class AppFixtures extends Fixture
             $gallery->addPhoto($photo);
             $manager->persist($photo);
         }
+
+        // --- Film livré dans la galerie (le film de mariage) -------------
+        $film = new ClientFilm();
+        $film->setTitle('Votre film de mariage — Sophie & Julien');
+        $film->setDescription("Le film complet de votre journée, monté avec amour.\nN'hésitez pas à le partager avec vos proches via ce lien privé.");
+        $film->setUrl('https://vimeo.com/76979871');
+        $film->setDuration('6:24');
+        $film->setDownloadUrl('https://wetransfer.com/downloads/demo-placeholder');
+        $film->setPosition(1);
+        $gallery->addFilm($film);
+        $manager->persist($film);
 
         $manager->persist($gallery);
     }

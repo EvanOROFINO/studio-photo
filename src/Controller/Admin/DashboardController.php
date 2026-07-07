@@ -8,6 +8,7 @@ use App\Entity\BeforeAfter;
 use App\Entity\BlockedDate;
 use App\Entity\Booking;
 use App\Entity\Category;
+use App\Entity\ClientFilm;
 use App\Entity\ClientGallery;
 use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
@@ -81,6 +82,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Galeries clients');
         yield MenuItem::linkToCrud('Galeries privées', 'fa fa-lock', ClientGallery::class);
         yield MenuItem::linkToCrud('Photos clients', 'fa fa-images', ClientPhoto::class);
+        yield MenuItem::linkToCrud('Films livrés', 'fa fa-film', ClientFilm::class);
 
         yield MenuItem::section('Blog');
         yield MenuItem::linkToCrud('Articles', 'fa fa-newspaper', Article::class);

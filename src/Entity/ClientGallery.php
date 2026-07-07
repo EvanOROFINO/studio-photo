@@ -63,12 +63,18 @@ class ClientGallery
     #[ORM\OrderBy(['position' => 'ASC', 'createdAt' => 'ASC'])]
     private Collection $photos;
 
+    /** @var Collection<int, ClientFilm> */
+    #[ORM\OneToMany(targetEntity: ClientFilm::class, mappedBy: 'gallery', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC', 'createdAt' => 'ASC'])]
+    private Collection $films;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->expiresAt = (new \DateTimeImmutable())->modify('+6 months');
         $this->token = bin2hex(random_bytes(16));
         $this->photos = new ArrayCollection();
+        $this->films = new ArrayCollection();
     }
 
     public function regenerateToken(): void
@@ -237,6 +243,34 @@ class ClientGallery
             $photo->setGallery(null);
         }
         return $this;
+    }
+
+    /** @return Collection<int, ClientFilm> */
+    public function getFilms(): Collection
+    {
+        return $this->films;
+    }
+
+    public function addFilm(ClientFilm $film): static
+    {
+        if (!$this->films->contains($film)) {
+            $this->films->add($film);
+            $film->setGallery($this);
+        }
+        return $this;
+    }
+
+    public function removeFilm(ClientFilm $film): static
+    {
+        if ($this->films->removeElement($film) && $film->getGallery() === $this) {
+            $film->setGallery(null);
+        }
+        return $this;
+    }
+
+    public function hasFilms(): bool
+    {
+        return !$this->films->isEmpty();
     }
 
     public function __toString(): string
