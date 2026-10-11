@@ -3,27 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Article;
-use App\Entity\ArticleCategory;
-use App\Entity\BeforeAfter;
-use App\Entity\BlockedDate;
 use App\Entity\Booking;
 use App\Entity\Category;
 use App\Entity\ClientFilm;
 use App\Entity\ClientGallery;
-use App\Entity\ClientPhoto;
 use App\Entity\ContactRequest;
 use App\Entity\NewsletterSubscriber;
-use App\Entity\Order;
-use App\Entity\Photo;
-use App\Entity\Product;
-use App\Entity\Service;
-use App\Entity\Tag;
-use App\Entity\Testimonial;
-use App\Entity\User;
 use App\Entity\Video;
 use App\Entity\VideoCategory;
 use App\Entity\VideoPackage;
-use App\Entity\Site;
 use App\Repository\ContactRequestRepository;
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -217,7 +205,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Studio Photo — Administration')
+            ->setTitle('Studio Photo/Vidéos — Administration')
             ->setFaviconPath('favicon.ico');
     }
 
@@ -225,44 +213,45 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
+        // EasyAdmin 5 : linkToCrud() a disparu, on pointe désormais vers le CrudController.
         yield MenuItem::section('Site public');
-        yield MenuItem::linkToCrud('Photos', 'fa fa-image', Photo::class);
-        yield MenuItem::linkToCrud('Catégories', 'fa fa-folder', Category::class);
-        yield MenuItem::linkToCrud('Tags', 'fa fa-hashtag', Tag::class);
-        yield MenuItem::linkToCrud('Prestations', 'fa fa-tag', Service::class);
-        yield MenuItem::linkToCrud('Témoignages', 'fa fa-star', Testimonial::class);
-        yield MenuItem::linkToCrud('Avant / Après', 'fa fa-sliders-h', BeforeAfter::class);
-        yield MenuItem::linkToCrud('Showreel / Vidéos', 'fa fa-video', Video::class);
-        yield MenuItem::linkToCrud('Catégories vidéo', 'fa fa-film', VideoCategory::class);
-        yield MenuItem::linkToCrud('Forfaits vidéo', 'fa fa-clapperboard', VideoPackage::class);
+        yield MenuItem::linkTo(PhotoCrudController::class, 'Photos', 'fa fa-image');
+        yield MenuItem::linkTo(CategoryCrudController::class, 'Catégories', 'fa fa-folder');
+        yield MenuItem::linkTo(TagCrudController::class, 'Tags', 'fa fa-hashtag');
+        yield MenuItem::linkTo(ServiceCrudController::class, 'Prestations', 'fa fa-tag');
+        yield MenuItem::linkTo(TestimonialCrudController::class, 'Témoignages', 'fa fa-star');
+        yield MenuItem::linkTo(BeforeAfterCrudController::class, 'Avant / Après', 'fa fa-sliders-h');
+        yield MenuItem::linkTo(VideoCrudController::class, 'Showreel / Vidéos', 'fa fa-video');
+        yield MenuItem::linkTo(VideoCategoryCrudController::class, 'Catégories vidéo', 'fa fa-film');
+        yield MenuItem::linkTo(VideoPackageCrudController::class, 'Forfaits vidéo', 'fa fa-clapperboard');
 
         yield MenuItem::section('Multi-site');
-        yield MenuItem::linkToCrud('Sites (Photo / Vidéo)', 'fa fa-globe', Site::class);
+        yield MenuItem::linkTo(SiteCrudController::class, 'Sites (Photo / Vidéo)', 'fa fa-globe');
 
         yield MenuItem::section('Galeries clients');
-        yield MenuItem::linkToCrud('Galeries privées', 'fa fa-lock', ClientGallery::class);
-        yield MenuItem::linkToCrud('Photos clients', 'fa fa-images', ClientPhoto::class);
-        yield MenuItem::linkToCrud('Films livrés', 'fa fa-film', ClientFilm::class);
+        yield MenuItem::linkTo(ClientGalleryCrudController::class, 'Galeries privées', 'fa fa-lock');
+        yield MenuItem::linkTo(ClientPhotoCrudController::class, 'Photos clients', 'fa fa-images');
+        yield MenuItem::linkTo(ClientFilmCrudController::class, 'Films livrés', 'fa fa-film');
 
         yield MenuItem::section('Blog');
-        yield MenuItem::linkToCrud('Articles', 'fa fa-newspaper', Article::class);
-        yield MenuItem::linkToCrud('Catégories blog', 'fa fa-tags', ArticleCategory::class);
+        yield MenuItem::linkTo(ArticleCrudController::class, 'Articles', 'fa fa-newspaper');
+        yield MenuItem::linkTo(ArticleCategoryCrudController::class, 'Catégories blog', 'fa fa-tags');
 
         yield MenuItem::section('Réservations');
-        yield MenuItem::linkToCrud('Réservations', 'fa fa-calendar-check', Booking::class);
-        yield MenuItem::linkToCrud('Dates bloquées', 'fa fa-calendar-times', BlockedDate::class);
+        yield MenuItem::linkTo(BookingCrudController::class, 'Réservations', 'fa fa-calendar-check');
+        yield MenuItem::linkTo(BlockedDateCrudController::class, 'Dates bloquées', 'fa fa-calendar-times');
 
         yield MenuItem::section('Boutique');
-        yield MenuItem::linkToCrud('Tirages / Produits', 'fa fa-tags', Product::class);
-        yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-bag', Order::class);
-        yield MenuItem::linkToCrud('Codes promo', 'fa fa-ticket-alt', \App\Entity\Coupon::class);
+        yield MenuItem::linkTo(ProductCrudController::class, 'Tirages / Produits', 'fa fa-tags');
+        yield MenuItem::linkTo(OrderCrudController::class, 'Commandes', 'fa fa-shopping-bag');
+        yield MenuItem::linkTo(CouponCrudController::class, 'Codes promo', 'fa fa-ticket-alt');
 
         yield MenuItem::section('Audience');
-        yield MenuItem::linkToCrud('Demandes de contact', 'fa fa-envelope', ContactRequest::class);
-        yield MenuItem::linkToCrud('Abonnés newsletter', 'fa fa-bell', NewsletterSubscriber::class);
+        yield MenuItem::linkTo(ContactRequestCrudController::class, 'Demandes de contact', 'fa fa-envelope');
+        yield MenuItem::linkTo(NewsletterSubscriberCrudController::class, 'Abonnés newsletter', 'fa fa-bell');
 
         yield MenuItem::section('Système');
-        yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-user', User::class);
+        yield MenuItem::linkTo(UserCrudController::class, 'Utilisateurs', 'fa fa-user');
         yield MenuItem::linkToUrl('Voir le site', 'fa fa-external-link-alt', '/')->setLinkTarget('_blank');
         yield MenuItem::linkToLogout('Déconnexion', 'fa fa-sign-out-alt');
     }

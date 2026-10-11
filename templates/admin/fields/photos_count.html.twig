@@ -1,1 +1,2 @@
-{{ value|length }} photo{{ value|length > 1 ? 's' : '' }}
+{# EasyAdmin 5 : la valeur du champ est dans field.value (la variable "value" n'existe plus) #}
+{{ field.value|length }} photo{{ field.value|length > 1 ? 's' : '' }}
