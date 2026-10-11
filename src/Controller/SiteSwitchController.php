@@ -22,19 +22,17 @@ class SiteSwitchController extends AbstractController
         $currentHost = $request->getHttpHost();
         $domain = $target->getDomain();
 
-        // En production : si le site cible a un vrai domaine distinct, on y redirige
-        $looksLikeRealDomain = $domain
-            && str_contains($domain, '.')
-            && !str_starts_with($domain, '127.')
-            && !str_starts_with($domain, 'localhost')
-            && $domain !== $currentHost;
+        // En production : on n'est redirigé vers le vrai domaine du site cible que si
+        // l'on est déjà servi depuis l'un des vrais domaines (et non un domaine de staging).
+        $current = $siteRepository->findByDomain($currentHost);
+        $onProductionDomain = $current !== null && strcasecmp((string) $current->getDomain(), $currentHost) === 0;
 
-        if ($looksLikeRealDomain) {
+        if ($onProductionDomain && $domain && strcasecmp($domain, $currentHost) !== 0) {
             $scheme = $request->isSecure() ? 'https' : 'http';
             return $this->redirect($scheme . '://' . $domain);
         }
 
-        // En dev / staging (même host) : on bascule via la session
+        // Ailleurs (localhost, staging, lien de démo via tunnel…) : on bascule via la session
         $request->getSession()->set('_site_override', $slug);
 
         return $this->redirectToRoute('app_home');

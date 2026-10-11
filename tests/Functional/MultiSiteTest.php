@@ -121,6 +121,31 @@ class MultiSiteTest extends AbstractAppWebTestCase
         $this->assertResponseRedirects();
     }
 
+    public function testSiteSwitchOnUnknownHostUsesSessionNotRealDomain(): void
+    {
+        // Hôte inconnu (localhost, tunnel de démo…) : on ne doit PAS quitter vers studio-video.fr
+        $this->client->request('GET', '/changer-de-site/video', [], [], ['HTTP_HOST' => 'demo-abc.trycloudflare.com']);
+        $this->assertResponseRedirects('/');
+
+        $this->client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Raconter votre histoire', $this->client->getResponse()->getContent());
+    }
+
+    public function testSiteSwitchFromProductionDomainRedirectsToTargetDomain(): void
+    {
+        // Depuis le vrai domaine du site Photo, le sélecteur renvoie vers le domaine du site Vidéo
+        $this->client->request('GET', '/changer-de-site/video', [], [], ['HTTP_HOST' => 'studio-photo.fr']);
+        $this->assertResponseRedirects('http://studio-video.fr');
+    }
+
+    public function testSiteSwitchFromStagingHostStaysOnSameHost(): void
+    {
+        // Le domaine de staging (127.0.0.1:8000) n'est pas un domaine de production
+        $this->client->request('GET', '/changer-de-site/video', [], [], ['HTTP_HOST' => '127.0.0.1:8000']);
+        $this->assertResponseRedirects('/');
+    }
+
     // -- Data isolation --------------------------------------------------
 
     public function testVideoPackagesBelongToVideoSiteOnly(): void
