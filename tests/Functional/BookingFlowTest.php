@@ -12,7 +12,6 @@ class BookingFlowTest extends AbstractAppWebTestCase
     {
         $repo = $this->em->getRepository(Service::class);
         $all = $repo->findAll();
-        fwrite(STDERR, "\n[DEBUG] Services in DB: ".count($all).PHP_EOL);
         $service = $repo->findOneBy([]);
         $this->assertNotNull($service, sprintf('A service must exist in fixtures (found %d total)', count($all)));
         return $service;

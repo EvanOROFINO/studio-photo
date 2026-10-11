@@ -8,6 +8,7 @@
     --border: #eeeeee;
     --muted: #777777;
     --nav-bg: #ffffff;
+    --header-bg: #1a1a1a;
     --hero-overlay-start: rgba(0,0,0,.35);
     --hero-overlay-end: rgba(0,0,0,.55);
 }
@@ -20,6 +21,7 @@
     --border: #2a2a2c;
     --muted: #aaa;
     --nav-bg: #1a1a1c;
+    --header-bg: #1a1a1c;
     --hero-overlay-start: rgba(0,0,0,.55);
     --hero-overlay-end: rgba(0,0,0,.8);
 }
@@ -274,7 +276,8 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
 
 /* Page header ------------------------------------------------- */
 .page-header {
-    background: var(--ink);
+    /* --header-bg (et non --ink) : --ink devient clair en thème sombre */
+    background: var(--header-bg);
     color: #fff;
     padding: 5rem 0 4rem;
     text-align: center;
@@ -424,7 +427,15 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
 [data-theme="dark"] .navbar-light .navbar-toggler-icon {
     filter: invert(1);
 }
-[data-theme="dark"] section.bg-white { background-color: var(--surface) !important; }
+[data-theme="dark"] .bg-white { background-color: var(--surface) !important; }
+[data-theme="dark"] .page-header { border-bottom: 1px solid var(--border); }
+[data-theme="dark"] .btn-dark { color: var(--bg); }
+[data-theme="dark"] .btn-dark:hover { background: #fff; border-color: #fff; color: #000; }
+[data-theme="dark"] .category-pills .btn { background: var(--surface); border-color: var(--border); color: var(--ink); }
+[data-theme="dark"] .category-pills .btn:hover,
+[data-theme="dark"] .category-pills .btn.active { background: var(--accent); border-color: var(--accent); color: #111; }
+[data-theme="dark"] .text-dark { color: var(--ink) !important; }
+[data-theme="dark"] .badge.bg-dark { background-color: var(--accent) !important; color: #111 !important; }
 [data-theme="dark"] .bg-light { background-color: var(--surface-alt) !important; color: var(--ink); }
 [data-theme="dark"] .text-muted { color: var(--muted) !important; }
 [data-theme="dark"] .border-top { border-color: var(--border) !important; }
@@ -580,4 +591,59 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
 .client-photo-download:hover {
     background: var(--accent);
     color: #fff;
+}
+
+/* Favorite (heart) button — top-left of each client photo */
+.client-photo-fav {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: #b0b0b0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .3s ease, transform .3s ease, color .2s ease, background .2s ease;
+    z-index: 2;
+}
+
+.client-photo:hover .client-photo-fav {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.client-photo-fav:hover {
+    color: #e0245e;
+}
+
+/* Once favorited, keep the heart visible even without hover */
+.client-photo-fav.is-fav {
+    opacity: 1;
+    transform: translateY(0);
+    color: #e0245e;
+}
+
+.client-photo-fav.is-loading {
+    pointer-events: none;
+    opacity: .6;
+}
+
+.client-photo-fav.just-toggled {
+    animation: favPop .35s ease;
+}
+
+@keyframes favPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    70%  { transform: scale(.9); }
+    100% { transform: scale(1); }
 }

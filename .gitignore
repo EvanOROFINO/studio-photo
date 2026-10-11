@@ -42,6 +42,9 @@
 /release/
 *.zip
 
+# Config locale des outils (chemins absolus propres à chaque poste)
+/.claude/
+
 # IDE / OS
 .idea/
 .vscode/

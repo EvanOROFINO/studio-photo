@@ -24,6 +24,7 @@ use App\Entity\VideoCategory;
 use App\Entity\VideoPackage;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -33,6 +34,8 @@ class AppFixtures extends Fixture
         private readonly UserPasswordHasherInterface $userHasher,
         private readonly PasswordHasherFactoryInterface $hasherFactory,
         private readonly string $clientGalleriesDir,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment = 'dev',
     ) {
     }
 
@@ -41,7 +44,7 @@ class AppFixtures extends Fixture
         // --- Sites (multi-site : Photo + Vidéo) ---------------------------
         $sitePhoto = new Site();
         $sitePhoto->setSlug(Site::SLUG_PHOTO);
-        $sitePhoto->setName('Studio Photo');
+        $sitePhoto->setName('Studio Photo/Vidéos');
         $sitePhoto->setDomain('studio-photo.fr');
         $sitePhoto->setDomainStaging('127.0.0.1:8000');
         $sitePhoto->setTagline('Capturer l\'instant. Sublimer l\'émotion.');
@@ -533,12 +536,18 @@ class AppFixtures extends Fixture
             @mkdir($this->clientGalleriesDir, 0775, true);
         }
 
+        // En test : aucun téléchargement (suite rapide, sans réseau) et des noms de fichiers
+        // stables, pour que les exécutions successives n'accumulent pas des Go d'images.
+        $isTest = $this->environment === 'test';
+
         for ($i = 1; $i <= 6; $i++) {
-            $filename = sprintf('demo-%d-%s.jpg', $i, bin2hex(random_bytes(4)));
+            $filename = $isTest
+                ? sprintf('demo-%d-test.jpg', $i)
+                : sprintf('demo-%d-%s.jpg', $i, bin2hex(random_bytes(4)));
             $path = $this->clientGalleriesDir.DIRECTORY_SEPARATOR.$filename;
 
             $url = "https://picsum.photos/seed/clientgal{$i}/1600/1100";
-            $content = @file_get_contents($url);
+            $content = $isTest ? false : @file_get_contents($url);
             if ($content !== false) {
                 file_put_contents($path, $content);
             } else {
@@ -554,6 +563,8 @@ class AppFixtures extends Fixture
             $photo->setImageSize(filesize($path) ?: 1024);
             $photo->setPosition($i);
             $photo->setTitle(sprintf('Photo %d', $i));
+            // Le client a déjà sélectionné quelques favoris (démo de la fonctionnalité)
+            $photo->setFavorite(in_array($i, [2, 5], true));
 
             $gallery->addPhoto($photo);
             $manager->persist($photo);

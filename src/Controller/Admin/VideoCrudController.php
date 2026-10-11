@@ -44,7 +44,7 @@ class VideoCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->hideOnForm();
         yield AssociationField::new('site', 'Site')
-            ->setHelp('Studio Photo (showreel du site photo) ou Studio Vidéo.');
+            ->setHelp('Studio Photo/Vidéos (showreel du site photo) ou Studio Vidéo.');
         yield AssociationField::new('category', 'Catégorie vidéo')->setRequired(false);
         yield TextField::new('title', 'Titre');
         yield UrlField::new('url', 'URL YouTube / Vimeo')

@@ -14,7 +14,7 @@ class Site
     public const SLUG_VIDEO = 'video';
 
     public const SLUGS = [
-        'Studio Photo' => self::SLUG_PHOTO,
+        'Studio Photo/Vidéos' => self::SLUG_PHOTO,
         'Studio Vidéo' => self::SLUG_VIDEO,
     ];
 

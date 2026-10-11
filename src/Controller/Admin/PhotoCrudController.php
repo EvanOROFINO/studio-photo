@@ -47,7 +47,7 @@ class PhotoCrudController extends AbstractCrudController
         yield TextField::new('title', 'Titre');
 
         yield AssociationField::new('site', 'Site')->hideOnIndex()
-            ->setHelp('Généralement Studio Photo.');
+            ->setHelp('Généralement Studio Photo/Vidéos.');
 
         yield AssociationField::new('category', 'Catégorie');
 

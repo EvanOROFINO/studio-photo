@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:install:sites',
-    description: 'Crée (ou met à jour) les 2 sites par défaut : Studio Photo et Studio Vidéo',
+    description: 'Crée (ou met à jour) les 2 sites par défaut : Studio Photo/Vidéos et Studio Vidéo',
 )]
 class InstallSitesCommand extends Command
 {
@@ -31,7 +31,7 @@ class InstallSitesCommand extends Command
         $sites = [
             [
                 'slug' => Site::SLUG_PHOTO,
-                'name' => 'Studio Photo',
+                'name' => 'Studio Photo/Vidéos',
                 'domain' => 'studio-photo.fr',
                 'domainStaging' => '127.0.0.1:8000',
                 'tagline' => 'Capturer l\'instant. Sublimer l\'émotion.',
