@@ -22,6 +22,11 @@ security:
                 check_path: app_login
                 enable_csrf: true
                 default_target_path: admin
+            login_throttling:
+                # Protège la connexion de l'admin contre le brute-force :
+                # 5 tentatives échouées maximum par tranche de 15 minutes.
+                max_attempts: 5
+                interval: '15 minutes'
             logout:
                 path: app_logout
                 target: app_home
