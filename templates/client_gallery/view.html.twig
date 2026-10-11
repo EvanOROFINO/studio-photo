@@ -4,6 +4,7 @@
 {% block meta_description %}Galerie privée — accès réservé.{% endblock %}
 
 {% block body %}
+{% set favCount = gallery.favoriteCount %}
 <header class="page-header">
     <div class="container">
         <p class="section-subtitle text-light opacity-50 mb-2">
@@ -17,13 +18,21 @@
             {% if gallery.photos|length > 0 %}{{ gallery.photos|length }} photo{{ gallery.photos|length > 1 ? 's' : '' }}{% endif %}
         </p>
 
-        {% if gallery.allowDownload and gallery.photos|length > 0 %}
-            <div class="mt-4">
+        <div class="mt-4 d-flex flex-wrap gap-3 justify-content-center">
+            {% if gallery.allowDownload and gallery.photos|length > 0 %}
                 <a href="{{ path('app_client_gallery_download_all', { token: gallery.token }) }}" class="btn btn-light btn-lg px-4">
                     <i class="bi bi-cloud-download me-2"></i>Tout télécharger en ZIP
                 </a>
-            </div>
-        {% endif %}
+            {% endif %}
+            {% if gallery.photos|length > 0 %}
+                <span class="btn btn-outline-light btn-lg px-4 disabled" id="fav-summary"
+                      data-empty="Vos favoris apparaîtront ici"
+                      style="pointer-events:none;{{ favCount == 0 ? 'opacity:.65;' : '' }}">
+                    <i class="bi bi-heart-fill me-2 text-danger"></i>
+                    <span id="fav-count">{{ favCount }}</span> favori<span id="fav-plural">{{ favCount > 1 ? 's' : '' }}</span> sélectionné<span id="fav-plural2">{{ favCount > 1 ? 's' : '' }}</span>
+                </span>
+            {% endif %}
+        </div>
 
         <div class="mt-3">
             <a href="{{ path('app_client_gallery_logout', { token: gallery.token }) }}" class="small text-light opacity-75 text-decoration-none">
@@ -86,6 +95,10 @@
         {% if gallery.photos|length == 0 and not gallery.hasFilms %}
             <p class="text-center text-muted py-5">La galerie est vide pour le moment. Le photographe ajoutera bientôt vos contenus.</p>
         {% elseif gallery.photos|length > 0 %}
+            <p class="text-center text-muted mb-4">
+                <i class="bi bi-heart me-1"></i>Cliquez sur le cœur d'une photo pour l'ajouter à vos favoris —
+                pratique pour indiquer au photographe vos préférées (album, tirages…).
+            </p>
             <div class="photo-grid">
                 {% for photo in gallery.photos %}
                     <div class="photo-card client-photo" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 50 }}">
@@ -93,6 +106,13 @@
                            data-gallery="client" data-title="{{ photo.title }}">
                             <img src="{{ path('app_client_gallery_photo', { token: gallery.token, photoId: photo.id }) }}" alt="{{ photo.title }}" loading="lazy">
                         </a>
+                        <button type="button"
+                                class="client-photo-fav{{ photo.favorite ? ' is-fav' : '' }}"
+                                data-url="{{ path('app_client_gallery_favorite', { token: gallery.token, photoId: photo.id }) }}"
+                                aria-pressed="{{ photo.favorite ? 'true' : 'false' }}"
+                                title="Ajouter aux favoris" aria-label="Ajouter {{ photo.title }} aux favoris">
+                            <i class="bi bi-heart{{ photo.favorite ? '-fill' : '' }}"></i>
+                        </button>
                         {% if gallery.allowDownload %}
                             <a href="{{ path('app_client_gallery_download', { token: gallery.token, photoId: photo.id }) }}"
                                class="client-photo-download" title="Télécharger" aria-label="Télécharger {{ photo.title }}">
@@ -112,4 +132,63 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const countEl = document.getElementById('fav-count');
+        const summaryEl = document.getElementById('fav-summary');
+        const pluralEls = [document.getElementById('fav-plural'), document.getElementById('fav-plural2')];
+
+        function refreshSummary(count) {
+            if (countEl) countEl.textContent = count;
+            pluralEls.forEach(el => { if (el) el.textContent = count > 1 ? 's' : ''; });
+            if (summaryEl) summaryEl.style.opacity = count === 0 ? '.65' : '1';
+        }
+
+        document.querySelectorAll('.client-photo-fav').forEach((btn) => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (btn.dataset.loading === '1') return;
+                btn.dataset.loading = '1';
+                btn.classList.add('is-loading');
+
+                try {
+                    const res = await fetch(btn.dataset.url, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+
+                    if (res.status === 403) {
+                        // Session expirée : on recharge pour renvoyer vers le login.
+                        window.location.reload();
+                        return;
+                    }
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+                    const data = await res.json();
+                    const icon = btn.querySelector('i');
+                    btn.classList.toggle('is-fav', data.favorite);
+                    btn.setAttribute('aria-pressed', data.favorite ? 'true' : 'false');
+                    if (icon) {
+                        icon.classList.toggle('bi-heart-fill', data.favorite);
+                        icon.classList.toggle('bi-heart', !data.favorite);
+                    }
+                    // Petite animation de "pop"
+                    btn.classList.remove('just-toggled');
+                    void btn.offsetWidth;
+                    btn.classList.add('just-toggled');
+
+                    refreshSummary(data.count);
+                } catch (err) {
+                    console.error('Favori non enregistré :', err);
+                } finally {
+                    btn.dataset.loading = '0';
+                    btn.classList.remove('is-loading');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

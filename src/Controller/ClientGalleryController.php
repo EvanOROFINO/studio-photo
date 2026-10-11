@@ -148,6 +148,32 @@ class ClientGalleryController extends AbstractController
         return $response;
     }
 
+    #[Route('/galerie-client/{token}/favori/{photoId}', name: 'app_client_gallery_favorite', requirements: ['token' => '[a-f0-9]{32}', 'photoId' => '\d+'], methods: ['POST'])]
+    public function toggleFavorite(string $token, int $photoId, Request $request): Response
+    {
+        $check = $this->resolveAuth($token, $request);
+        if ($check instanceof Response) {
+            // For an AJAX call, signal that the session expired.
+            return $this->json(['error' => 'expired'], 403);
+        }
+
+        $photo = $this->findPhotoInGallery($check, $photoId);
+        $photo->setFavorite(!$photo->isFavorite());
+        $this->em->flush();
+
+        $favoriteCount = 0;
+        foreach ($check->getPhotos() as $p) {
+            if ($p->isFavorite()) {
+                $favoriteCount++;
+            }
+        }
+
+        return $this->json([
+            'favorite' => $photo->isFavorite(),
+            'count' => $favoriteCount,
+        ]);
+    }
+
     #[Route('/galerie-client/{token}/logout', name: 'app_client_gallery_logout', requirements: ['token' => '[a-f0-9]{32}'])]
     public function logout(string $token, Request $request): Response
     {

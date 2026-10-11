@@ -4,6 +4,7 @@ namespace App\Tests\Functional;
 
 use App\Entity\ClientFilm;
 use App\Entity\ClientGallery;
+use App\Entity\ClientPhoto;
 use App\Tests\AbstractAppWebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
@@ -74,6 +75,57 @@ class ClientGalleryAccessTest extends AbstractAppWebTestCase
         $gallery = $this->createGallery();
         $this->client->request('GET', '/galerie-client/'.$gallery->getToken().'/photos');
         $this->assertResponseRedirects('/galerie-client/'.$gallery->getToken());
+    }
+
+    public function testFavoriteToggleRequiresUnlockedSession(): void
+    {
+        $gallery = $this->createGallery('favpass');
+        $photo = $this->addPhoto($gallery);
+
+        // Sans déverrouillage, l'action favori doit être refusée (403 JSON).
+        $this->client->request('POST', '/galerie-client/'.$gallery->getToken().'/favori/'.$photo->getId());
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    public function testFavoriteToggleFlipsStateAndReturnsCount(): void
+    {
+        $gallery = $this->createGallery('favpass');
+        $photo = $this->addPhoto($gallery);
+        $this->assertFalse($photo->isFavorite());
+
+        // Déverrouillage de la galerie
+        $crawler = $this->client->request('GET', '/galerie-client/'.$gallery->getToken());
+        $token = $crawler->filter('input[name="_token"]')->attr('value');
+        $this->client->request('POST', '/galerie-client/'.$gallery->getToken(), [
+            'password' => 'favpass',
+            '_token' => $token,
+        ]);
+
+        // 1er clic : ajout aux favoris
+        $this->client->request('POST', '/galerie-client/'.$gallery->getToken().'/favori/'.$photo->getId());
+        $this->assertResponseIsSuccessful();
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertTrue($data['favorite']);
+        $this->assertSame(1, $data['count']);
+
+        // 2e clic : retrait des favoris
+        $this->client->request('POST', '/galerie-client/'.$gallery->getToken().'/favori/'.$photo->getId());
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertFalse($data['favorite']);
+        $this->assertSame(0, $data['count']);
+    }
+
+    private function addPhoto(ClientGallery $gallery): ClientPhoto
+    {
+        $photo = new ClientPhoto();
+        $photo->setImageName('test-fav.jpg');
+        $photo->setOriginalName('test-fav.jpg');
+        $photo->setPosition(1);
+        $gallery->addPhoto($photo);
+        $this->em->persist($photo);
+        $this->em->flush();
+
+        return $photo;
     }
 
     public function testDeliveredFilmAppearsInUnlockedGallery(): void

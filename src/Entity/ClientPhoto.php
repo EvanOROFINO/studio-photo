@@ -37,6 +37,13 @@ class ClientPhoto
     #[ORM\Column]
     private int $position = 0;
 
+    /**
+     * Set to true when the client marks this photo as a favorite from
+     * their private gallery (used to build their album selection).
+     */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $favorite = false;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -129,6 +136,17 @@ class ClientPhoto
     public function setPosition(int $position): static
     {
         $this->position = $position;
+        return $this;
+    }
+
+    public function isFavorite(): bool
+    {
+        return $this->favorite;
+    }
+
+    public function setFavorite(bool $favorite): static
+    {
+        $this->favorite = $favorite;
         return $this;
     }
 

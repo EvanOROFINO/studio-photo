@@ -83,6 +83,10 @@ class ClientGalleryCrudController extends AbstractCrudController
         yield AssociationField::new('photos', 'Photos')
             ->onlyOnIndex()
             ->setTemplatePath('admin/fields/photos_count.html.twig');
+
+        yield IntegerField::new('favoriteCount', '❤️ Favoris client')
+            ->onlyOnIndex()
+            ->setHelp('Nombre de photos que le client a sélectionnées comme préférées.');
     }
 
     public function createEntity(string $entityFqcn): ClientGallery

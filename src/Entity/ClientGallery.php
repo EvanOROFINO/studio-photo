@@ -245,6 +245,17 @@ class ClientGallery
         return $this;
     }
 
+    /** @return Collection<int, ClientPhoto> Photos the client marked as favorites. */
+    public function getFavoritePhotos(): Collection
+    {
+        return $this->photos->filter(fn (ClientPhoto $p) => $p->isFavorite());
+    }
+
+    public function getFavoriteCount(): int
+    {
+        return $this->getFavoritePhotos()->count();
+    }
+
     /** @return Collection<int, ClientFilm> */
     public function getFilms(): Collection
     {

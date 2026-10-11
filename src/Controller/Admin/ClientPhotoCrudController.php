@@ -6,10 +6,13 @@ use App\Entity\ClientPhoto;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class ClientPhotoCrudController extends AbstractCrudController
@@ -24,8 +27,15 @@ class ClientPhotoCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Photo client')
             ->setEntityLabelInPlural('Photos clients')
-            ->setDefaultSort(['createdAt' => 'DESC'])
-            ->setHelp('index', 'Ajoutez ici les photos à mettre dans une galerie client. Elles ne seront visibles que par le client via son lien privé.');
+            ->setDefaultSort(['favorite' => 'DESC', 'createdAt' => 'DESC'])
+            ->setHelp('index', 'Ajoutez ici les photos à mettre dans une galerie client. Elles ne seront visibles que par le client via son lien privé. La colonne <strong>❤️ Favori</strong> indique les photos que le client a sélectionnées comme préférées.');
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('gallery')
+            ->add(BooleanFilter::new('favorite', 'Favori du client'));
     }
 
     public function configureFields(string $pageName): iterable
@@ -41,6 +51,9 @@ class ClientPhotoCrudController extends AbstractCrudController
             ])
             ->onlyOnForms();
         yield TextField::new('originalName', 'Nom original')->onlyOnIndex();
+        yield BooleanField::new('favorite', '❤️ Favori')
+            ->renderAsSwitch(false)
+            ->setHelp('Coché lorsque le client a ajouté cette photo à ses favoris.');
         yield IntegerField::new('position', 'Ordre');
         yield DateTimeField::new('createdAt', 'Ajoutée le')->hideOnForm();
     }
