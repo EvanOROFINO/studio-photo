@@ -7,12 +7,15 @@
 #
 # Usage : depuis la racine du projet sur le serveur
 #   bash bin/post-deploy.sh
+#
+# Le script peut être relancé à chaque mise à jour : il n'écrase jamais les
+# données existantes (sites, catégories, comptes).
 # =============================================================================
 
 set -e
 
 echo ""
-echo "==> Studio Photo : post-déploiement"
+echo "==> Studio Photo/Vidéos : post-déploiement"
 echo ""
 
 # 1. Vérifier que .env.prod.local existe
@@ -36,42 +39,45 @@ export APP_DEBUG=0
 # 4. Permissions sur les dossiers writables
 echo "==> Permissions sur var/ et public/uploads/"
 mkdir -p var/cache var/log var/client-galleries
-mkdir -p public/uploads/photos public/uploads/articles
+mkdir -p public/uploads/photos public/uploads/articles public/uploads/avatars public/uploads/before-after public/uploads/products
 chmod -R 775 var public/uploads 2>/dev/null || true
 
-# 5. Cache warmup
+# 5. Cache
 echo "==> Préparation du cache Symfony"
 php bin/console cache:clear --env=prod --no-debug
 php bin/console cache:warmup --env=prod --no-debug
 
-# 6. Migrations Doctrine
+# 6. Assets des bundles (CSS/JS de l'admin EasyAdmin)
+echo "==> Assets de l'admin"
+php bin/console assets:install public --env=prod --no-debug
+
+# 7. Migrations Doctrine
 echo "==> Migration de la base de données"
-php bin/console doctrine:migrations:migrate --env=prod --no-interaction
+php bin/console doctrine:migrations:migrate --env=prod --no-interaction --allow-no-migration
 
-# 7. Créer un compte admin si la table user est vide
-ADMIN_COUNT=$(php bin/console doctrine:query:sql "SELECT COUNT(*) AS n FROM \`user\`" --env=prod 2>&1 | grep -oP '\d+' | tail -1)
-if [ "$ADMIN_COUNT" = "0" ]; then
-    echo "==> Aucun admin trouvé. Création d'un compte par défaut..."
-    php bin/console security:hash-password >/dev/null 2>&1 || true
-    echo ""
-    echo "IMPORTANT : créez votre admin manuellement en suivant ces étapes :"
-    echo "  1. Générez un hash de mot de passe :"
-    echo "     php bin/console security:hash-password --env=prod"
-    echo "  2. Insérez en BDD :"
-    echo "     INSERT INTO \`user\` (email, roles, password, full_name) VALUES"
-    echo "     ('votre.email@exemple.fr', '[\"ROLE_ADMIN\"]', 'HASH_OBTENU', 'Votre Nom');"
-    echo ""
-fi
+# 8. Données de base (ne crée que ce qui manque, n'écrase jamais l'existant)
+echo "==> Données de base (sites Photo/Vidéo, catégories vidéo)"
+php bin/console app:install:sites --only-missing --env=prod --no-interaction
+php bin/console app:install:video-categories --only-missing --env=prod --no-interaction
 
-# 8. Lien symbolique public/ si nécessaire (hébergement où DocumentRoot != public/)
+# 9. Compte administrateur : créé seulement s'il n'y en a encore aucun.
+#    Sans ADMIN_EMAIL / ADMIN_PASSWORD dans .env.prod.local, la commande vous les demande
+#    (mot de passe masqué, 12 caractères minimum).
+echo "==> Compte administrateur"
+php bin/console app:create-admin --if-none --env=prod
+
+# 10. Lien symbolique public/ si nécessaire (hébergement où DocumentRoot != public/)
 # Décommentez si votre hébergeur sert depuis la racine du domaine :
 # ln -sf public/* . 2>/dev/null || true
 
 echo ""
 echo "==> Déploiement terminé !"
 echo ""
-echo "Pensez à vérifier :"
-echo "  - https://votre-domaine.fr → le site répond"
-echo "  - https://votre-domaine.fr/admin → page de login admin accessible"
+echo "À vérifier maintenant :"
+echo "  - https://votre-domaine.fr          → le site répond"
+echo "  - https://votre-domaine.fr/admin    → connexion avec le compte créé ci-dessus"
+echo "  - Admin > Sites : renseigner les vrais noms de domaine des sites Photo et Vidéo"
 echo "  - HTTPS forcé (décommentez les lignes RewriteRule dans public/.htaccess)"
+echo ""
+echo "Pensez aussi à retirer ADMIN_PASSWORD de .env.prod.local une fois le compte créé."
 echo ""

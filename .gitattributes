@@ -1,0 +1,5 @@
+# Scripts exécutés sous Linux (conteneur, hébergeur) : toujours des fins de ligne LF.
+# Sous Windows, git les convertirait en CRLF et Linux répondrait « bad interpreter ».
+*.sh text eol=lf
+Dockerfile text eol=lf
+docker-entrypoint.sh text eol=lf

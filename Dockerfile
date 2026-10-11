@@ -25,6 +25,22 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e "s!/var/www/html!\${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf \
     && sed -ri -e "s!/var/www/!\${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# 3b. public/.htaccess (réécriture des URLs Symfony) n'est lu que si AllowOverride est actif :
+#     par défaut l'image Apache l'ignore et toutes les pages sauf l'accueil donneraient une 404.
+RUN printf '<Directory %s>\n    AllowOverride All\n    Require all granted\n</Directory>\n' "$APACHE_DOCUMENT_ROOT" \
+        > /etc/apache2/conf-available/symfony.conf \
+    && a2enconf symfony
+
+# 3c. PHP : les défauts (2 Mo par fichier envoyé) bloqueraient l'envoi des photos depuis l'admin
+RUN { \
+        echo 'upload_max_filesize=32M'; \
+        echo 'post_max_size=40M'; \
+        echo 'memory_limit=256M'; \
+        echo 'max_execution_time=60'; \
+        echo 'opcache.enable=1'; \
+        echo 'opcache.validate_timestamps=0'; \
+    } > /usr/local/etc/php/conf.d/studio-photo.ini
+
 # 4. Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -36,7 +52,9 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-pr
 COPY . .
 
 # 6. Finalise install + permissions
+#    (assets:install : CSS/JS de l'admin EasyAdmin, absents sinon car "composer install --no-scripts")
 RUN composer dump-autoload --optimize --classmap-authoritative \
+    && APP_ENV=prod APP_DEBUG=0 php bin/console assets:install public --no-interaction \
     && mkdir -p var/cache var/log var/client-galleries public/uploads/photos public/uploads/articles public/uploads/avatars public/uploads/before-after public/uploads/products public/media/cache \
     && chown -R www-data:www-data var public/uploads public/media \
     && chmod -R 775 var public/uploads public/media

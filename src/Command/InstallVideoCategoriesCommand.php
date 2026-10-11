@@ -8,12 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:install:video-categories',
-    description: 'Crée les catégories vidéo de base (Mariage, Corporate, Clip)',
+    description: 'Crée les catégories vidéo de base (Mariage, Corporate, Clip, Événement)',
 )]
 class InstallVideoCategoriesCommand extends Command
 {
@@ -24,9 +25,15 @@ class InstallVideoCategoriesCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('only-missing', null, InputOption::VALUE_NONE, 'Ne crée que les catégories manquantes et ne modifie jamais celles qui existent (à utiliser au démarrage d\'un serveur)');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $onlyMissing = (bool) $input->getOption('only-missing');
 
         $categories = [
             ['slug' => 'mariage', 'name' => 'Mariage', 'iconEmoji' => '💍', 'position' => 1, 'description' => 'Films de mariage cinématographiques, racontés à votre rythme.'],
@@ -37,14 +44,21 @@ class InstallVideoCategoriesCommand extends Command
 
         $created = 0;
         $updated = 0;
+        $skipped = 0;
 
         foreach ($categories as $data) {
             $cat = $this->repository->findOneBy(['slug' => $data['slug']]);
+
+            if ($cat !== null && $onlyMissing) {
+                ++$skipped;
+                continue;
+            }
+
             if ($cat === null) {
                 $cat = new VideoCategory();
-                $created++;
+                ++$created;
             } else {
-                $updated++;
+                ++$updated;
             }
             $cat->setSlug($data['slug']);
             $cat->setName($data['name']);
@@ -58,7 +72,7 @@ class InstallVideoCategoriesCommand extends Command
         }
 
         $this->em->flush();
-        $io->success(sprintf('%d catégorie(s) créée(s), %d mise(s) à jour.', $created, $updated));
+        $io->success(sprintf('%d catégorie(s) créée(s), %d mise(s) à jour, %d inchangée(s).', $created, $updated, $skipped));
 
         return Command::SUCCESS;
     }

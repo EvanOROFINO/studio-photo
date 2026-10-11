@@ -35,7 +35,11 @@ New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 
 # 2. Copy source files (without vendor / var / node_modules / .git)
 Write-Host "Copie des sources..." -ForegroundColor Yellow
-$exclude = @('vendor', 'var', 'node_modules', '.git', '.idea', '.vscode', 'release', 'build', 'dist', '.phpunit.cache', 'tests')
+$exclude = @(
+    'vendor', 'var', 'node_modules', '.git', '.idea', '.vscode', 'release', 'build', 'dist', '.phpunit.cache', 'tests',
+    # Outils de développement et supports commerciaux : jamais sur le serveur du client
+    '.claude', '.github', 'docs', 'pitch-slides', 'pitch-deck.pptx', 'build-pitch.js'
+)
 Get-ChildItem $projectRoot -Force | Where-Object { $exclude -notcontains $_.Name } | ForEach-Object {
     if ($_.PSIsContainer) {
         Copy-Item $_.FullName -Destination $buildDir -Recurse -Force
@@ -67,10 +71,22 @@ Write-Host "Suppression des fichiers de developpement..." -ForegroundColor Yello
     ".env.test",
     "phpunit.dist.xml",
     "config\packages\test",
-    "config\services_test.yaml"
+    "config\services_test.yaml",
+    "bin\demo-router.php",
+    "bin\build-release.ps1"
 ) | ForEach-Object {
     $path = Join-Path $buildDir $_
     if (Test-Path $path) { Remove-Item $path -Recurse -Force }
+}
+
+# Contenu de démonstration : photos envoyées et miniatures générées restent chez le développeur
+# (le client enverra les siennes ; les miniatures se régénèrent à la demande).
+Write-Host "Retrait des photos de demo et des miniatures..." -ForegroundColor Yellow
+foreach ($dir in @("public\uploads", "public\media\cache")) {
+    $full = Join-Path $buildDir $dir
+    if (Test-Path $full) {
+        Get-ChildItem $full -Force -Recurse -File | Where-Object { $_.Name -ne ".gitkeep" } | Remove-Item -Force
+    }
 }
 
 # 6. Create production .env from the .dist template

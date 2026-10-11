@@ -5,7 +5,7 @@
 ![CI](https://github.com/EvanOROFINO/studio-photo/actions/workflows/ci.yml/badge.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)
 ![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-74%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-87%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ---
@@ -95,7 +95,7 @@ Une **seule application Symfony** pilote **deux sites distincts** avec un **back
 | Markdown | `league/commonmark` (Github-flavored) |
 | Upload | **VichUploaderBundle** (4 mappings dont 1 hors `public/` pour sécurité) |
 | Admin | **EasyAdmin 5** |
-| Tests | **PHPUnit 11** (74 tests, BDD SQLite isolée) |
+| Tests | **PHPUnit 11** (87 tests, BDD SQLite isolée) |
 | CI/CD | **GitHub Actions** (lint Twig/YAML/container + tests + audit) |
 | SEO | Sitemap dynamique, robots.txt, Open Graph, JSON-LD BlogPosting |
 
@@ -108,10 +108,11 @@ vendor/bin/phpunit --testdox
 php -d extension=intl vendor/bin/phpunit --testdox
 ```
 
-**74 tests, 186 assertions** (~2 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
+**87 tests, 227 assertions** (~2,5 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
 - Smoke tests des routes publiques (Photo + Vidéo)
 - Tests fonctionnels métier (galerie privée avec favoris, réservation Stripe en mode démo, panier + coupons)
 - **Tests de l'admin EasyAdmin** (connecté : tableau de bord + liste, création, filtres, fiche et édition de chaque section ; ignorés si l'extension `intl` est absente)
+- **Tests de mise en production** (création du compte admin, installation des données de base sans jamais écraser l'existant) et **limitation des tentatives de connexion** (5 échecs par 15 minutes)
 - **Tests multi-site** (détection de site, bascule, showreel filtré, forfaits, isolation des données)
 - Tests unitaires (`StripeCheckoutService`, `AvailabilityService`, parsing `Video`)
 - Validation des règles d'accès (auth, expiration, dates passées)
@@ -147,7 +148,7 @@ php bin/console doctrine:query:sql "SELECT token FROM client_gallery LIMIT 1"
 ```
 Puis ouvrir `/galerie-client/{token}` avec le mot de passe `demo1234`.
 
-## ☁️ Déploiement Railway (gratuit, 1 clic)
+## ☁️ Déploiement Docker / Railway
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/EvanOROFINO/studio-photo)
 
@@ -158,12 +159,21 @@ Le projet inclut **`Dockerfile`**, **`docker-entrypoint.sh`** et **`railway.toml
 3. Dans **Variables**, ajoute :
    ```
    APP_ENV=prod
-   APP_SECRET=<32 hex chars — générer avec : openssl rand -hex 32>
    APP_DEBUG=0
+   APP_SECRET=<32 hex chars — générer avec : openssl rand -hex 32>
+   ADMIN_EMAIL=vous@exemple.fr
+   ADMIN_PASSWORD=<12 caractères minimum — à retirer des variables après le premier démarrage>
+   SITE_PHOTO_DOMAIN=mon-studio.fr          # optionnel, modifiable ensuite dans l'admin > Sites
+   SITE_VIDEO_DOMAIN=mon-studio-video.fr    # optionnel
    ```
-4. Railway build l'image Docker, lance les migrations + fixtures au démarrage, et expose le site sur une URL `xxx.up.railway.app`.
+4. Au démarrage, le conteneur applique les **migrations**, installe les **données de base** (sites Photo/Vidéo, catégories vidéo) **sans jamais écraser l'existant**, et crée le **compte admin** s'il n'y en a aucun. **Aucune donnée de démonstration n'est chargée en production** (le compte `admin`/`admin` des fixtures n'existe qu'en développement).
+5. Les deux noms de domaine se rattachent au même service : le site affiché dépend du nom de domaine demandé.
 
 → **Healthcheck** automatique sur `/health` (configuré dans `railway.toml`).
+
+> ⚠️ **Fichiers envoyés** : le disque d'un conteneur est effacé à chaque déploiement. Sans volume persistant, les photos envoyées depuis l'admin (`public/uploads`) et les galeries clients (`var/client-galleries`) sont perdues à la mise à jour suivante. Pour un site avec envoi de photos, préférez l'hébergement classique ci-dessous, ou montez un volume.
+>
+> ℹ️ Image Docker non testée en conteneur sur le poste de développement (pas de Docker installé) : à vérifier au premier déploiement.
 
 ---
 
@@ -183,11 +193,28 @@ cp .env.prod.local.example .env.prod.local
 bash bin/post-deploy.sh
 ```
 
+`post-deploy.sh` vérifie la configuration, prépare le cache, installe les assets de l'admin, applique les migrations, installe les données de base **sans écraser l'existant**, puis crée le compte administrateur (mot de passe masqué, 12 caractères minimum) s'il n'y en a aucun. Il peut être relancé à chaque mise à jour.
+
 Configurations Apache fournies :
 - `public/.htaccess` : rewrite Symfony + HSTS-ready + gzip + cache assets
 - `.htaccess` racine : fallback si l'hébergeur ne permet pas de pointer le DocumentRoot sur `public/`
+- `public/.user.ini` : limites PHP adaptées à l'envoi de photos (32 Mo par fichier)
 
-Hébergeurs testés : OVH, Infomaniak, o2switch (PHP 8.2 + MySQL 10.6+).
+Prérequis : PHP 8.2 (extensions `intl`, `gd` avec WebP, `pdo_mysql`, `zip`), MySQL/MariaDB 10.6+, accès SSH et Composer.
+
+### ✅ Checklist avant de mettre en ligne
+
+- [ ] **Mot de passe admin** : créé avec `app:create-admin` (12 caractères minimum) — jamais `admin`/`admin`
+- [ ] **`APP_SECRET`** unique et aléatoire, **`APP_ENV=prod`**, `APP_DEBUG=0`
+- [ ] **Admin > Sites** : les vrais noms de domaine des sites Photo et Vidéo (les deux pointent vers la même application)
+- [ ] **E-mails** : `MAILER_DSN` réel (sinon aucun e-mail n'est envoyé)
+- [ ] **Coordonnées** : e-mail, téléphone et réseaux sociaux du photographe dans `config/services.yaml` (`app.contact_email`, `app.contact_phone`, `app.social_*`)
+- [ ] **Mentions légales** et politique de confidentialité complétées avec les informations du photographe
+- [ ] **HTTPS** actif et forcé (lignes `RewriteRule` de `public/.htaccess`)
+- [ ] **Sauvegarde** de la base planifiée (voir plus bas)
+- [ ] Stripe : clés live renseignées, ou laissé en mode démo
+
+La page de connexion de l'admin limite les tentatives : **5 échecs par tranche de 15 minutes** (protection contre le brute-force).
 
 ### Activer le vrai Stripe en production
 
@@ -242,7 +269,7 @@ studio-photo/
 │   ├── macros/                # Macros images responsive
 │   └── partials/              # Header, footer
 ├── tests/
-│   ├── Functional/            # 7 fichiers de tests fonctionnels
+│   ├── Functional/            # 9 fichiers de tests fonctionnels
 │   └── Unit/                  # Tests services
 ├── translations/              # messages.fr.yaml, messages.en.yaml
 └── var/
@@ -254,7 +281,7 @@ studio-photo/
 
 - **70+ tâches livrées** sur 4 jours
 - **14 entités Doctrine** + 16 routes publiques
-- **74 tests** PHPUnit verts
+- **87 tests** PHPUnit verts
 - **6 graphiques** Chart.js dans le dashboard
 - **7 presets** d'image LiipImagine (thumbnail/card/full/hero/og/Retina)
 - **2 langues** (FR/EN)
