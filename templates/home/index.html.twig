@@ -8,7 +8,7 @@
     <div class="container text-center">
         <p class="text-uppercase mb-3" style="letter-spacing: 0.3em; font-size: 0.8rem;" data-aos="fade-down">Photographe à {{ studio_city }}</p>
         <h1 class="mb-4" data-aos="fade-up">Capturer<br>l'instant. Pour toujours.</h1>
-        <p class="lead mx-auto mb-5" data-aos="fade-up" data-aos-delay="150">{{ studio_tagline }}. Mariages, portraits, événements professionnels — chaque image raconte votre histoire.</p>
+        <p class="lead mx-auto mb-5" data-aos="fade-up" data-aos-delay="150">{{ studio_tagline }}. Mariages, portraits, événements, grossesse &amp; bébé — chaque image raconte votre histoire.</p>
         <div class="d-flex gap-3 justify-content-center flex-wrap" data-aos="fade-up" data-aos-delay="300">
             <a href="{{ path('app_gallery') }}" class="btn btn-light btn-lg px-4">Voir la galerie</a>
             <a href="{{ path('app_contact') }}" class="btn btn-outline-light btn-lg px-4">Réserver une séance</a>
@@ -53,7 +53,8 @@
             <h2 class="section-title">Explorer par thème</h2>
         </div>
         <div class="row g-3">
-            {% for category in categories|slice(0, 4) %}
+            {# Tous les thèmes, comme dans la galerie : aucune limite #}
+            {% for category in categories %}
                 {% set firstPhoto = category.photos|first %}
                 {% set bg = firstPhoto and firstPhoto.imageName
                     ? ('/uploads/photos/' ~ firstPhoto.imageName) | imagine_filter('card')

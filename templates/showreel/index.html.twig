@@ -7,18 +7,10 @@
 
 {% block body %}
 
-    {# ============ HERO ============ #}
-    <section class="text-white py-6" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
-        <div class="container py-5 text-center" data-aos="fade-up">
-            <span class="text-uppercase small fw-semibold" style="color: {{ accent }}; letter-spacing: 0.25em;">— Showreel</span>
-            <h1 class="display-3 fw-bold mt-2 mb-3" style="font-family: 'Playfair Display', serif;">
-                Mes <em style="color: {{ accent }};">films</em>
-            </h1>
-            <p class="lead opacity-75" style="max-width: 600px; margin: 0 auto;">
-                {{ videos|length }} réalisation{{ videos|length > 1 ? 's' : '' }}{% if activeCategory %} — catégorie « {{ activeCategory.name }} »{% endif %}.
-            </p>
-        </div>
-    </section>
+    {# ============ BANDEAU PORTFOLIO (commun à toutes les galeries) ============ #}
+    {% include 'partials/_portfolio_banner.html.twig' with {
+        details: videos|length ~ ' réalisation' ~ (videos|length > 1 ? 's' : '') ~ (activeCategory ? ' — ' ~ activeCategory.name : '')
+    } %}
 
     {# ============ FILTRES PAR CATÉGORIE ============ #}
     {% if categories is defined and categories|length > 0 %}
@@ -28,7 +20,7 @@
                 <a href="{{ path('app_showreel') }}"
                    class="btn btn-sm rounded-pill px-3 {{ activeCategory is null ? '' : 'btn-outline-secondary' }}"
                    style="{{ activeCategory is null ? 'background: ' ~ accent ~ '; border-color: ' ~ accent ~ '; color: #1a1a1a;' : '' }}">
-                    ✦ Tout
+                    Tout voir
                 </a>
                 {% for category in categories %}
                     <a href="{{ path('app_showreel') }}?category={{ category.slug }}"

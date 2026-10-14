@@ -293,6 +293,100 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
     margin: 0;
 }
 
+/* Mention de métier en en-tête de la page « À propos » */
+.page-header .about-role {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-weight: 600;
+    opacity: 1;
+}
+
+/* Bandeau commun des portfolios (galerie, thèmes, showreel) */
+.portfolio-banner-tagline {
+    max-width: 640px;
+    font-size: 1.05rem;
+}
+
+.portfolio-banner-details {
+    letter-spacing: 0.04em;
+    opacity: 0.5;
+}
+
+/* Barre de navigation sur écran large (≥ 1200 px, sinon menu burger) : une seule ligne,
+   compacte pour que logo + liens + bascule + langue + thème tiennent dans le conteneur. */
+@media (min-width: 1200px) {
+    /* Même spécificité que la règle Bootstrap (.navbar-expand-xl …), placée après elle */
+    .navbar-expand-xl .navbar-nav .nav-link {
+        padding-left: 0.35rem;
+        padding-right: 0.35rem;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .navbar .navbar-brand {
+        margin-right: 0.5rem;
+        font-size: 1.15rem;
+        white-space: nowrap;
+    }
+
+    .navbar .navbar-brand .me-2 {
+        margin-right: 0.35rem !important;
+    }
+
+    .navbar .btn-sm {
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+        white-space: nowrap;
+    }
+
+    /* Le bouton « Me contacter » garde son libellé, sans l'icône, pour gagner de la place */
+    .navbar .btn-sm i.bi-envelope {
+        display: none;
+    }
+
+    .site-switch {
+        min-width: 80px;
+    }
+}
+
+/* Bascule Photos / Vidéo : les deux intitulés l'un au-dessus de l'autre */
+.site-switch {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 92px;
+}
+
+.site-switch-link {
+    display: block;
+    padding: 0.15rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--ink);
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.site-switch-link:not(.is-active):hover {
+    background: var(--surface-alt);
+    border-color: var(--accent);
+    color: var(--ink);
+}
+
+.site-switch-link.is-active {
+    color: #1a1a1a;
+    border-color: transparent;
+    cursor: default;
+}
+
 /* Filter pills ----------------------------------------------- */
 .category-pills .btn {
     border-radius: 999px;

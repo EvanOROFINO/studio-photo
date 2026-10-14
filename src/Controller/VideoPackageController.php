@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\VideoCategoryRepository;
 use App\Repository\VideoPackageRepository;
 use App\Service\SiteContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,10 +16,12 @@ class VideoPackageController extends AbstractController
     }
 
     #[Route('/forfaits-video', name: 'app_video_packages')]
-    public function index(VideoPackageRepository $repository): Response
+    public function index(VideoPackageRepository $repository, VideoCategoryRepository $categoryRepository): Response
     {
         return $this->render('video/packages.html.twig', [
             'packages' => $repository->findActiveForSite($this->siteContext->getCurrent()),
+            // Mêmes catégories que le showreel et l'accueil vidéo
+            'categories' => $categoryRepository->findActiveOrdered(),
         ]);
     }
 }

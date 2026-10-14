@@ -52,6 +52,32 @@
         </div>
     </section>
 
+    {# ============ ACCROCHES STUDIO VIDÉO (textes du photographe-vidéaste) ============ #}
+    <section class="py-6" style="background: var(--bs-body-bg);">
+        <div class="container py-5">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="text-uppercase small fw-semibold" style="color: {{ current_site.accentColor }}; letter-spacing: 0.2em;">— Un équilibre parfait entre privé et pro</span>
+                <h2 class="display-5 fw-bold mt-2" style="font-family: 'Playfair Display', serif;">Modernes, polyvalentes et professionnelles</h2>
+            </div>
+            <div class="row g-4 justify-content-center">
+                {% set pitches = [
+                    {t: 'Mariages, événements et projets sur mesure', d: 'Le film unique de tous vos moments d\'exception.', i: '💍'},
+                    {t: 'Capturer l\'émotion, sublimer l\'instant', d: 'Une présence vidéo unique pour vos événements privés et professionnels.', i: '🎬'},
+                    {t: 'Du jour J aux grands événements', d: 'La vidéo qui donne du sens et de l\'impact à vos projets.', i: '✨'}
+                ] %}
+                {% for pitch in pitches %}
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                        <div class="h-100 p-4 rounded-3 text-center" style="background: var(--bs-tertiary-bg); border-top: 3px solid {{ current_site.accentColor }};">
+                            <div style="font-size: 36px;">{{ pitch.i }}</div>
+                            <h3 class="h5 fw-bold mt-3 mb-2" style="font-family: 'Playfair Display', serif;">{{ pitch.t }}</h3>
+                            <p class="text-muted mb-0">{{ pitch.d }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
     {# ============ SHOWREEL FEATURED ============ #}
     {% if featuredVideos|length > 0 %}
     <section class="py-6" style="background: var(--bs-body-bg);">

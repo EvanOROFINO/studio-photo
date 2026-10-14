@@ -36,7 +36,15 @@ class AppFixtures extends Fixture
         private readonly string $clientGalleriesDir,
         #[Autowire('%kernel.environment%')]
         private readonly string $environment = 'dev',
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir = '',
     ) {
+    }
+
+    /** En test : aucun téléchargement ni copie de fichier (suite rapide, aucun fichier qui s'accumule). */
+    private function isTestEnvironment(): bool
+    {
+        return $this->environment === 'test';
     }
 
     public function load(ObjectManager $manager): void
@@ -97,42 +105,61 @@ class AppFixtures extends Fixture
         }
 
         // --- Photos -------------------------------------------------------
+        // Chaque photo illustre réellement son thème (voir docs/demo-photos/CREDITS.md).
+        // Le 3e élément est l'image de démonstration copiée dans public/uploads/photos.
         $photosByCategory = [
             'Mariages' => [
-                ['Cérémonie au coucher du soleil', '2024-09-14'],
-                ['Premier regard', '2024-08-22'],
-                ['Lancer de bouquet', '2024-07-10'],
-                ['Discours du témoin', '2024-06-29'],
-                ['Danse d\'ouverture', '2024-05-18'],
-                ['Détails de la robe', '2024-09-14'],
+                ['Cérémonie traditionnelle', '2024-09-14', 'mariage-ceremonie.jpg'],
+                ['Larmes de joie', '2024-08-22', 'mariage-emotion.jpg'],
+                ['Le voile et le sourire', '2024-07-10', 'mariage-voile.jpg'],
+                ['L\'échange des alliances', '2024-06-29', 'mariage-alliances.jpg'],
+                ['Le bouquet de la mariée', '2024-05-18', 'mariage-bouquet.jpg'],
+                ['Première danse', '2024-09-14', 'mariage-danse.jpg'],
             ],
             'Portraits' => [
-                ['Portrait corporate', '2025-01-12'],
-                ['Maternité en lumière douce', '2024-11-30'],
-                ['Couple en automne', '2024-10-15'],
-                ['Portrait artistique', '2025-02-20'],
+                ['Portrait en lumière naturelle', '2025-01-12', 'portrait-lumiere-naturelle.jpg'],
+                ['Sourire naturel', '2024-10-15', 'portrait-sourire.jpg'],
+                ['Portrait artistique', '2025-02-20', 'portrait-artistique.jpg'],
             ],
             'Événements' => [
-                ['Conférence tech 2024', '2024-11-08'],
-                ['Soirée de lancement', '2024-12-05'],
-                ['Remise de prix', '2025-01-25'],
+                ['Conférence tech', '2024-11-08', 'evenement-conference.jpg'],
+                ['Soirée de lancement', '2024-12-05', 'evenement-soiree.jpg'],
+                ['Prise de parole', '2025-01-25', 'evenement-prise-de-parole.jpg'],
             ],
             'Grossesse & Bébé' => [
-                ['Attendre en douceur', '2025-02-14'],
-                ['Premiers jours', '2025-03-02'],
-                ['Petites mains', '2025-03-10'],
+                ['Attendre en douceur', '2025-02-14', 'bebe-attente.jpg'],
+                ['Maternité en lumière douce', '2024-11-30', 'bebe-maternite.jpg'],
+                ['Premiers jours', '2025-03-02', 'bebe-premiers-jours.jpg'],
+                ['Petits petons', '2025-03-10', 'bebe-petons.jpg'],
             ],
         ];
 
+        $demoPhotosDir = $this->projectDir.'/docs/demo-photos';
+        $uploadsDir = $this->projectDir.'/public/uploads/photos';
+        $withImages = !$this->isTestEnvironment() && $this->projectDir !== '' && is_dir($demoPhotosDir);
+        if ($withImages && !is_dir($uploadsDir)) {
+            @mkdir($uploadsDir, 0775, true);
+        }
+
         $featuredCount = 0;
         foreach ($categories as $category) {
-            foreach ($photosByCategory[$category->getName()] ?? [] as $i => [$title, $date]) {
+            foreach ($photosByCategory[$category->getName()] ?? [] as $i => [$title, $date, $file]) {
                 $photo = new Photo();
                 $photo->setTitle($title);
                 $photo->setCategory($category);
                 $photo->setTakenAt(new \DateTimeImmutable($date));
                 $photo->setFeatured($featuredCount < 6 && $i === 0);
                 $photo->setSite($sitePhoto);
+
+                if ($withImages && is_file($demoPhotosDir.'/'.$file)) {
+                    $imageName = 'demo-'.$file;
+                    if (!is_file($uploadsDir.'/'.$imageName)) {
+                        copy($demoPhotosDir.'/'.$file, $uploadsDir.'/'.$imageName);
+                    }
+                    $photo->setImageName($imageName);
+                    $photo->setImageSize((int) filesize($uploadsDir.'/'.$imageName));
+                }
+
                 $manager->persist($photo);
                 if ($photo->isFeatured()) {
                     $featuredCount++;
@@ -252,10 +279,12 @@ class AppFixtures extends Fixture
         }
 
         // --- Demo showreel videos ----------------------------------------
+        // Vidéos de démonstration (tiers, intégrées via YouTube) dont le contenu correspond à leur
+        // intitulé — voir docs/demo-photos/CREDITS.md. À remplacer par les films du photographe.
         $videosData = [
-            ['Highlights — Mariage Sophie & Julien', 'Le résumé de leur journée, condensé en 3 minutes.', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', true, 1],
-            ['Séance grossesse — Camille', 'Un moment d\'intimité capturé en lumière douce.', 'https://www.youtube.com/watch?v=jNQXAC9IVRw', false, 2],
-            ['Behind the scenes — Reportage corporate', 'Coulisses d\'un shooting d\'entreprise à Lyon.', 'https://www.youtube.com/watch?v=9bZkp7q19f0', false, 3],
+            ['Highlights — Journée de mariage', 'Les temps forts d\'une journée de mariage, en quelques minutes.', 'https://www.youtube.com/watch?v=O7iWM-JCKyc', true, 1],
+            ['Séance grossesse — Coulisses', 'Dans les coulisses d\'une séance de photos de grossesse.', 'https://www.youtube.com/watch?v=6bV5vvzAE10', false, 2],
+            ['Coulisses — Reportage corporate', 'Les coulisses d\'un tournage pour une entreprise.', 'https://www.youtube.com/watch?v=MgMsppzfJ0g', false, 3],
         ];
         foreach ($videosData as [$title, $description, $url, $featured, $position]) {
             $v = new Video();
@@ -289,12 +318,13 @@ class AppFixtures extends Fixture
             $videoCategories[$slug] = $vc;
         }
 
+        // Chaque film correspond à sa catégorie (vidéos de démonstration de tiers, voir CREDITS.md).
         $videoSiteData = [
-            ['Mariage Camille & Antoine — Domaine de Saint-Trys', 'https://vimeo.com/76979871', 'mariage', '4:32', 'Camille & Antoine', 'Beaujolais', true, 1],
-            ['Film corporate — Banque Lyonnaise', 'https://vimeo.com/22439234', 'corporate', '2:18', 'Banque Lyonnaise', 'Lyon Confluence', true, 2],
-            ['Clip Pamplemousse — Brand film', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'clip', '3:12', 'Pamplemousse Studio', 'Lyon', true, 3],
-            ['Aftermovie La Soirée du Code', 'https://vimeo.com/33617840', 'evenement', '1:48', 'La Plage Digitale', 'Lyon Part-Dieu', false, 4],
-            ['Mariage Léa & Vincent — Château de Pizay', 'https://vimeo.com/142480565', 'mariage', '5:08', 'Léa & Vincent', 'Beaujolais', false, 5],
+            ['Film de mariage — Highlights', 'https://www.youtube.com/watch?v=KZdMSjAkiSk', 'mariage', '4:13', 'Vidéo de démonstration', null, true, 1],
+            ['Film corporate — Présentation d\'entreprise', 'https://www.youtube.com/watch?v=YTOEgCxtMEY', 'corporate', '2:40', 'Vidéo de démonstration', null, true, 2],
+            ['Film de marque — Spot publicitaire', 'https://www.youtube.com/watch?v=9puSmd0Yr1k', 'clip', '4:30', 'Vidéo de démonstration', null, true, 3],
+            ['Aftermovie — Conférence', 'https://www.youtube.com/watch?v=PhIBLF3zGJg', 'evenement', '2:13', 'Vidéo de démonstration', null, false, 4],
+            ['Film de mariage — Le récit de la journée', 'https://www.youtube.com/watch?v=sJTeEmSs2qo', 'mariage', '3:31', 'Vidéo de démonstration', null, false, 5],
         ];
         foreach ($videoSiteData as [$title, $url, $catSlug, $duration, $client, $location, $featured, $pos]) {
             $v = new Video();
@@ -538,7 +568,7 @@ class AppFixtures extends Fixture
 
         // En test : aucun téléchargement (suite rapide, sans réseau) et des noms de fichiers
         // stables, pour que les exécutions successives n'accumulent pas des Go d'images.
-        $isTest = $this->environment === 'test';
+        $isTest = $this->isTestEnvironment();
 
         for ($i = 1; $i <= 6; $i++) {
             $filename = $isTest
@@ -574,8 +604,8 @@ class AppFixtures extends Fixture
         $film = new ClientFilm();
         $film->setTitle('Votre film de mariage — Sophie & Julien');
         $film->setDescription("Le film complet de votre journée, monté avec amour.\nN'hésitez pas à le partager avec vos proches via ce lien privé.");
-        $film->setUrl('https://vimeo.com/76979871');
-        $film->setDuration('6:24');
+        $film->setUrl('https://www.youtube.com/watch?v=sJTeEmSs2qo');
+        $film->setDuration('3:31');
         $film->setDownloadUrl('https://wetransfer.com/downloads/demo-placeholder');
         $film->setPosition(1);
         $gallery->addFilm($film);

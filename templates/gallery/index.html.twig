@@ -2,15 +2,12 @@
 {% import 'macros/images.html.twig' as img %}
 
 {% block title %}{{ currentTag ? currentTag.name ~ ' — Galerie' : 'Galerie' }} — {{ studio_name }}{% endblock %}
-{% block meta_description %}Découvrez la galerie de {{ studio_name }} : mariages, portraits, événements et plus.{% endblock %}
+{% block meta_description %}Découvrez le portfolio de {{ studio_name }} : mariages, portraits, événements, grossesse &amp; bébé.{% endblock %}
 
 {% block body %}
-<header class="page-header">
-    <div class="container">
-        <h1>{{ currentTag ? currentTag.name : 'Galerie' }}</h1>
-        <p>{{ totalPhotos }} photo{{ totalPhotos > 1 ? 's' : '' }} à découvrir</p>
-    </div>
-</header>
+{% include 'partials/_portfolio_banner.html.twig' with {
+    details: (currentTag ? '#' ~ currentTag.name ~ ' — ' : '') ~ totalPhotos ~ ' photo' ~ (totalPhotos > 1 ? 's' : '') ~ ' à découvrir'
+} %}
 
 <section class="section">
     <div class="container">

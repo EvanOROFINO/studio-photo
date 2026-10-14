@@ -5,25 +5,24 @@
 {% block meta_description %}{{ category.description|default(category.name ~ ' — Galerie photo de ' ~ studio_name) }}{% endblock %}
 
 {% block body %}
-<header class="page-header">
-    <div class="container">
-        <p class="section-subtitle text-light opacity-50 mb-2">Galerie</p>
-        <h1>{{ category.name }}</h1>
-        {% if category.description %}
-            <p class="lead opacity-75 mx-auto" style="max-width: 600px;">{{ category.description }}</p>
-        {% else %}
-            <p>{{ photos|length }} photo{{ photos|length > 1 ? 's' : '' }}</p>
-        {% endif %}
-    </div>
-</header>
+{% include 'partials/_portfolio_banner.html.twig' with {
+    details: category.name ~ ' — ' ~ photos|length ~ ' photo' ~ (photos|length > 1 ? 's' : '')
+} %}
 
 <section class="section">
     <div class="container">
-        <div class="category-pills d-flex flex-wrap gap-2 justify-content-center mb-5">
+        <div class="category-pills d-flex flex-wrap gap-2 justify-content-center mb-4">
             <a href="{{ path('app_gallery') }}" class="btn">Tout voir</a>
             {% for c in categories %}
                 <a href="{{ path('app_gallery_category', { slug: c.slug }) }}" class="btn {{ c.id == category.id ? 'active' : '' }}">{{ c.name }}</a>
             {% endfor %}
+        </div>
+
+        <div class="text-center mb-5">
+            <h2 class="serif mb-2">{{ category.name }}</h2>
+            {% if category.description %}
+                <p class="text-muted mx-auto mb-0" style="max-width: 600px;">{{ category.description }}</p>
+            {% endif %}
         </div>
 
         {% if photos|length == 0 %}
