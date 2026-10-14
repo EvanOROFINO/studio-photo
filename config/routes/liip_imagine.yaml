@@ -1,0 +1,4 @@
+# Route de génération des miniatures à la demande (/media/cache/resolve/{filter}/{path}).
+# Sans elle, tout affichage d'une photo envoyée (filtre |imagine_filter) provoque une erreur 500.
+_liip_imagine:
+    resource: "@LiipImagineBundle/Resources/config/routing.yaml"
