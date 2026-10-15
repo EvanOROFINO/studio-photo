@@ -5,7 +5,7 @@
 ![CI](https://github.com/EvanOROFINO/studio-photo/actions/workflows/ci.yml/badge.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)
 ![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-97%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-98%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ---
@@ -95,7 +95,7 @@ Une **seule application Symfony** pilote **deux sites distincts** avec un **back
 | Markdown | `league/commonmark` (Github-flavored) |
 | Upload | **VichUploaderBundle** (4 mappings dont 1 hors `public/` pour sécurité) |
 | Admin | **EasyAdmin 5** |
-| Tests | **PHPUnit 11** (97 tests, BDD SQLite isolée) |
+| Tests | **PHPUnit 11** (98 tests, BDD SQLite isolée) |
 | CI/CD | **GitHub Actions** (lint Twig/YAML/container + tests + audit) |
 | SEO | Sitemap dynamique, robots.txt, Open Graph, JSON-LD BlogPosting |
 
@@ -108,7 +108,7 @@ vendor/bin/phpunit --testdox
 php -d extension=intl vendor/bin/phpunit --testdox
 ```
 
-**97 tests, 322 assertions** (~3 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
+**98 tests, 328 assertions** (~3 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
 - Smoke tests des routes publiques (Photo + Vidéo)
 - Tests fonctionnels métier (galerie privée avec favoris, réservation Stripe en mode démo, panier + coupons)
 - **Tests de l'admin EasyAdmin** (connecté : tableau de bord + liste, création, filtres, fiche et édition de chaque section ; ignorés si l'extension `intl` est absente)
@@ -281,7 +281,7 @@ studio-photo/
 
 - **70+ tâches livrées** sur 4 jours
 - **14 entités Doctrine** + 16 routes publiques
-- **97 tests** PHPUnit verts
+- **98 tests** PHPUnit verts
 - **6 graphiques** Chart.js dans le dashboard
 - **7 presets** d'image LiipImagine (thumbnail/card/full/hero/og/Retina)
 - **2 langues** (FR/EN)

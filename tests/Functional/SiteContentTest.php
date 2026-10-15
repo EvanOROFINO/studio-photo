@@ -109,6 +109,24 @@ class SiteContentTest extends AbstractAppWebTestCase
         }
     }
 
+    public function testEachSiteShowreelOnlyPresentsItsOwnVideos(): void
+    {
+        // Notes : « toutes les photos et vidéos doivent correspondre aux intitulés »
+        $this->client->request('GET', '/showreel?_site=photo');
+        $this->assertResponseIsSuccessful();
+        $text = $this->text();
+        $this->assertStringContainsString('Highlights — Journée de mariage', $text);
+        $this->assertStringNotContainsString('Film de mariage — Highlights', $text, 'Les films du Studio Vidéo ne doivent pas apparaître sur le site Photo.');
+        $this->assertStringNotContainsString('Clip & Brand', $text, 'Pas de pastille vidéo inopérante sur le site Photo.');
+
+        $this->client->request('GET', '/showreel?_site=video');
+        $this->assertResponseIsSuccessful();
+        $text = $this->text();
+        $this->assertStringContainsString('Film de mariage — Highlights', $text);
+        $this->assertStringNotContainsString('Highlights — Journée de mariage', $text, 'Les vidéos du site Photo ne doivent pas apparaître sur le Studio Vidéo.');
+        $this->assertStringContainsString('Clip & Brand', $text);
+    }
+
     // -- 8. Bandeau commun des portfolios -----------------------------------------
 
     public function testEveryShowcasePageUsesTheSameBannerComponent(): void

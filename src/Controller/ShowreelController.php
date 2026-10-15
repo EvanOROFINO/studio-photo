@@ -23,20 +23,19 @@ class ShowreelController extends AbstractController
         VideoCategoryRepository $categoryRepository,
     ): Response {
         $site = $this->siteContext->getCurrent();
-        $categories = $categoryRepository->findActiveOrdered();
+
+        // Les pastilles Mariage / Corporate / Clip & Brand / Événement sont celles du Studio Vidéo :
+        // sur le site Photo, les vidéos n'en dépendent pas, on n'affiche donc pas de filtre inopérant.
+        $categories = $this->siteContext->isVideo() ? $categoryRepository->findActiveOrdered() : [];
 
         $activeCategory = null;
         $categorySlug = $request->query->get('category');
-        if ($categorySlug) {
+        if ($categorySlug && $categories !== []) {
             $activeCategory = $categoryRepository->findBySlug($categorySlug);
         }
 
-        // Filtre par site (video) ; sur le site photo, on garde le comportement historique
-        if ($this->siteContext->isVideo()) {
-            $videos = $repository->findForSite($site, $activeCategory);
-        } else {
-            $videos = $repository->findPublishedOrdered();
-        }
+        // Chaque site ne présente que ses propres vidéos
+        $videos = $repository->findForSite($site, $activeCategory);
 
         return $this->render('showreel/index.html.twig', [
             'videos' => $videos,
