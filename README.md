@@ -108,7 +108,7 @@ vendor/bin/phpunit --testdox
 php -d extension=intl vendor/bin/phpunit --testdox
 ```
 
-**98 tests, 328 assertions** (~3 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
+**98 tests, 330 assertions** (~3 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
 - Smoke tests des routes publiques (Photo + Vidéo)
 - Tests fonctionnels métier (galerie privée avec favoris, réservation Stripe en mode démo, panier + coupons)
 - **Tests de l'admin EasyAdmin** (connecté : tableau de bord + liste, création, filtres, fiche et édition de chaque section ; ignorés si l'extension `intl` est absente)
