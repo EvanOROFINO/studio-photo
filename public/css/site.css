@@ -304,13 +304,13 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
     opacity: 1;
 }
 
-/* Bandeau commun des portfolios (galerie, thèmes, showreel) */
-.portfolio-banner-tagline {
+/* Bandeau commun de toutes les pages vitrine (galerie, thèmes, prestations, showreel, forfaits) */
+.page-banner-tagline {
     max-width: 640px;
     font-size: 1.05rem;
 }
 
-.portfolio-banner-details {
+.page-banner-details {
     letter-spacing: 0.04em;
     opacity: 0.5;
 }
@@ -740,4 +740,44 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
     40%  { transform: scale(1.35); }
     70%  { transform: scale(.9); }
     100% { transform: scale(1); }
+}
+
+/* Prestation par thème : bandeau-image identique à la carte du thème (accueil), même titre */
+.service-card--theme {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card-band {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 170px;
+    padding: 1rem 1.25rem;
+    background-color: #2a2a2c;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    text-decoration: none;
+}
+
+.service-card-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.05) 70%);
+}
+
+.service-card-band-title {
+    position: relative;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.service-card-body {
+    padding: 1.5rem;
+    flex: 1;
 }

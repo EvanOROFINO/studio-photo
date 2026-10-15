@@ -47,6 +47,32 @@ class AppFixtures extends Fixture
         return $this->environment === 'test';
     }
 
+    /**
+     * Copie une image de démonstration (docs/demo-photos) dans public/uploads/<dossier> et renvoie
+     * son nom, ou null (tests, fichier absent) : les pages retombent alors sur leur visuel par défaut.
+     */
+    private function copyDemoImage(string $file, string $folder): ?string
+    {
+        if ($this->isTestEnvironment() || $this->projectDir === '') {
+            return null;
+        }
+        $source = $this->projectDir.'/docs/demo-photos/'.$file;
+        if (!is_file($source)) {
+            return null;
+        }
+
+        $dir = $this->projectDir.'/public/uploads/'.$folder;
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $name = 'demo-'.$file;
+        if (!is_file($dir.'/'.$name)) {
+            copy($source, $dir.'/'.$name);
+        }
+
+        return $name;
+    }
+
     public function load(ObjectManager $manager): void
     {
         // --- Sites (multi-site : Photo + Vidéo) ---------------------------
@@ -169,13 +195,13 @@ class AppFixtures extends Fixture
 
         // --- Services -----------------------------------------------------
         $services = [];
+        // Une prestation par thème, avec EXACTEMENT les mêmes intitulés que les catégories de la galerie
+        // et de « Explorer par thème » (Accueil / Galerie / Prestations : les mêmes thématiques).
         $servicesData = [
-            ['Reportage mariage', 'Couverture intégrale de votre journée, de la préparation à la fin de soirée. Plus de 500 photos retouchées livrées en galerie privée sous 6 semaines.', '1200', 'Journée complète (8h+)', 'bi-heart-fill', 1],
-            ['Séance portrait', 'Séance individuelle ou en duo en studio ou en extérieur. 1h de shooting, 30 photos retouchées au choix.', '180', '1 heure', 'bi-person-fill', 2],
-            ['Séance famille', 'Séance en extérieur d\'1h30, jusqu\'à 6 personnes. 40 photos retouchées livrées en galerie.', '290', '1h30', 'bi-people-fill', 3],
-            ['Événement professionnel', 'Couverture photographique de votre événement d\'entreprise. Livraison express sous 48h pour la presse.', '450', 'Demi-journée', 'bi-building', 4],
-            ['Grossesse & nouveau-né', 'Séance douce en studio ou à domicile. 2h pour capturer ces instants uniques. 50 photos retouchées.', '320', '2 heures', 'bi-flower2', 5],
-            ['Shooting produit', 'Mise en valeur de vos produits sur fond neutre ou mise en scène. Idéal e-commerce.', '350', 'Demi-journée', 'bi-bag-fill', 6],
+            ['Mariages', 'Couverture intégrale de votre journée, de la préparation à la fin de soirée. Plus de 500 photos retouchées livrées en galerie privée sous 6 semaines.', '1200', 'Journée complète (8h+)', 'bi-heart-fill', 1],
+            ['Portraits', 'Séance individuelle, en duo ou en famille, en studio ou en extérieur. 1h de shooting, 30 photos retouchées au choix.', '180', '1 heure', 'bi-person-fill', 2],
+            ['Événements', 'Couverture photographique de vos événements professionnels et privés : conférences, soirées, lancements. Livraison express sous 48h.', '450', 'Demi-journée', 'bi-calendar-event-fill', 3],
+            ['Grossesse & Bébé', 'Séance douce en studio ou à domicile, de la grossesse aux premiers jours du nouveau-né. 2h pour capturer ces instants uniques. 50 photos retouchées.', '320', '2 heures', 'bi-flower2', 4],
         ];
 
         foreach ($servicesData as [$title, $description, $price, $duration, $icon, $position]) {
@@ -196,7 +222,7 @@ class AppFixtures extends Fixture
         $bookingsData = [
             ['Léa & Tom Dubois', 'lea.tom@example.fr', '0612345678', '+45 days', 'Domaine du Cèdre, Beaujolais', 'Mariage en plein air, 80 invités. Cérémonie laïque à 17h.', 0, Booking::STATUS_PAID],
             ['Camille Robert', 'camille.robert@example.fr', '0623456789', '+12 days', 'Lyon 6ème, studio Tête d\'Or', 'Séance corporate pour mon site et LinkedIn.', 1, Booking::STATUS_PAID],
-            ['Famille Bertrand', 'bertrand.famille@example.fr', '0634567890', '+20 days', 'Parc de Gerland, Lyon', 'Séance famille avec 2 enfants (4 et 7 ans).', 2, Booking::STATUS_PENDING],
+            ['Famille Bertrand', 'bertrand.famille@example.fr', '0634567890', '+20 days', 'Parc de Gerland, Lyon', 'Séance famille avec 2 enfants (4 et 7 ans).', 1, Booking::STATUS_PENDING],
         ];
         foreach ($bookingsData as [$name, $email, $phone, $whenMod, $location, $notes, $serviceIdx, $status]) {
             $service = $services[$serviceIdx];
@@ -362,15 +388,16 @@ class AppFixtures extends Fixture
         }
 
         // --- Boutique : tirages d'art -----------------------------------
+        // Chaque tirage correspond à une photo de démonstration (docs/demo-photos) : titre, texte et image concordent.
         $productsData = [
-            ['Sérénité', 'Tirage fine art d\'un paysage de montagne au lever du soleil. Imprimé sur papier Hahnemühle Photo Rag 308 g, signé et numéroté.', '30×40 cm — papier mat', '89.00', 8, true, 1],
-            ['Premier regard', 'Photographie de mariage capturée à l\'instant exact où les mariés se découvrent. Tirage limité à 25 exemplaires.', '40×60 cm — papier baryté', '149.00', 25, true, 2],
-            ['Quai de Saône', 'Vue minimaliste de Lyon au petit matin, brume légère sur la Saône. Édition ouverte.', '20×30 cm — papier satiné', '49.00', -1, false, 3],
-            ['Mains d\'enfant', 'Détail tendre d\'une séance grossesse. Noir et blanc argentique.', '30×30 cm — papier mat carré', '69.00', 12, false, 4],
-            ['Coulisses de scène', 'Photographie d\'événement, lumière naturelle. Tirage signé, certificat d\'authenticité fourni.', '50×75 cm — papier fine art', '199.00', 5, true, 5],
-            ['Carnet de voyage — Marseille', 'Triptyque de photos du Vieux-Port (livré en 3 tirages 20×30 cm).', '3× 20×30 cm — papier baryté', '129.00', 10, false, 6],
+            ['Lumière naturelle', 'Portrait en lumière naturelle, près d\'une fenêtre. Tirage fine art imprimé sur papier Hahnemühle Photo Rag 308 g, signé et numéroté.', '30×40 cm — papier mat', '89.00', 8, true, 1, 'portrait-lumiere-naturelle.jpg'],
+            ['Premier regard', 'Photographie de mariage capturée à l\'instant exact où les mariés se découvrent. Tirage limité à 25 exemplaires.', '40×60 cm — papier baryté', '149.00', 25, true, 2, 'mariage-voile.jpg'],
+            ['Le bouquet', 'Le bouquet de la mariée, détail d\'une journée de mariage. Édition ouverte.', '20×30 cm — papier satiné', '49.00', -1, false, 3, 'mariage-bouquet.jpg'],
+            ['Petits petons', 'Détail tendre d\'une séance nouveau-né. Tirage carré, papier mat.', '30×30 cm — papier mat carré', '69.00', 12, false, 4, 'bebe-petons.jpg'],
+            ['Soirée de lancement', 'Photographie d\'événement, ambiance de salle. Tirage signé, certificat d\'authenticité fourni.', '50×75 cm — papier fine art', '199.00', 5, true, 5, 'evenement-soiree.jpg'],
+            ['Les alliances', 'Gros plan sur l\'échange des alliances. Édition limitée à 15 exemplaires.', '20×30 cm — papier baryté', '129.00', 10, false, 6, 'mariage-alliances.jpg'],
         ];
-        foreach ($productsData as [$title, $description, $format, $price, $stock, $featured, $position]) {
+        foreach ($productsData as [$title, $description, $format, $price, $stock, $featured, $position, $imageFile]) {
             $p = new Product();
             $p->setTitle($title);
             $p->setDescription($description);
@@ -380,6 +407,9 @@ class AppFixtures extends Fixture
             $p->setFeatured($featured);
             $p->setPosition($position);
             $p->setPublished(true);
+            if (($imageName = $this->copyDemoImage($imageFile, 'products')) !== null) {
+                $p->setImageName($imageName);
+            }
             $manager->persist($p);
         }
 
@@ -435,6 +465,7 @@ class AppFixtures extends Fixture
         $articlesData = [
             [
                 'title' => '10 conseils pour réussir vos photos de mariage',
+                'cover' => 'mariage-ceremonie.jpg',
                 'category' => 0,
                 'excerpt' => 'Le mariage est le jour le plus mémorable d\'une vie. Voici mes 10 conseils, accumulés en 10 ans, pour que vos photos racontent vraiment votre histoire — au-delà des poses figées.',
                 'content' => "## 1. Choisir un photographe dont le style vous parle\n\nNe choisissez pas un photographe parce qu'il est *populaire*. Choisissez-le parce que **ses photos vous touchent**. Regardez plusieurs reportages complets, pas juste les 5 meilleures images.\n\n## 2. Prévoir un \"first look\" en amont\n\nLe first look — moment privé où les mariés se découvrent avant la cérémonie — détend tout le monde et libère du temps pour les photos de couple. C'est devenu mon moment préféré.\n\n## 3. Préparer un planning photo réaliste\n\nUn cocktail dure rarement 1h30 comme prévu. Comptez 20 minutes de marge entre chaque temps fort.\n\n## 4. Garder du temps pour les photos de couple\n\nMinimum 45 minutes en fin de journée, à la *golden hour*. C'est le moment où la lumière est magique.\n\n## 5. Les détails comptent\n\n- L'alliance posée sur l'invitation\n- Les chaussures avant qu'on les mette\n- Le bouquet sur le rebord d'une fenêtre\n\nCes images racontent autant que les portraits.\n\n## 6. Faire confiance à votre photographe\n\nVous l'avez choisi pour son œil. Laissez-le faire ses propositions sans micro-management. Vous verrez le résultat dans 4 à 6 semaines.\n\n## 7. Préparer une liste de photos famille\n\nUne liste de 8-10 groupes maximum. Au-delà, ça devient interminable et personne ne profite.\n\n## 8. Ne pas négliger la danse\n\nLes photos de soirée racontent l'ambiance. Demandez explicitement à votre photographe de rester jusqu'au bout (ou au moins jusqu'aux premières grosses danses).\n\n## 9. Prévoir un \"plan B\" météo\n\nUne grange, un porche, une salle avec belles fenêtres. La pluie ne doit pas ruiner vos photos.\n\n## 10. Profiter\n\nLa meilleure photo est celle d'un visage détendu et heureux. Si vous vivez votre journée pleinement, le résultat sera magique.\n\n---\n\n**Envie d'en discuter ?** [Contactez-moi](/contact) pour parler de votre projet.",
@@ -444,6 +475,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'title' => 'La lumière naturelle : mon outil n°1',
+                'cover' => 'portrait-lumiere-naturelle.jpg',
                 'category' => 1,
                 'excerpt' => 'Pourquoi je travaille presque exclusivement en lumière naturelle, et comment je m\'adapte aux ciels gris.',
                 'content' => "Quand on me demande quel est mon **objectif favori**, je réponds toujours : *aucun. C'est la lumière qui compte.*\n\n## Pourquoi la lumière naturelle ?\n\nElle est honnête. Elle ne déforme pas les visages, elle ne crée pas d'ambiance artificielle. Une fenêtre vaut souvent mieux qu'un kit de 3 flashes.\n\n## Mais que faire un jour de pluie ?\n\nLes meilleurs portraits que j'ai faits l'année dernière étaient sous un ciel gris, à 14h, dans un studio improvisé près d'une grande baie vitrée.\n\n> La lumière douce d'un jour couvert est l'équivalent gratuit d'une softbox de 3 mètres.\n\n## Mes 3 règles\n\n1. **Toujours observer la lumière 5 minutes avant de shooter.**\n2. **Placer le sujet par rapport à la fenêtre, pas par rapport au décor.**\n3. **Préférer 16h en hiver qu'à 12h en plein été.**\n\nC'est tout. Le reste, c'est de la pratique.",
@@ -453,6 +485,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'title' => '5 lieux secrets à Lyon pour vos séances couple',
+                'cover' => 'mariage-danse.jpg',
                 'category' => 2,
                 'excerpt' => 'Bien au-delà de la Place Bellecour ou des berges du Rhône, voici 5 spots méconnus où la magie opère.',
                 'content' => "Lyon regorge de coins méconnus, parfaits pour des photos qui sortent de l'ordinaire.\n\n## 1. La Cour des Voraces (Croix-Rousse)\n\nUne **traboule iconique**, mais photographiée correctement, elle devient un décor magnifique. Préférez 9h le dimanche pour éviter les passants.\n\n## 2. Le Parc des Hauteurs (Fourvière)\n\nVue panoramique sur la ville, lumière dorée garantie le soir. Évitez le belvédère bondé, descendez les escaliers.\n\n## 3. La passerelle du Palais de Justice\n\nLignes minimalistes, fond neutre, idéal pour un style éditorial.\n\n## 4. Le marché de la Croix-Rousse (mardi matin)\n\nVie, couleurs, rires. Si vous aimez les photos vivantes, c'est un terrain de jeu.\n\n## 5. Le parc de Gerland\n\nMoins touristique que la Tête d'Or, plus moderne. Parfait pour les couples qui aiment l'architecture contemporaine.",
@@ -462,6 +495,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'title' => 'Comment choisir sa tenue pour une séance portrait',
+                'cover' => 'portrait-sourire.jpg',
                 'category' => 0,
                 'excerpt' => 'Les couleurs unies, les matières qui photographient bien, les motifs à éviter : un guide pratique pour préparer votre garde-robe.',
                 'content' => "## Les bases\n\n- **Couleurs unies > motifs** : un motif géométrique peut créer un moiré désagréable.\n- **Matières naturelles** : lin, laine, coton mat. Évitez le synthétique brillant.\n- **Tenues coordonnées, pas identiques** : pour un couple, choisissez une palette commune (terre, bleu nuit, écru) sans porter exactement la même chose.\n\n## Ce qu'il faut éviter\n\n- Les logos visibles (datent immédiatement la photo)\n- Le blanc pur sous une lumière intense (crame facilement)\n- Le noir total (mange les détails)\n\n## Mon conseil\n\nApportez **3 tenues maximum**, on choisira ensemble en arrivant en fonction de la lumière et du lieu.",
@@ -492,6 +526,9 @@ class AppFixtures extends Fixture
             $a->setPublished(true);
             $a->setPublishedAt(new \DateTimeImmutable('-'.$data['days_ago'].' days'));
             $a->setViewCount(random_int(40, 800));
+            if (isset($data['cover']) && ($coverName = $this->copyDemoImage($data['cover'], 'articles')) !== null) {
+                $a->setCoverImageName($coverName);
+            }
             $a->setSite($sitePhoto);
             $manager->persist($a);
         }
@@ -530,6 +567,11 @@ class AppFixtures extends Fixture
             $a->setPublishedAt(new \DateTimeImmutable('-'.$data['days_ago'].' days'));
             $a->setViewCount(random_int(40, 400));
             $a->setSite($siteVideo);
+            foreach (['Behind the scenes' => 'mariage-emotion.jpg', 'Comment je filme' => 'mariage-ceremonie.jpg', 'Drone' => 'mariage-voile.jpg'] as $prefix => $coverFile) {
+                if (str_starts_with($data['title'], $prefix) && ($coverName = $this->copyDemoImage($coverFile, 'articles')) !== null) {
+                    $a->setCoverImageName($coverName);
+                }
+            }
             $manager->persist($a);
         }
 

@@ -61,10 +61,17 @@ class HomeController extends AbstractController
     }
 
     #[Route('/prestations', name: 'app_services')]
-    public function services(ServiceRepository $serviceRepository): Response
+    public function services(ServiceRepository $serviceRepository, CategoryRepository $categoryRepository): Response
     {
+        // Les prestations portent les mêmes intitulés que les thèmes de la galerie : on les relie par leur nom.
+        $themes = [];
+        foreach ($categoryRepository->findAllOrdered() as $category) {
+            $themes[$category->getName()] = $category;
+        }
+
         return $this->render('home/services.html.twig', [
             'services' => $serviceRepository->findActiveOrdered(),
+            'themes' => $themes,
         ]);
     }
 }

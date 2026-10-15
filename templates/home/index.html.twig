@@ -83,8 +83,9 @@
             <h2 class="section-title">Mes formules</h2>
         </div>
         <div class="row g-4">
-            {% for service in services|slice(0, 3) %}
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+            {# Toutes les prestations (une par thème) : mêmes thématiques que « Explorer par thème » #}
+            {% for service in services %}
+                <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
                     <div class="service-card text-center">
                         <i class="bi {{ service.icon }} icon"></i>
                         <h4 class="serif">{{ service.title }}</h4>

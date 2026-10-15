@@ -8,7 +8,9 @@
 {% block body %}
 
     {# ============ BANDEAU PORTFOLIO (commun à toutes les galeries) ============ #}
-    {% include 'partials/_portfolio_banner.html.twig' with {
+    {% include 'partials/_page_banner.html.twig' with {
+        title: 'Showreel',
+        tagline: 'Du jour J aux grands événements, la vidéo qui donne du sens et de l\'impact à vos projets',
         details: videos|length ~ ' réalisation' ~ (videos|length > 1 ? 's' : '') ~ (activeCategory ? ' — ' ~ activeCategory.name : '')
     } %}
 

@@ -7,18 +7,11 @@
 
 {% block body %}
 
-    {# ============ HERO ============ #}
-    <section class="text-white py-6" style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
-        <div class="container py-5 text-center" data-aos="fade-up">
-            <span class="text-uppercase small fw-semibold" style="color: {{ accent }}; letter-spacing: 0.25em;">— Forfaits</span>
-            <h1 class="display-3 fw-bold mt-2 mb-3" style="font-family: 'Playfair Display', serif;">
-                Choisissez votre <em style="color: {{ accent }};">film</em>
-            </h1>
-            <p class="lead opacity-75" style="max-width: 620px; margin: 0 auto;">
-                Trois formules pensées pour chaque budget et chaque ambition. Sur-mesure possible sur simple demande.
-            </p>
-        </div>
-    </section>
+    {# ============ BANDEAU COMMUN ============ #}
+    {% include 'partials/_page_banner.html.twig' with {
+        title: 'Forfaits',
+        tagline: 'Trois formules pensées pour chaque budget et chaque ambition. Sur-mesure possible sur simple demande.'
+    } %}
 
     {# ============ MÊMES THÈMES QUE LE SHOWREEL ============ #}
     {% if categories is defined and categories|length > 0 %}

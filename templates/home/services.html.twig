@@ -3,12 +3,12 @@
 {% block title %}Prestations & tarifs — {{ studio_name }}{% endblock %}
 
 {% block body %}
-<header class="page-header">
-    <div class="container">
-        <h1>Prestations</h1>
-        <p>Des formules adaptées à chaque occasion</p>
-    </div>
-</header>
+{# Même bandeau que les autres pages ; une prestation par thème, avec le même intitulé qu'ailleurs #}
+{% include 'partials/_page_banner.html.twig' with {
+    title: 'Prestations',
+    tagline: 'Des formules adaptées à chaque occasion',
+    details: services|length ~ ' thème' ~ (services|length > 1 ? 's' : '')
+} %}
 
 <section class="section">
     <div class="container">
@@ -17,24 +17,43 @@
         {% else %}
             <div class="row g-4">
                 {% for service in services %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="service-card">
-                            <i class="bi {{ service.icon }} icon"></i>
-                            <h4 class="serif">{{ service.title }}</h4>
-                            <p class="text-muted">{{ service.description }}</p>
-                            {% if service.duration %}
-                                <p class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>{{ service.duration }}</p>
+                    {# Le thème de la galerie portant le même nom que la prestation (même photo qu'à l'accueil) #}
+                    {% set theme = themes[service.title]|default(null) %}
+                    {% set themePhoto = theme ? (theme.photos|first) : null %}
+                    <div class="col-md-6 col-lg-3">
+                        <div class="service-card service-card--theme h-100">
+                            {% if theme %}
+                                <a class="service-card-band" href="{{ path('app_gallery_category', { slug: theme.slug }) }}"
+                                   style="background-image: url('{{ themePhoto and themePhoto.imageName ? (('/uploads/photos/' ~ themePhoto.imageName) | imagine_filter('card')) : '' }}');"
+                                   aria-label="Voir les photos « {{ theme.name }} »">
+                                    <span class="service-card-band-title">{{ service.title }}</span>
+                                </a>
                             {% endif %}
-                            {% if service.priceFrom %}
-                                <p class="price">À partir de {{ service.priceFrom|number_format(0, ',', ' ') }} €</p>
-                            {% endif %}
-                            <div class="d-flex gap-2 mt-2 flex-wrap">
-                                {% if service.priceFrom %}
-                                    <a href="{{ path('app_booking_new', { id: service.id }) }}" class="btn btn-dark btn-sm">
-                                        <i class="bi bi-credit-card me-1"></i>Réserver en ligne
-                                    </a>
+                            <div class="service-card-body text-center">
+                                {% if not theme %}
+                                    <i class="bi {{ service.icon }} icon"></i>
+                                    <h4 class="serif">{{ service.title }}</h4>
                                 {% endif %}
-                                <a href="{{ path('app_contact') }}" class="btn btn-outline-dark btn-sm">Sur devis</a>
+                                <p class="text-muted">{{ service.description }}</p>
+                                {% if service.duration %}
+                                    <p class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>{{ service.duration }}</p>
+                                {% endif %}
+                                {% if service.priceFrom %}
+                                    <p class="price">À partir de {{ service.priceFrom|number_format(0, ',', ' ') }} €</p>
+                                {% endif %}
+                                <div class="d-flex gap-2 mt-2 flex-wrap justify-content-center">
+                                    {% if service.priceFrom %}
+                                        <a href="{{ path('app_booking_new', { id: service.id }) }}" class="btn btn-dark btn-sm">
+                                            <i class="bi bi-credit-card me-1"></i>Réserver en ligne
+                                        </a>
+                                    {% endif %}
+                                    <a href="{{ path('app_contact') }}" class="btn btn-outline-dark btn-sm">Sur devis</a>
+                                </div>
+                                {% if theme %}
+                                    <p class="mt-3 mb-0 small">
+                                        <a href="{{ path('app_gallery_category', { slug: theme.slug }) }}">Voir les photos « {{ theme.name }} » <i class="bi bi-arrow-right"></i></a>
+                                    </p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -5,8 +5,12 @@
 {% block meta_description %}{{ category.description|default(category.name ~ ' — Galerie photo de ' ~ studio_name) }}{% endblock %}
 
 {% block body %}
-{% include 'partials/_portfolio_banner.html.twig' with {
-    details: category.name ~ ' — ' ~ photos|length ~ ' photo' ~ (photos|length > 1 ? 's' : '')
+{# Même bandeau, et le thème porte ici le même titre que dans l'accueil, les pastilles et les prestations #}
+{% include 'partials/_page_banner.html.twig' with {
+    title: category.name,
+    tagline: category.description,
+    eyebrow: 'Galerie',
+    details: photos|length ~ ' photo' ~ (photos|length > 1 ? 's' : '')
 } %}
 
 <section class="section">
@@ -19,10 +23,9 @@
         </div>
 
         <div class="text-center mb-5">
-            <h2 class="serif mb-2">{{ category.name }}</h2>
-            {% if category.description %}
-                <p class="text-muted mx-auto mb-0" style="max-width: 600px;">{{ category.description }}</p>
-            {% endif %}
+            <a href="{{ path('app_services') }}" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-tag me-1"></i>Voir la prestation « {{ category.name }} »
+            </a>
         </div>
 
         {% if photos|length == 0 %}

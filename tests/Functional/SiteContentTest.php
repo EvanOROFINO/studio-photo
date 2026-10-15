@@ -69,9 +69,10 @@ class SiteContentTest extends AbstractAppWebTestCase
 
     // -- 2/3. Mêmes thèmes sur Accueil, Galerie, portfolios -----------------------
 
-    public function testHomeAndGalleryShowTheSameFourThemes(): void
+    public function testHomeGalleryPrestationsAndContactShowTheSameFourThemes(): void
     {
-        foreach (['/', '/galerie'] as $url) {
+        // Notes du photographe : « Accueil / Galerie / Prestations → les mêmes thématiques »
+        foreach (['/', '/galerie', '/prestations', '/contact'] as $url) {
             $this->client->request('GET', $url);
             $this->assertResponseIsSuccessful();
             $text = $this->text();
@@ -110,15 +111,40 @@ class SiteContentTest extends AbstractAppWebTestCase
 
     // -- 8. Bandeau commun des portfolios -----------------------------------------
 
-    public function testPortfolioBannerIsTheSameOnEveryPortfolioPage(): void
+    public function testEveryShowcasePageUsesTheSameBannerComponent(): void
     {
         $mariages = $this->em->getRepository(Category::class)->findOneBy(['name' => 'Mariages']);
 
-        foreach (['/galerie', '/galerie/'.$mariages->getSlug(), '/showreel?_site=video'] as $url) {
+        $expected = [
+            '/galerie' => 'Galerie',
+            '/galerie/'.$mariages->getSlug() => 'Mariages', // le thème porte le même titre que partout
+            '/prestations' => 'Prestations',
+            '/showreel?_site=video' => 'Showreel',
+            '/forfaits-video?_site=video' => 'Forfaits',
+        ];
+
+        foreach ($expected as $url => $title) {
             $this->client->request('GET', $url);
             $this->assertResponseIsSuccessful();
-            $this->assertSelectorTextSame('header.portfolio-banner h1', 'Portfolio', sprintf('Le bandeau de %s doit porter le titre « Portfolio ».', $url));
+            $this->assertSelectorTextSame('header.page-banner h1', $title, sprintf('Le bandeau commun de %s doit porter le titre « %s ».', $url, $title));
         }
+    }
+
+    public function testPrestationsAreExactlyTheFourThemesLinkedToTheGallery(): void
+    {
+        $this->client->request('GET', '/prestations');
+        $this->assertResponseIsSuccessful();
+        $text = $this->text();
+
+        foreach (self::PHOTO_THEMES as $theme) {
+            $this->assertStringContainsString($theme, $text);
+            $category = $this->em->getRepository(Category::class)->findOneBy(['name' => $theme]);
+            $this->assertSelectorExists(sprintf('a[href="/galerie/%s"]', $category->getSlug()), sprintf('La prestation « %s » doit renvoyer vers sa galerie.', $theme));
+        }
+
+        // Plus de formules hors thèmes
+        $this->assertStringNotContainsString('Séance famille', $text);
+        $this->assertStringNotContainsString('Shooting produit', $text);
     }
 
     // -- 4. Bascule Photos / Vidéo -------------------------------------------------
@@ -159,6 +185,17 @@ class SiteContentTest extends AbstractAppWebTestCase
         $this->client->request('GET', '/?_site=video');
         $this->assertResponseIsSuccessful();
         $text = $this->text();
+
+        // Les accroches sont tout en haut (dans l'en-tête, avant la section « Mes films »)
+        $this->assertLessThan(
+            mb_strpos($text, 'Mes films'),
+            mb_strpos($text, 'Modernes, polyvalentes et professionnelles'),
+            'Le titre doit apparaître avant le showreel, dès l\'arrivée sur le site.',
+        );
+        $this->assertLessThan(
+            mb_strpos($text, 'Mes films'),
+            mb_strpos($text, 'Du jour J aux grands événements'),
+        );
 
         $this->assertStringContainsString('Modernes, polyvalentes et professionnelles', $text);
         $this->assertStringContainsString('Mariages, événements et projets sur mesure', $text);

@@ -13,11 +13,12 @@ class ContactRequest
     public const STATUS_READ = 'lu';
     public const STATUS_REPLIED = 'traité';
 
+    /** Mêmes intitulés que les thèmes de la galerie et des prestations (les valeurs techniques ne changent pas). */
     public const TYPES = [
-        'Mariage' => 'mariage',
-        'Portrait / Famille' => 'portrait',
-        'Événement professionnel' => 'pro',
-        'Grossesse / Nouveau-né' => 'grossesse',
+        'Mariages' => 'mariage',
+        'Portraits' => 'portrait',
+        'Événements' => 'pro',
+        'Grossesse & Bébé' => 'grossesse',
         'Autre' => 'autre',
     ];
 

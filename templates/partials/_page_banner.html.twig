@@ -1,0 +1,26 @@
+{#
+   Bandeau COMMUN à toutes les pages vitrine : galerie, pages par thème, prestations, showreel, forfaits.
+   Même composant, même mise en page partout. Un thème porte le MÊME titre dans l'accueil, les pastilles
+   de la galerie, le bandeau de sa page et sa prestation (notes du photographe).
+
+   Paramètres :
+     title    (obligatoire)  titre de la page ou nom du thème
+     tagline  (optionnel)    phrase d'accroche sous le titre
+     details  (optionnel)    petite ligne : nombre de photos, thème actif…
+     eyebrow  (optionnel)    surtitre ; par défaut le nom du site
+
+   Usage :
+       {% include 'partials/_page_banner.html.twig' with { title: 'Mariages', details: '6 photos' } %}
+#}
+<header class="page-header page-banner">
+    <div class="container">
+        <p class="section-subtitle text-light opacity-50 mb-2">{{ eyebrow|default((current_site.iconEmoji|default('📸')) ~ ' ' ~ (current_site.name|default(studio_name))) }}</p>
+        <h1>{{ title }}</h1>
+        {% if tagline|default('') %}
+            <p class="page-banner-tagline mx-auto">{{ tagline }}</p>
+        {% endif %}
+        {% if details|default('') %}
+            <p class="page-banner-details mt-2 small">{{ details }}</p>
+        {% endif %}
+    </div>
+</header>

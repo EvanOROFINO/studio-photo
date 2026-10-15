@@ -5,7 +5,9 @@
 {% block meta_description %}Découvrez le portfolio de {{ studio_name }} : mariages, portraits, événements, grossesse &amp; bébé.{% endblock %}
 
 {% block body %}
-{% include 'partials/_portfolio_banner.html.twig' with {
+{% include 'partials/_page_banner.html.twig' with {
+    title: 'Galerie',
+    tagline: 'Une sélection de mes images, classées par thème',
     details: (currentTag ? '#' ~ currentTag.name ~ ' — ' : '') ~ totalPhotos ~ ' photo' ~ (totalPhotos > 1 ? 's' : '') ~ ' à découvrir'
 } %}
 
