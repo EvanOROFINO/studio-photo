@@ -198,9 +198,9 @@ class AppFixtures extends Fixture
         // Une prestation par thème, avec EXACTEMENT les mêmes intitulés que les catégories de la galerie
         // et de « Explorer par thème » (Accueil / Galerie / Prestations : les mêmes thématiques).
         $servicesData = [
-            ['Mariages', 'Couverture intégrale de votre journée, de la préparation à la fin de soirée. Plus de 500 photos retouchées livrées en galerie privée sous 6 semaines.', '1200', 'Journée complète (8h+)', 'bi-heart-fill', 1],
-            ['Portraits', 'Séance individuelle, en duo ou en famille, en studio ou en extérieur. 1h de shooting, 30 photos retouchées au choix.', '180', '1 heure', 'bi-person-fill', 2],
-            ['Événements', 'Couverture photographique de vos événements professionnels et privés : conférences, soirées, lancements. Livraison express sous 48h.', '450', 'Demi-journée', 'bi-calendar-event-fill', 3],
+            ['Mariages', 'Couverture intégrale de votre journée, de la préparation à la fin de soirée. Plus de 500 photos retouchées livrées en galerie privée sous 6 semaines.', '1500', 'Journée complète (8h+)', 'bi-heart-fill', 1],
+            ['Portraits', 'Séance individuelle, en duo ou en famille, en studio ou en extérieur. 1h de shooting, 30 photos retouchées au choix.', '220', '1 heure', 'bi-person-fill', 2],
+            ['Événements', 'Couverture photographique de vos événements professionnels et privés : conférences, soirées, lancements. Livraison express sous 48h.', '600', 'Demi-journée', 'bi-calendar-event-fill', 3],
             ['Grossesse & Bébé', 'Séance douce en studio ou à domicile, de la grossesse aux premiers jours du nouveau-né. 2h pour capturer ces instants uniques. 50 photos retouchées.', '320', '2 heures', 'bi-flower2', 4],
         ];
 
@@ -369,8 +369,8 @@ class AppFixtures extends Fixture
 
         $videoPackagesData = [
             ['Essentiel', 'Pour immortaliser l\'essentiel', 1490, "Film souvenir 3-4 minutes\nCouverture cérémonie + temps forts\n1 caméra + stabilisateur\nMusique sous licence\nLivraison full HD\n1 série de retouches incluse", 'Livré sous 4 semaines', false, 1],
-            ['Signature', 'Le film complet, monté comme un court-métrage', 2490, "Film cinématique 6-8 minutes\nTeaser réseaux sociaux 1 min offert\n2 caméras + stabilisateur + drone\nCaptation son HD (micros-cravate)\nÉtalonnage colorimétrique pro\nMusique sur-mesure + voix off\n2 séries de retouches\nLivraison 4K + clé USB gravée", 'Livré sous 6 semaines', true, 2],
-            ['Prestige', 'L\'expérience haut de gamme, sans compromis', 3990, "Tout le forfait Signature +\nFilm long 10-15 min + version courte\nSecond cadreur sur la journée\nDrone cinématique + travelling\nInterviews proches + voix off\nAlbum vidéo interactif en ligne\nGalerie privée pour partager\nLivraison 4K HDR + coffret premium\nRévisions illimitées 30 jours", 'Livré sous 8 semaines', false, 3],
+            ['Signature', 'Le film complet, monté comme un court-métrage', 2900, "Film cinématique 6-8 minutes\nTeaser réseaux sociaux 1 min offert\n2 caméras + stabilisateur + drone\nCaptation son HD (micros-cravate)\nÉtalonnage colorimétrique pro\nMusique sur-mesure + voix off\n2 séries de retouches\nLivraison 4K + clé USB gravée", 'Livré sous 6 semaines', true, 2],
+            ['Prestige', 'L\'expérience haut de gamme, sans compromis', 4500, "Tout le forfait Signature +\nFilm long 10-15 min + version courte\nSecond cadreur sur la journée\nDrone cinématique + travelling\nInterviews proches + voix off\nAlbum vidéo interactif en ligne\nGalerie privée pour partager\nLivraison 4K HDR + coffret premium\nRévisions illimitées 30 jours", 'Livré sous 8 semaines', false, 3],
         ];
         foreach ($videoPackagesData as [$name, $tagline, $price, $features, $delivery, $featured, $pos]) {
             $vp = new VideoPackage();
@@ -390,12 +390,12 @@ class AppFixtures extends Fixture
         // --- Boutique : tirages d'art -----------------------------------
         // Chaque tirage correspond à une photo de démonstration (docs/demo-photos) : titre, texte et image concordent.
         $productsData = [
-            ['Lumière naturelle', 'Portrait en lumière naturelle, près d\'une fenêtre. Tirage fine art imprimé sur papier Hahnemühle Photo Rag 308 g, signé et numéroté.', '30×40 cm — papier mat', '89.00', 8, true, 1, 'portrait-lumiere-naturelle.jpg'],
-            ['Premier regard', 'Photographie de mariage capturée à l\'instant exact où les mariés se découvrent. Tirage limité à 25 exemplaires.', '40×60 cm — papier baryté', '149.00', 25, true, 2, 'mariage-voile.jpg'],
+            ['Lumière naturelle', 'Portrait en lumière naturelle, près d\'une fenêtre. Tirage fine art imprimé sur papier Hahnemühle Photo Rag 308 g, signé et numéroté.', '30×40 cm — papier mat', '150.00', 8, true, 1, 'portrait-lumiere-naturelle.jpg'],
+            ['Premier regard', 'Photographie de mariage capturée à l\'instant exact où les mariés se découvrent. Tirage limité à 25 exemplaires.', '40×60 cm — papier baryté', '250.00', 25, true, 2, 'mariage-voile.jpg'],
             ['Le bouquet', 'Le bouquet de la mariée, détail d\'une journée de mariage. Édition ouverte.', '20×30 cm — papier satiné', '49.00', -1, false, 3, 'mariage-bouquet.jpg'],
             ['Petits petons', 'Détail tendre d\'une séance nouveau-né. Tirage carré, papier mat.', '30×30 cm — papier mat carré', '69.00', 12, false, 4, 'bebe-petons.jpg'],
-            ['Soirée de lancement', 'Photographie d\'événement, ambiance de salle. Tirage signé, certificat d\'authenticité fourni.', '50×75 cm — papier fine art', '199.00', 5, true, 5, 'evenement-soiree.jpg'],
-            ['Les alliances', 'Gros plan sur l\'échange des alliances. Édition limitée à 15 exemplaires.', '20×30 cm — papier baryté', '129.00', 10, false, 6, 'mariage-alliances.jpg'],
+            ['Soirée de lancement', 'Photographie d\'événement, ambiance de salle. Tirage signé, certificat d\'authenticité fourni.', '50×75 cm — papier fine art', '350.00', 5, true, 5, 'evenement-soiree.jpg'],
+            ['Les alliances', 'Gros plan sur l\'échange des alliances. Édition limitée à 15 exemplaires.', '3× 20×30 cm — papier baryté', '149.00', 10, false, 6, 'mariage-alliances.jpg'],
         ];
         foreach ($productsData as [$title, $description, $format, $price, $stock, $featured, $position, $imageFile]) {
             $p = new Product();
