@@ -829,3 +829,12 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5 {
     padding: 1.5rem;
     flex: 1;
 }
+
+/* Mobile : la gouttière g-5 (3 rem) dépassait le padding du conteneur et créait un défilement horizontal */
+@media (max-width: 991.98px) {
+    .row.g-5 { --bs-gutter-x: 1.5rem; }
+}
+
+/* Les animations AOS (fade-left/right) décalent les éléments hors de l'écran avant leur apparition :
+   sans ceci, la page devenait plus large que l'écran sur mobile (défilement horizontal). */
+main section, main header { overflow-x: clip; }

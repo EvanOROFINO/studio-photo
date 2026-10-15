@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Une erreur est survenue — {{ studio_name }}{% endblock %}
+{% block meta_description %}Une erreur est survenue sur {{ studio_name }}. Réessayez dans un instant ou revenez à l'accueil.{% endblock %}
+
+{% block body %}
+    {% include 'partials/_page_banner.html.twig' with {
+        title: 'Une erreur est survenue',
+        eyebrow: 'Erreur ' ~ status_code,
+        tagline: 'Le site a rencontré un problème. Réessayez dans un instant.'
+    } %}
+
+    <section class="section">
+        <div class="container text-center">
+            <p class="lead text-muted mb-4">Si le problème persiste, n'hésitez pas à me le signaler.</p>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <a href="{{ path('app_home') }}" class="btn btn-dark px-4">Retour à l'accueil</a>
+                <a href="{{ path('app_contact') }}" class="btn btn-outline-dark px-4">Me contacter</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

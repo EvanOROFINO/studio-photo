@@ -20,13 +20,14 @@ class MailService
         private readonly LoggerInterface $logger,
         private readonly string $adminEmail,
         private readonly string $studioName,
+        private readonly string $mailFrom,
     ) {
     }
 
     public function sendContactReceivedToClient(ContactRequest $contact): void
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@studio-photo.local', $this->studioName))
+            ->from(new Address($this->mailFrom, $this->studioName))
             ->to(new Address($contact->getEmail(), $contact->getFullName()))
             ->subject(sprintf('Votre demande a bien été reçue — %s', $this->studioName))
             ->htmlTemplate('emails/contact_received_client.html.twig')
@@ -41,7 +42,7 @@ class MailService
             return;
         }
         $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@studio-photo.local', $this->studioName))
+            ->from(new Address($this->mailFrom, $this->studioName))
             ->to($this->adminEmail)
             ->replyTo(new Address($contact->getEmail(), $contact->getFullName()))
             ->subject(sprintf('Nouvelle demande : %s', $contact->getFullName()))
@@ -54,7 +55,7 @@ class MailService
     public function sendBookingConfirmation(Booking $booking): void
     {
         $email = (new TemplatedEmail())
-            ->from(new Address('no-reply@studio-photo.local', $this->studioName))
+            ->from(new Address($this->mailFrom, $this->studioName))
             ->to(new Address($booking->getClientEmail(), $booking->getClientName()))
             ->subject(sprintf('Réservation confirmée — %s', $booking->getReference()))
             ->htmlTemplate('emails/booking_confirmed.html.twig')

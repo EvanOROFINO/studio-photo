@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ photo.title }} — {{ studio_name }}{% endblock %}
-{% block meta_description %}{{ photo.description|default(photo.title ~ ' — ' ~ photo.category.name) }}{% endblock %}
+{% block meta_description %}{{ photo.description|default('« ' ~ photo.title ~ ' »' ~ (photo.category ? ', photographie de la série ' ~ photo.category.name : '') ~ ' — ' ~ studio_name ~ ', ' ~ studio_tagline|lower ~ ' à ' ~ studio_city ~ '.') }}{% endblock %}
 
 {% block body %}
 {% set img = photo.imageName ? ('/uploads/photos/' ~ photo.imageName) | imagine_filter('full') : 'https://picsum.photos/seed/photo' ~ photo.id ~ '/1600/1100' %}

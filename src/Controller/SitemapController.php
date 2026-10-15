@@ -18,6 +18,7 @@ class SitemapController extends AbstractController
     }
 
     #[Route('/sitemap', name: 'app_sitemap')]
+    #[Route('/sitemap.xml', name: 'app_sitemap_xml')]
     public function sitemap(
         CategoryRepository $categoryRepository,
         PhotoRepository $photoRepository,

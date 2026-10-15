@@ -30,7 +30,7 @@
         <meta property="og:description" content="{{ block('meta_description') }}">
         <meta property="og:url" content="{{ app.request.uri }}">
         <meta property="og:locale" content="fr_FR">
-        {% block og_image %}<meta property="og:image" content="https://images.unsplash.com/photo-{{ current_site.videoSite ? '1492691527719-9d1e07e534b4' : '1519741497674-611481863552' }}?w=1200">{% endblock %}
+        {% block og_image %}<meta property="og:image" content="{{ absolute_url(asset('images/og-' ~ (current_site.videoSite|default(false) ? 'video' : 'photo') ~ '.jpg')) }}">{% endblock %}
         <meta name="twitter:card" content="summary_large_image">
         <meta name="theme-color" content="{{ current_site.primaryColor|default('#1a1a1a') }}">
 
@@ -99,7 +99,7 @@
         {% include 'partials/_footer.html.twig' %}
 
         {# Floating WhatsApp button #}
-        <a href="https://wa.me/{{ contact_phone|replace({' ': '', '+': '', '.': ''}) }}"
+        <a href="https://wa.me/{{ contact_phone|whatsapp_number }}"
            target="_blank" rel="noopener"
            class="whatsapp-fab"
            aria-label="Discuter sur WhatsApp">

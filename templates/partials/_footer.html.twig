@@ -8,7 +8,7 @@
                 <div class="d-flex gap-3">
                     <a href="{{ social_instagram }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-instagram"></i></a>
                     <a href="{{ social_facebook }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-facebook"></i></a>
-                    <a href="https://wa.me/{{ contact_phone|replace({' ': '', '+': '', '.': ''}) }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-whatsapp"></i></a>
+                    <a href="https://wa.me/{{ contact_phone|whatsapp_number }}" target="_blank" rel="noopener" class="text-light opacity-75 fs-5"><i class="bi bi-whatsapp"></i></a>
                 </div>
                 {% if all_sites|length > 1 %}
                     <div class="mt-3 pt-3 border-top border-secondary">
@@ -65,7 +65,10 @@
         <hr class="border-secondary mt-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small opacity-75">
             <p class="mb-2 mb-md-0">&copy; {{ "now"|date('Y') }} {{ current_site.name|default(studio_name) }} — Tous droits réservés.</p>
-            <a href="{{ path('app_login') }}" class="text-light opacity-50 text-decoration-none"><i class="bi bi-lock me-1"></i>Espace admin</a>
+            {# Lien d'administration visible uniquement une fois connecté : le public n'a pas à le voir #}
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin') }}" class="text-light opacity-50 text-decoration-none"><i class="bi bi-speedometer2 me-1"></i>Administration</a>
+            {% endif %}
         </div>
     </div>
 </footer>

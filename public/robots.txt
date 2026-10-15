@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /login
-Disallow: /_profiler
-Disallow: /_wdt
-
-Sitemap: /sitemap

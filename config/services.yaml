@@ -7,13 +7,28 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app.studio_name: 'Studio Photo/Vidéos'
-    app.studio_tagline: 'Photographe portraitiste & événementiel'
-    app.studio_city: 'Lyon'
-    app.contact_email: 'contact@studio-photo.local'
-    app.contact_phone: '06 12 34 56 78'
-    app.social_instagram: 'https://instagram.com/studio.photo'
-    app.social_facebook: 'https://facebook.com/studio.photo'
+    # Valeurs de démonstration. Chacune se remplace SANS toucher au code par la variable d'environnement
+    # du même nom en majuscules (STUDIO_NAME, STUDIO_TAGLINE, STUDIO_CITY, CONTACT_EMAIL, CONTACT_PHONE,
+    # SOCIAL_INSTAGRAM, SOCIAL_FACEBOOK), dans .env.local ou dans la configuration de l'hébergeur.
+    default.studio_name: 'Studio Photo/Vidéos'
+    default.studio_tagline: 'Photographe portraitiste & événementiel'
+    default.studio_city: 'Lyon'
+    default.contact_email: 'contact@studio-photo.local'
+    default.contact_phone: '06 12 34 56 78'
+    default.social_instagram: 'https://instagram.com/studio.photo'
+    default.social_facebook: 'https://facebook.com/studio.photo'
+    # Adresse d'expédition des e-mails du site (MAIL_FROM) : en production, une adresse du nom de domaine
+    # du studio (ex. no-reply@mon-studio.fr), sinon les messages sont rejetés ou classés en spam.
+    default.mail_from: 'no-reply@studio-photo.local'
+
+    app.studio_name: '%env(default:default.studio_name:STUDIO_NAME)%'
+    app.studio_tagline: '%env(default:default.studio_tagline:STUDIO_TAGLINE)%'
+    app.studio_city: '%env(default:default.studio_city:STUDIO_CITY)%'
+    app.contact_email: '%env(default:default.contact_email:CONTACT_EMAIL)%'
+    app.contact_phone: '%env(default:default.contact_phone:CONTACT_PHONE)%'
+    app.social_instagram: '%env(default:default.social_instagram:SOCIAL_INSTAGRAM)%'
+    app.social_facebook: '%env(default:default.social_facebook:SOCIAL_FACEBOOK)%'
+    app.mail_from: '%env(default:default.mail_from:MAIL_FROM)%'
     app.client_galleries_dir: '%kernel.project_dir%/var/client-galleries'
     app.backup_dir: '%kernel.project_dir%/var/backups'
     app.stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
@@ -33,6 +48,7 @@ services:
             $databaseUrl: '%env(DATABASE_URL)%'
             $backupDir: '%app.backup_dir%'
             $adminEmail: '%app.contact_email%'
+            $mailFrom: '%app.mail_from%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

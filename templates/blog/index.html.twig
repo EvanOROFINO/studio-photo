@@ -2,7 +2,7 @@
 {% import 'macros/images.html.twig' as img %}
 
 {% block title %}{{ currentCategory ? currentCategory.name ~ ' — Blog' : 'Blog' }} — {{ studio_name }}{% endblock %}
-{% block meta_description %}{{ currentCategory ? currentCategory.description : 'Conseils, coulisses et inspirations photo — le blog de ' ~ studio_name }}{% endblock %}
+{% block meta_description %}{{ currentCategory ? currentCategory.description|default('Les articles de la catégorie « ' ~ currentCategory.name ~ ' » : conseils, coulisses et inspirations — le blog de ' ~ studio_name ~ '.') : 'Conseils, coulisses et inspirations photo — le blog de ' ~ studio_name }}{% endblock %}
 
 {% block body %}
 <header class="page-header">

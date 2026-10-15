@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page introuvable — {{ studio_name }}{% endblock %}
+{% block meta_description %}Cette page est introuvable. Retrouvez le portfolio, les prestations ou contactez {{ studio_name }}.{% endblock %}
+
+{% block body %}
+    {% include 'partials/_page_banner.html.twig' with {
+        title: 'Page introuvable',
+        eyebrow: 'Erreur 404',
+        tagline: 'Cette page n\'existe pas ou a changé d\'adresse.'
+    } %}
+
+    <section class="section">
+        <div class="container text-center">
+            <p class="lead text-muted mb-4">Pas de panique, voici où continuer :</p>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <a href="{{ path('app_home') }}" class="btn btn-dark px-4">Retour à l'accueil</a>
+                {% if current_site.videoSite|default(false) %}
+                    <a href="{{ path('app_showreel') }}" class="btn btn-outline-dark px-4">Voir le showreel</a>
+                {% else %}
+                    <a href="{{ path('app_gallery') }}" class="btn btn-outline-dark px-4">Voir la galerie</a>
+                {% endif %}
+                <a href="{{ path('app_contact') }}" class="btn btn-outline-dark px-4">Me contacter</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

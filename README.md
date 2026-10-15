@@ -5,7 +5,7 @@
 ![CI](https://github.com/EvanOROFINO/studio-photo/actions/workflows/ci.yml/badge.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)
 ![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-98%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-108%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ---
@@ -95,7 +95,7 @@ Une **seule application Symfony** pilote **deux sites distincts** avec un **back
 | Markdown | `league/commonmark` (Github-flavored) |
 | Upload | **VichUploaderBundle** (4 mappings dont 1 hors `public/` pour sécurité) |
 | Admin | **EasyAdmin 5** |
-| Tests | **PHPUnit 11** (98 tests, BDD SQLite isolée) |
+| Tests | **PHPUnit 11** (108 tests, BDD SQLite isolée) |
 | CI/CD | **GitHub Actions** (lint Twig/YAML/container + tests + audit) |
 | SEO | Sitemap dynamique, robots.txt, Open Graph, JSON-LD BlogPosting |
 
@@ -108,7 +108,7 @@ vendor/bin/phpunit --testdox
 php -d extension=intl vendor/bin/phpunit --testdox
 ```
 
-**98 tests, 330 assertions** (~3 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
+**108 tests, 368 assertions** (~3 min, sans accès réseau : les fixtures ne téléchargent aucune image en environnement de test) :
 - Smoke tests des routes publiques (Photo + Vidéo)
 - Tests fonctionnels métier (galerie privée avec favoris, réservation Stripe en mode démo, panier + coupons)
 - **Tests de l'admin EasyAdmin** (connecté : tableau de bord + liste, création, filtres, fiche et édition de chaque section ; ignorés si l'extension `intl` est absente)
@@ -207,8 +207,9 @@ Prérequis : PHP 8.2 (extensions `intl`, `gd` avec WebP, `pdo_mysql`, `zip`), My
 - [ ] **Mot de passe admin** : créé avec `app:create-admin` (12 caractères minimum) — jamais `admin`/`admin`
 - [ ] **`APP_SECRET`** unique et aléatoire, **`APP_ENV=prod`**, `APP_DEBUG=0`
 - [ ] **Admin > Sites** : les vrais noms de domaine des sites Photo et Vidéo (les deux pointent vers la même application)
-- [ ] **E-mails** : `MAILER_DSN` réel (sinon aucun e-mail n'est envoyé)
-- [ ] **Coordonnées** : e-mail, téléphone et réseaux sociaux du photographe dans `config/services.yaml` (`app.contact_email`, `app.contact_phone`, `app.social_*`)
+- [ ] **E-mails** : `MAILER_DSN` réel (sinon aucun e-mail n'est envoyé) et `MAIL_FROM` = une adresse du nom de domaine du studio
+- [ ] **Coordonnées** : `CONTACT_EMAIL`, `CONTACT_PHONE`, `STUDIO_CITY`, `SOCIAL_INSTAGRAM`, `SOCIAL_FACEBOOK` dans `.env.prod.local` (aucune modification du code nécessaire ; valeurs de démonstration tant qu'elles sont absentes)
+- [ ] **Portrait « À propos »** : remplacer `public/images/portrait-placeholder.svg` par le portrait du photographe
 - [ ] **Mentions légales** et politique de confidentialité complétées avec les informations du photographe
 - [ ] **HTTPS** actif et forcé (lignes `RewriteRule` de `public/.htaccess`)
 - [ ] **Sauvegarde** de la base planifiée (voir plus bas)
@@ -281,7 +282,7 @@ studio-photo/
 
 - **70+ tâches livrées** sur 4 jours
 - **14 entités Doctrine** + 16 routes publiques
-- **98 tests** PHPUnit verts
+- **108 tests** PHPUnit verts
 - **6 graphiques** Chart.js dans le dashboard
 - **7 presets** d'image LiipImagine (thumbnail/card/full/hero/og/Retina)
 - **2 langues** (FR/EN)
