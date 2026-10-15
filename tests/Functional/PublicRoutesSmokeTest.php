@@ -3,6 +3,7 @@
 namespace App\Tests\Functional;
 
 use App\Tests\AbstractAppWebTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PublicRoutesSmokeTest extends AbstractAppWebTestCase
 {
@@ -30,7 +31,7 @@ class PublicRoutesSmokeTest extends AbstractAppWebTestCase
         yield 'login' => ['/login', 'Espace administrateur'];
     }
 
-    /** @dataProvider publicUrlsProvider */
+    #[DataProvider('publicUrlsProvider')]
     public function testPublicUrlIsReachable(string $url, string $expectedContent): void
     {
         $this->client->request('GET', $url);
