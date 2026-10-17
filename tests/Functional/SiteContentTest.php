@@ -189,11 +189,13 @@ class SiteContentTest extends AbstractAppWebTestCase
     {
         $this->client->request('GET', '/a-propos?_site=photo');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Je suis votre photographe et pas vidéaste', $this->text());
+        $this->assertSelectorTextSame('.about-role', 'Je suis votre photographe');
+        $this->assertStringNotContainsString('et pas vidéaste', $this->text());
 
         $this->client->request('GET', '/a-propos?_site=video');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Je suis votre vidéaste et pas photographe', $this->text());
+        $this->assertSelectorTextSame('.about-role', 'Je suis votre vidéaste');
+        $this->assertStringNotContainsString('et pas photographe', $this->text());
     }
 
     // -- 6. Textes du Studio Vidéo ---------------------------------------------------
