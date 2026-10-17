@@ -6,8 +6,9 @@
 {% block body %}
 
     {# ============ HERO VIDEO ============ #}
-    <section class="position-relative overflow-hidden text-white py-6"
-             style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); min-height: 80vh; display: flex; align-items: center;">
+    {# Fond d'ambiance événementielle (scène, public) sous un voile sombre : le texte reste lisible à gauche #}
+    <section class="position-relative overflow-hidden text-white py-6 hero-video"
+             style="--hero-img: url('{{ asset('images/hero-evenement.jpg') }}'); min-height: 80vh; display: flex; align-items: center;">
         <div class="container py-5">
             <div class="row align-items-center">
                 <div class="col-lg-7" data-aos="fade-up">
@@ -17,7 +18,7 @@
                     </div>
                     {# Titre et accroches du photographe-vidéaste : visibles dès l'arrivée sur le site #}
                     <h1 class="display-4 fw-bold mb-2" style="font-family: 'Playfair Display', serif; line-height: 1.1;">
-                        Modernes, polyvalentes et professionnelles
+                        Modernes, polyvalents et professionnels
                     </h1>
                     <p class="h4 mb-3" style="color: {{ current_site.accentColor }}; font-family: 'Playfair Display', serif; font-style: italic;">
                         un équilibre parfait entre privé et pro

@@ -50,3 +50,10 @@ Elles restent la propriété de leurs auteurs. Vérifiées intégrables le 2026-
 
 Si une vidéo est retirée par son auteur, l'emplacement s'affiche vide : remplacer l'URL depuis l'admin
 (Showreel / Vidéos) ou dans les fixtures.
+
+## Images du site (hors fixtures)
+
+| Fichier | Source |
+|---|---|
+| `public/images/hero-evenement.jpg` | Fond de l'en-tête du Studio Vidéo : recadrage 16/9 de `evenement-soiree.jpg` (https://www.pexels.com/photo/31129059/) |
+| `public/images/og-photo.jpg`, `og-video.jpg` | Aperçus de partage : recadrages de `mariage-ceremonie.jpg` et `mariage-emotion.jpg` |

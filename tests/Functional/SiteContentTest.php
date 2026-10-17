@@ -207,7 +207,7 @@ class SiteContentTest extends AbstractAppWebTestCase
         // Les accroches sont tout en haut (dans l'en-tête, avant la section « Mes films »)
         $this->assertLessThan(
             mb_strpos($text, 'Mes films'),
-            mb_strpos($text, 'Modernes, polyvalentes et professionnelles'),
+            mb_strpos($text, 'Modernes, polyvalents et professionnels'),
             'Le titre doit apparaître avant le showreel, dès l\'arrivée sur le site.',
         );
         $this->assertLessThan(
@@ -215,7 +215,11 @@ class SiteContentTest extends AbstractAppWebTestCase
             mb_strpos($text, 'Du jour J aux grands événements'),
         );
 
-        $this->assertStringContainsString('Modernes, polyvalentes et professionnelles', $text);
+        // Fond d'ambiance événementielle derrière l'en-tête
+        $this->assertStringContainsString('images/hero-evenement.jpg', (string) $this->client->getResponse()->getContent());
+        $this->assertFileExists(static::getContainer()->getParameter('kernel.project_dir').'/public/images/hero-evenement.jpg');
+
+        $this->assertStringContainsString('Modernes, polyvalents et professionnels', $text);
         $this->assertStringContainsString('Mariages, événements et projets sur mesure', $text);
         $this->assertStringContainsString('Le film unique de tous vos moments d\'exception', $text);
         $this->assertStringContainsString('Capturer l\'émotion, sublimer l\'instant', $text);
