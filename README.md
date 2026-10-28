@@ -206,7 +206,7 @@ Prérequis : PHP 8.2 (extensions `intl`, `gd` avec WebP, `pdo_mysql`, `zip`), My
 
 - [ ] **Mot de passe admin** : créé avec `app:create-admin` (12 caractères minimum) — jamais `admin`/`admin`
 - [ ] **`APP_SECRET`** unique et aléatoire, **`APP_ENV=prod`**, `APP_DEBUG=0`
-- [ ] **Admin > Sites** : les vrais noms de domaine des sites Photo et Vidéo (les deux pointent vers la même application)
+- [ ] **Noms de domaine des sites** : `SITE_PHOTO_DOMAIN` et `SITE_VIDEO_DOMAIN` dans `.env.prod.local` (lus par `bin/post-deploy.sh` au premier déploiement, modifiables ensuite dans l'admin > Sites). Un seul nom de domaine suffit avec deux sous-domaines (`photo.mon-studio.com` et `video.mon-studio.com`) : ils pointent vers la même application, le site affiché dépend du nom demandé
 - [ ] **E-mails** : `MAILER_DSN` réel (sinon aucun e-mail n'est envoyé) et `MAIL_FROM` = une adresse du nom de domaine du studio
 - [ ] **Coordonnées** : `CONTACT_EMAIL`, `CONTACT_PHONE`, `STUDIO_CITY`, `SOCIAL_INSTAGRAM`, `SOCIAL_FACEBOOK` dans `.env.prod.local` (aucune modification du code nécessaire ; valeurs de démonstration tant qu'elles sont absentes)
 - [ ] **Portrait « À propos »** : remplacer `public/images/portrait-placeholder.svg` par le portrait du photographe

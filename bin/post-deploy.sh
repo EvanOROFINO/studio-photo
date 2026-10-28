@@ -56,8 +56,25 @@ echo "==> Migration de la base de données"
 php bin/console doctrine:migrations:migrate --env=prod --no-interaction --allow-no-migration
 
 # 8. Données de base (ne crée que ce qui manque, n'écrase jamais l'existant)
+#    Les noms de domaine des deux sites viennent de SITE_PHOTO_DOMAIN et SITE_VIDEO_DOMAIN
+#    dans .env.prod.local (ex. photo.mon-studio.com et video.mon-studio.com : un seul nom
+#    de domaine suffit, avec deux sous-domaines). Sans eux, valeurs par défaut à corriger dans l'admin.
+env_value() {
+    grep -E "^$1=" .env.prod.local | tail -n 1 | cut -d= -f2- | tr -d "\"'\r"
+}
+SITE_PHOTO_DOMAIN="${SITE_PHOTO_DOMAIN:-$(env_value SITE_PHOTO_DOMAIN)}"
+SITE_VIDEO_DOMAIN="${SITE_VIDEO_DOMAIN:-$(env_value SITE_VIDEO_DOMAIN)}"
+
+sites_args=(--only-missing --env=prod --no-interaction)
+if [ -n "$SITE_PHOTO_DOMAIN" ]; then
+    sites_args+=("--photo-domain=$SITE_PHOTO_DOMAIN")
+fi
+if [ -n "$SITE_VIDEO_DOMAIN" ]; then
+    sites_args+=("--video-domain=$SITE_VIDEO_DOMAIN")
+fi
+
 echo "==> Données de base (sites Photo/Vidéo, catégories vidéo)"
-php bin/console app:install:sites --only-missing --env=prod --no-interaction
+php bin/console app:install:sites "${sites_args[@]}"
 php bin/console app:install:video-categories --only-missing --env=prod --no-interaction
 
 # 9. Compte administrateur : créé seulement s'il n'y en a encore aucun.
@@ -76,7 +93,7 @@ echo ""
 echo "À vérifier maintenant :"
 echo "  - https://votre-domaine.fr          → le site répond"
 echo "  - https://votre-domaine.fr/admin    → connexion avec le compte créé ci-dessus"
-echo "  - Admin > Sites : renseigner les vrais noms de domaine des sites Photo et Vidéo"
+echo "  - Admin > Sites : vérifier les noms de domaine des sites Photo et Vidéo (SITE_PHOTO_DOMAIN / SITE_VIDEO_DOMAIN)"
 echo "  - HTTPS forcé (décommentez les lignes RewriteRule dans public/.htaccess)"
 echo ""
 echo "Pensez aussi à retirer ADMIN_PASSWORD de .env.prod.local une fois le compte créé."
